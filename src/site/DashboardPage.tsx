@@ -189,15 +189,6 @@ export default function DashboardPage() {
               </p>
               <a href="/games" className="sq-start-link">Explore Games →</a>
             </div>
-
-            <div className="sq-premium-banner">
-              <div className="sq-premium-head">
-                <span>👑 Premium</span>
-                <button type="button" className="sq-close-x">✕</button>
-              </div>
-              <p>Master more of your syllabus with bigger uploads and harder questions from the Advanced AI model.</p>
-              <button type="button" className="sq-see-plans-btn">See plans</button>
-            </div>
           </div>
         </section>
 

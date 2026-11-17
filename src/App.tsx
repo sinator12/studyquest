@@ -17,7 +17,10 @@ export default function App() {
   if (pathname === "/games/study-cafe") return <StudyCafeGame />;
   if (pathname === "/games/angry-nerds") return <AngryNerdsGame />;
   if (pathname === "/games") return <GamesPage />;
-  if (pathname.startsWith("/games/")) return <GamePlayPage />;
+  if (pathname.startsWith("/games/")) {
+    window.location.href = "/games";
+    return <GamesPage />;
+  }
   if (pathname === "/" || pathname === "") return <DashboardPage />;
   return <DashboardPage />;
 }
