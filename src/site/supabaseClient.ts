@@ -31,10 +31,12 @@ export async function signInWithGoogleOAuth(): Promise<{ error?: string }> {
   }
 
   try {
+    // Always redirect to the production URL to avoid localhost redirect issues
+    const redirectTo = import.meta.env.VITE_SITE_URL || window.location.origin;
     const { error } = await supabase.auth.signInWithOAuth({
       provider: "google",
       options: {
-        redirectTo: window.location.origin,
+        redirectTo,
         queryParams: {
           access_type: "offline",
           prompt: "consent",
