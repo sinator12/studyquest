@@ -17,7 +17,9 @@
   min-height: 100vh;
   background: var(--gp-bg);
   color: var(--gp-ink);
-  font-family: "Gabarito", ui-rounded, system-ui, sans-serif;
+  font-family: "Inter", "Plus Jakarta Sans", system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
 }
 
 /* ---- Back link ---- */

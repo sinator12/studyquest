@@ -8,7 +8,9 @@
   color: #FFFFFF;
   display: flex;
   flex-direction: column;
-  font-family: "Gabarito", system-ui, sans-serif;
+  font-family: "Inter", "Plus Jakarta Sans", system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
 }
 
 /* ---------------- Intro Modal (from frame 016) ---------------- */
