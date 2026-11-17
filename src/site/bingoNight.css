@@ -199,9 +199,9 @@
 .sq-bingo-main-title {
   position: relative;
   z-index: 3;
-  font-size: 54px;
+  font-size: clamp(28px, 6vw, 54px);
   font-weight: 900;
-  letter-spacing: 0.12em;
+  letter-spacing: clamp(0.04em, 1.2vw, 0.12em);
   color: #FFF8EB;
   text-shadow: 0 6px 16px rgba(0, 0, 0, 0.6), 0 2px 4px #5A3A22;
   margin: 0 0 10px 0;
@@ -211,12 +211,13 @@
 .sq-bingo-subtitle {
   position: relative;
   z-index: 3;
-  font-size: 19px;
+  font-size: clamp(14px, 2.5vw, 19px);
   font-weight: 500;
   color: #E6CEB5;
   text-shadow: 0 2px 6px rgba(0, 0, 0, 0.5);
   margin: 0 0 25px 0;
   text-align: center;
+  padding: 0 16px;
 }
 
 /* Caller Selector Bar */
@@ -1423,4 +1424,295 @@
   font-size: 15px;
   font-weight: 800;
   cursor: pointer;
+}
+
+/* ==========================================================================
+   8. COMPREHENSIVE RESPONSIVE DESIGN (Desktop, Tablet, Mobile)
+   ========================================================================== */
+
+/* --- TABLET & MEDIUM DESKTOP (<= 960px) --- */
+@media (max-width: 960px) {
+  .sq-bingo-stage-grid {
+    grid-template-columns: 1fr;
+    gap: 24px;
+  }
+
+  .sq-bingo-playfield {
+    padding: 16px 20px 36px;
+  }
+
+  .sq-bingo-card-column {
+    width: 100%;
+  }
+
+  .sq-bingo-board-container {
+    max-width: 480px;
+    margin: 0 auto;
+  }
+}
+
+/* --- LARGE MOBILE & TABLET PORTRAIT (<= 768px) --- */
+@media (max-width: 768px) {
+  .sq-bingo-lobby-scene {
+    padding: 24px 16px 40px;
+  }
+
+  .sq-bingo-windows-backdrop {
+    width: 95%;
+    height: 320px;
+    top: 20px;
+  }
+
+  .sq-arch-window {
+    width: 48%;
+    height: 300px;
+    border-width: 8px;
+    border-radius: 120px 120px 0 0;
+  }
+
+  .sq-window-pane::before {
+    height: 300px;
+    top: -150px;
+  }
+
+  .sq-bingo-cards-row {
+    flex-direction: column;
+    width: 100%;
+    max-width: 400px;
+    gap: 16px;
+  }
+
+  .sq-bingo-option-card {
+    min-height: auto;
+    padding: 24px 20px;
+  }
+
+  .sq-card-title {
+    font-size: 22px;
+  }
+
+  .sq-caller-selector-bar {
+    flex-direction: column;
+    border-radius: 18px;
+    padding: 10px 14px;
+    gap: 8px;
+    width: 100%;
+    max-width: 400px;
+    box-sizing: border-box;
+  }
+
+  .sq-caller-pills {
+    justify-content: center;
+  }
+
+  /* Gameplay Topbar on Tablet/Mobile */
+  .sq-bingo-topbar {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 10px;
+  }
+
+  .sq-topbar-left {
+    display: flex;
+    justify-content: space-between;
+    width: 100%;
+  }
+
+  .sq-topbar-rivals {
+    width: 100%;
+    justify-content: center;
+    box-sizing: border-box;
+    overflow-x: auto;
+  }
+
+  .sq-topbar-right {
+    width: 100%;
+    justify-content: center;
+    gap: 8px;
+  }
+
+  .sq-stat-pill {
+    font-size: 13px;
+    padding: 5px 12px;
+  }
+
+  .sq-amber-prompt-banner {
+    font-size: 14.5px;
+    padding: 8px 14px;
+    margin-bottom: 14px;
+  }
+
+  .sq-question-title {
+    font-size: 18px;
+  }
+}
+
+/* --- COMPACT MOBILE (<= 540px) --- */
+@media (max-width: 540px) {
+  .sq-bingo-playfield {
+    padding: 10px 10px 24px;
+  }
+
+  /* Re-stack Tumbler & Caller with Speech Bubble below */
+  .sq-tumbler-host-row {
+    flex-wrap: wrap;
+    gap: 10px;
+    min-height: auto;
+    justify-content: center;
+  }
+
+  .sq-caller-portrait-img {
+    width: 68px;
+    height: 68px;
+  }
+
+  .sq-brass-tumbler {
+    width: 60px;
+    height: 70px;
+  }
+
+  .sq-tumbler-cage-body {
+    width: 50px;
+    height: 50px;
+  }
+
+  .sq-drawn-ball-badge {
+    width: 26px;
+    height: 26px;
+    font-size: 11px;
+  }
+
+  .sq-bingo-speech-bubble {
+    width: 100%;
+    flex: none;
+    border-radius: 16px;
+    padding: 10px 14px;
+  }
+
+  .sq-speech-tail {
+    left: 45px;
+    top: -12px;
+    transform: none;
+    border-left: 8px solid transparent;
+    border-right: 8px solid transparent;
+    border-bottom: 12px solid #5A351B;
+    border-top: none;
+  }
+  .sq-speech-tail::after {
+    left: -6px;
+    top: 3px;
+    border-left: 6px solid transparent;
+    border-right: 6px solid transparent;
+    border-bottom: 9px solid #FFFDF9;
+    border-top: none;
+  }
+
+  .sq-speech-text {
+    font-size: 14px;
+    text-align: center;
+  }
+
+  /* Single Column Choices on Mobile for optimal tap ergonomics */
+  .sq-choices-2x2-grid {
+    grid-template-columns: 1fr;
+    gap: 10px;
+  }
+
+  .sq-choice-btn {
+    padding: 13px 14px;
+    font-size: 15px;
+    min-height: 48px;
+  }
+
+  /* 5x5 Bingo Grid on Mobile */
+  .sq-bingo-board-container {
+    padding: 8px;
+    border-radius: 18px;
+    border-width: 3px;
+    max-width: 100%;
+  }
+
+  .sq-bingo-5x5-grid {
+    gap: 5px;
+  }
+
+  .sq-bingo-cell {
+    border-radius: 9px;
+    border-width: 1.5px;
+    padding: 2px;
+  }
+
+  .sq-cell-text {
+    font-size: clamp(8.5px, 2.7vw, 11.5px);
+    line-height: 1.15;
+  }
+
+  .sq-bingo-cell.free-star .sq-cell-text {
+    font-size: 20px;
+  }
+
+  .sq-stamp-instruction-text {
+    font-size: 17px;
+  }
+
+  .sq-next-ball-action-btn {
+    width: 100%;
+    padding: 13px;
+    font-size: 16px;
+  }
+
+  .sq-explain-btn {
+    width: 100%;
+    padding: 12px;
+    text-align: center;
+  }
+
+  /* Victory Modal on Mobile */
+  .sq-bingo-victory-modal {
+    padding: 28px 18px;
+    border-radius: 22px;
+    border-width: 3px;
+  }
+
+  .sq-victory-headline {
+    font-size: 34px;
+  }
+
+  .sq-vstat-val {
+    font-size: 18px;
+  }
+
+  .sq-vstat-lbl {
+    font-size: 10px;
+  }
+
+  .sq-victory-primary-btn {
+    font-size: 15.5px;
+    padding: 12px;
+  }
+}
+
+/* --- ULTRA-COMPACT MOBILE (<= 380px) --- */
+@media (max-width: 380px) {
+  .sq-bingo-5x5-grid {
+    gap: 3.5px;
+  }
+
+  .sq-bingo-cell {
+    border-radius: 7px;
+  }
+
+  .sq-cell-text {
+    font-size: 8px;
+  }
+
+  .sq-stat-pill {
+    font-size: 11px;
+    padding: 4px 8px;
+  }
+
+  .sq-leave-hall-btn {
+    padding: 6px 10px;
+    font-size: 12px;
+  }
 }

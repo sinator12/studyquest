@@ -920,3 +920,104 @@
     font-size: 15px;
   }
 }
+
+@media (max-width: 540px) {
+  .sq-cafe-stage-container {
+    padding: 8px 6px 20px;
+  }
+
+  .sq-cafe-scene-panel {
+    min-height: 300px;
+  }
+
+  .sq-cafe-counter {
+    height: 70px;
+    padding: 0 20px 0 100px;
+  }
+
+  .sq-cafe-customer-slot {
+    left: 10px;
+    bottom: 58px;
+  }
+
+  .sq-customer-portrait-img {
+    max-height: 165px;
+  }
+
+  .sq-customer-nametag {
+    left: 10px;
+    bottom: 12px;
+    padding: 4px 10px;
+    gap: 6px;
+  }
+
+  .sq-nametag-name {
+    font-size: 12px;
+  }
+
+  .sq-nametag-title {
+    font-size: 9px;
+  }
+
+  .sq-cafe-barista {
+    right: 12px;
+    bottom: 48px;
+  }
+
+  .sq-barista-char-img {
+    max-height: 135px;
+  }
+
+  .sq-cafe-speech-bubble {
+    left: 110px;
+    bottom: 85px;
+    max-width: 220px;
+    padding: 8px 12px;
+    border-radius: 16px;
+  }
+
+  .sq-order-question {
+    font-size: 13.5px;
+  }
+
+  /* Single Column Menu Choices on Small Phones */
+  .sq-cafe-menu-grid {
+    grid-template-columns: 1fr;
+    gap: 10px;
+  }
+
+  .sq-menu-item-card {
+    padding: 12px 14px;
+    min-height: 52px;
+  }
+
+  .sq-drink-illustration-wrap {
+    width: 48px;
+    height: 48px;
+  }
+
+  .sq-menu-card-title {
+    font-size: 14.5px;
+  }
+}
+
+@media (max-width: 380px) {
+  .sq-cafe-scene-panel {
+    min-height: 270px;
+  }
+
+  .sq-customer-portrait-img {
+    max-height: 145px;
+  }
+
+  .sq-barista-char-img {
+    max-height: 115px;
+  }
+
+  .sq-cafe-speech-bubble {
+    left: 95px;
+    bottom: 75px;
+    max-width: 190px;
+    font-size: 12px;
+  }
+}
