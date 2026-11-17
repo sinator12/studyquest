@@ -25,8 +25,8 @@ interface StudyPlan {
 const STORAGE_KEY = "sq_study_plan_active";
 
 export default function StudyPlanPage() {
-  // Wizard steps: 1 = Subject & Date, 2 = Study Material (photo), 3 = Generating, 4 = Review
-  const [step, setStep] = useState<number>(2);
+  // Wizard steps: 1 = Subject & Date, 2 = Study Material, 3 = Generating, 4 = Review
+  const [step, setStep] = useState<number>(1);
 
   const [activePlan, setActivePlan] = useState<StudyPlan | null>(null);
   const [examName, setExamName] = useState("Biology Midterm");
@@ -273,38 +273,51 @@ export default function StudyPlanPage() {
         <div className="sq-sp-stepper-bar">
           {/* Step 1: Subject & Date */}
           <div
-            className={`sq-sp-step-node ${step > 1 ? "completed" : step === 1 ? "active" : ""}`}
+            className={`sq-sp-step-node ${step > 1 ? "completed" : "active"}`}
             onClick={() => setStep(1)}
           >
-            <span className="sq-sp-step-circle sq-sp-step-green">✓</span>
-            <span className="sq-sp-step-name">Subject & Date</span>
+            {step > 1 ? (
+              <span className="sq-sp-step-circle sq-sp-step-green">✓</span>
+            ) : (
+              <span className="sq-sp-step-circle sq-sp-step-orange">1</span>
+            )}
+            <span className={`sq-sp-step-name ${step === 1 ? "active-text" : ""}`}>Subject & Date</span>
           </div>
 
-          <div className="sq-sp-step-connector completed" />
+          {/* Connector 1 -> 2: solid green when step > 1, dotted when step == 1 */}
+          <div className={`sq-sp-step-connector ${step > 1 ? "completed" : "dotted"}`} />
 
           {/* Step 2: Study Material */}
           <div
-            className={`sq-sp-step-node ${step === 2 ? "active" : step > 2 ? "completed" : ""}`}
-            onClick={() => setStep(2)}
+            className={`sq-sp-step-node ${step === 2 ? "active" : step > 2 ? "completed" : "inactive"}`}
+            onClick={() => {
+              if (step > 1 || examName.trim()) setStep(2);
+            }}
           >
-            <span className="sq-sp-step-circle sq-sp-step-orange">2</span>
-            <span className="sq-sp-step-name active-text">Study Material</span>
+            {step > 2 ? (
+              <span className="sq-sp-step-circle sq-sp-step-green">✓</span>
+            ) : (
+              <span className={`sq-sp-step-circle ${step === 2 ? "sq-sp-step-orange" : "sq-sp-step-gray"}`}>2</span>
+            )}
+            <span className={`sq-sp-step-name ${step === 2 ? "active-text" : ""}`}>Study Material</span>
           </div>
 
-          <div className={`sq-sp-step-connector ${step >= 3 ? "completed" : "dotted"}`} />
+          {/* Connector 2 -> 3 */}
+          <div className={`sq-sp-step-connector ${step > 2 ? "completed" : "dotted"}`} />
 
           {/* Step 3: Generating */}
           <div className={`sq-sp-step-node ${step === 3 ? "active" : step > 3 ? "completed" : "inactive"}`}>
-            <span className="sq-sp-step-circle sq-sp-step-gray">3</span>
-            <span className="sq-sp-step-name">Generating</span>
+            <span className={`sq-sp-step-circle ${step === 3 ? "sq-sp-step-orange" : "sq-sp-step-gray"}`}>3</span>
+            <span className={`sq-sp-step-name ${step === 3 ? "active-text" : ""}`}>Generating</span>
           </div>
 
-          <div className={`sq-sp-step-connector ${step >= 4 ? "completed" : "dotted"}`} />
+          {/* Connector 3 -> 4 */}
+          <div className={`sq-sp-step-connector ${step > 3 ? "completed" : "dotted"}`} />
 
           {/* Step 4: Review */}
           <div className={`sq-sp-step-node ${step === 4 ? "active" : "inactive"}`}>
-            <span className="sq-sp-step-circle sq-sp-step-gray">4</span>
-            <span className="sq-sp-step-name">Review</span>
+            <span className={`sq-sp-step-circle ${step === 4 ? "sq-sp-step-orange" : "sq-sp-step-gray"}`}>4</span>
+            <span className={`sq-sp-step-name ${step === 4 ? "active-text" : ""}`}>Review</span>
           </div>
         </div>
 
@@ -323,7 +336,26 @@ export default function StudyPlanPage() {
                   placeholder="e.g. Biology Midterm, Calculus II, World History"
                   value={examName}
                   onChange={(e) => setExamName(e.target.value)}
+                  onKeyDown={(e) => {
+                    if (e.key === "Enter") {
+                      if (!examName.trim()) setExamName("Upcoming Exam");
+                      setStep(2);
+                    }
+                  }}
                 />
+                <div className="sq-sp-quick-subjects">
+                  <span>Quick pick:</span>
+                  {["Biology", "Calculus", "World History", "Chemistry", "Psychology"].map((subj) => (
+                    <button
+                      key={subj}
+                      type="button"
+                      className="sq-sp-subj-pill"
+                      onClick={() => setExamName(subj + " Exam")}
+                    >
+                      {subj}
+                    </button>
+                  ))}
+                </div>
               </div>
 
               <div className="sq-sp-field-group">
@@ -334,6 +366,9 @@ export default function StudyPlanPage() {
                   value={examDate}
                   onChange={(e) => setExamDate(e.target.value)}
                 />
+                <small className="sq-sp-field-hint">
+                  AI will calculate days remaining and spread your study sessions evenly.
+                </small>
               </div>
 
               <div className="sq-sp-card-bottom-bar">
@@ -341,7 +376,10 @@ export default function StudyPlanPage() {
                 <button
                   type="button"
                   className="sq-sp-btn-gold"
-                  onClick={() => setStep(2)}
+                  onClick={() => {
+                    if (!examName.trim()) setExamName("Upcoming Exam");
+                    setStep(2);
+                  }}
                 >
                   Continue to Study Material →
                 </button>
