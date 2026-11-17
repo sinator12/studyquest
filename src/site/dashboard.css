@@ -102,35 +102,64 @@
 .sq-material-pill {
   display: inline-flex;
   align-items: center;
-  gap: 8px;
-  background: rgba(16, 185, 129, 0.14);
-  border: 1px solid rgba(16, 185, 129, 0.4);
-  padding: 6px 14px;
+  gap: 12px;
+  background: rgba(14, 43, 56, 0.75);
+  border: 1px solid rgba(45, 212, 191, 0.38);
+  padding: 5px 16px;
   border-radius: 999px;
-  color: #FFFFFF;
-  font-size: 13px;
-  font-weight: 700;
   cursor: pointer;
   transition: all 0.15s ease;
+  white-space: nowrap;
 }
 
 .sq-material-pill:hover {
-  background: rgba(16, 185, 129, 0.24);
+  background: rgba(14, 43, 56, 0.95);
+  border-color: rgba(45, 212, 191, 0.65);
 }
 
 .sq-green-dot {
-  width: 8px;
-  height: 8px;
+  width: 7px;
+  height: 7px;
   border-radius: 50%;
   background: #34D399;
-  box-shadow: 0 0 8px #34D399;
+  box-shadow: 0 0 10px #34D399;
+  flex-shrink: 0;
 }
 
-.sq-replace-link {
+.sq-material-info {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  text-align: left;
+  line-height: 1.15;
+}
+
+.sq-material-action {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  text-align: left;
+  line-height: 1.15;
+  margin-left: 4px;
+}
+
+.sq-material-info .sq-material-line {
+  color: #FFFFFF;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: -0.1px;
+}
+
+.sq-material-action .sq-material-line {
   color: #A7F3D0;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: -0.1px;
+}
+
+.sq-material-action .sq-underline {
   text-decoration: underline;
-  font-weight: 600;
-  margin-inline-start: 4px;
+  text-underline-offset: 2px;
 }
 
 .sq-stat-chip {

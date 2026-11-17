@@ -104,7 +104,7 @@ export default function TopNav({ activeTab = "dashboard", onOpenReviewerModal }:
 
         {/* Right tools matching photo 1 without 'Go Premium' */}
         <div className="sq-nav-right-tools">
-          {/* Active reviewer badge pill */}
+          {/* Active reviewer badge pill matching photo 1 */}
           <button
             type="button"
             className="sq-material-pill"
@@ -112,8 +112,14 @@ export default function TopNav({ activeTab = "dashboard", onOpenReviewerModal }:
             title="Click to change or add study notes"
           >
             <span className="sq-green-dot" />
-            <span className="sq-deck-count">{deck ? deck.questions.length : 8} questions ready</span>
-            <span className="sq-replace-link">Replace material</span>
+            <div className="sq-material-info">
+              <span className="sq-material-line">{deck ? deck.questions.length : 8} questions</span>
+              <span className="sq-material-line">ready</span>
+            </div>
+            <div className="sq-material-action">
+              <span className="sq-material-line sq-underline">Replace</span>
+              <span className="sq-material-line sq-underline">material</span>
+            </div>
           </button>
 
           {/* Pomodoro timer pill */}
