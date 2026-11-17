@@ -1,5 +1,5 @@
 /* ==========================================================================
-   Study Café Game Styling
+   Study Café Game Styling - With Integrated Assets & Redesigned Screens
    ========================================================================== */
 
 .sq-cafe-app {
@@ -11,7 +11,7 @@
   font-family: "Gabarito", system-ui, sans-serif;
 }
 
-/* ---------------- Intro View ---------------- */
+/* ---------------- 1. Intro View ---------------- */
 .sq-cafe-intro-wrap {
   max-width: 1200px;
   margin: 0 auto;
@@ -109,10 +109,12 @@
   font-weight: 900;
   cursor: pointer;
   box-shadow: 0 4px 0 #B45309;
+  transition: all 0.15s ease;
 }
 
 .sq-cafe-btn-play:hover {
   transform: translateY(-2px);
+  box-shadow: 0 6px 0 #B45309;
 }
 
 .sq-cafe-btn-sample {
@@ -129,6 +131,7 @@
   font-size: 16px;
   font-weight: 800;
   cursor: pointer;
+  transition: all 0.15s ease;
 }
 
 .sq-cafe-btn-sample:hover {
@@ -162,12 +165,29 @@
   border: 4px solid #F59E0B;
   box-shadow: 0 16px 40px rgba(0, 0, 0, 0.5);
   background: #1E293B;
+  min-height: 280px;
 }
 
 .sq-cafe-art-img {
   width: 100%;
-  height: auto;
+  height: 100%;
+  object-fit: cover;
   display: block;
+}
+
+.sq-cafe-preview-bartender-overlay {
+  position: absolute;
+  right: 18px;
+  bottom: 0;
+  width: 180px;
+  pointer-events: none;
+}
+
+.sq-cafe-preview-bartender-overlay img {
+  width: 100%;
+  height: auto;
+  object-fit: contain;
+  filter: drop-shadow(0 10px 20px rgba(0, 0, 0, 0.6));
 }
 
 .sq-cafe-float-play-btn {
@@ -182,40 +202,109 @@
   border-radius: 14px;
   font-weight: 900;
   font-size: 16px;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.4);
+  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.5);
   cursor: pointer;
   white-space: nowrap;
 }
 
-/* ---------------- Opening Screen ---------------- */
+/* ==========================================================================
+   2. REDESIGNED LOADING SCREEN (Based on First Reference Image)
+   ========================================================================== */
 .sq-cafe-opening-screen {
   flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  background-color: #F4EAD9;
+  background-image: radial-gradient(circle at 50% 40%, #FFF9F0 0%, #EFE4D2 100%);
+  color: #3E2718;
+  text-align: center;
+  padding: 40px 20px;
+  animation: sqCafeFadeIn 0.3s ease-out;
+}
+
+@keyframes sqCafeFadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+.sq-barista-opening-card {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  max-width: 440px;
+  width: 100%;
+}
+
+.sq-opening-bartender-wrap {
+  width: 220px;
+  height: 220px;
   display: grid;
   place-items: center;
-  background: #F5E8D3;
-  color: #3D2111;
-  text-align: center;
-  padding: 40px;
+  animation: sqCafeFloat 2.6s ease-in-out infinite;
 }
 
-.sq-barista-opening h2 {
-  font-size: 32px;
-  font-weight: 900;
-  margin: 16px 0 6px;
-  font-family: "Gabarito", serif;
+.sq-opening-bartender-img {
+  max-height: 210px;
+  width: auto;
+  object-fit: contain;
+  filter: drop-shadow(0 16px 28px rgba(62, 39, 24, 0.28));
 }
 
-.sq-barista-opening p {
-  color: #784825;
-  font-size: 16px;
+@keyframes sqCafeFloat {
+  0%, 100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-8px);
+  }
 }
 
-/* ---------------- Active Gameplay View ---------------- */
+/* Elegant Italic Serif Title Matching Reference Image */
+.sq-opening-serif-title {
+  font-family: "Newsreader", "Times New Roman", Georgia, serif;
+  font-style: italic;
+  font-size: 34px;
+  font-weight: 700;
+  color: #4A3020;
+  margin: 20px 0 16px;
+  letter-spacing: -0.01em;
+  text-shadow: 0 1px 2px rgba(255, 255, 255, 0.8);
+}
+
+.sq-opening-progress-track {
+  width: 240px;
+  height: 6px;
+  background: rgba(62, 39, 24, 0.14);
+  border-radius: 999px;
+  overflow: hidden;
+  margin-bottom: 14px;
+}
+
+.sq-opening-progress-fill {
+  height: 100%;
+  background: linear-gradient(90deg, #F59E0B, #D97706);
+  border-radius: 999px;
+  transition: width 0.12s ease;
+}
+
+.sq-opening-subtitle {
+  color: #7A5B44;
+  font-size: 13.5px;
+  margin: 0;
+  font-weight: 600;
+}
+
+/* ==========================================================================
+   3. ACTIVE GAMEPLAY VIEWPORT
+   ========================================================================== */
 .sq-cafe-game-viewport {
   flex: 1;
   display: flex;
   flex-direction: column;
-  background: #EFE4D2;
+  background: #110B07;
   color: #2D1B11;
 }
 
@@ -223,24 +312,25 @@
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding: 12px 24px;
-  background: #E5D5BF;
-  border-bottom: 2px solid #D6C2A6;
+  padding: 10px 20px;
+  background: #1E120A;
+  border-bottom: 1.5px solid #382417;
 }
 
 .sq-cafe-stats-left {
   display: flex;
-  gap: 12px;
+  gap: 10px;
+  flex-wrap: wrap;
 }
 
 .sq-cafe-pill {
   padding: 5px 14px;
   border-radius: 999px;
   font-weight: 800;
-  font-size: 14px;
-  background: #FFF;
-  border: 1px solid #C4AE91;
-  color: #3D2111;
+  font-size: 13px;
+  background: #2E1B10;
+  border: 1px solid #4D301F;
+  color: #FFE5B4;
 }
 
 .sq-cafe-controls-right {
@@ -248,155 +338,120 @@
   gap: 10px;
 }
 
-.sq-cafe-sound-toggle, .sq-cafe-exit-btn {
-  background: #FFF;
-  border: 1px solid #C4AE91;
+.sq-cafe-sound-toggle,
+.sq-cafe-exit-btn {
+  background: #2E1B10;
+  border: 1px solid #4D301F;
   padding: 6px 14px;
   border-radius: 10px;
   font-weight: 800;
   cursor: pointer;
-  color: #3D2111;
+  color: #FFE5B4;
+  font-family: inherit;
+  transition: all 0.15s ease;
 }
 
-/* Stage Grid */
+.sq-cafe-sound-toggle:hover,
+.sq-cafe-exit-btn:hover {
+  background: #432818;
+  color: #FFFFFF;
+}
+
+/* Main Split Grid */
 .sq-cafe-stage-grid {
   flex: 1;
   display: grid;
-  grid-template-columns: 1fr 420px;
-  min-height: calc(100vh - 120px);
+  grid-template-columns: 1fr 430px;
+  min-height: calc(100vh - 110px);
 }
 
-/* Left Scene */
+/* ---------------- LEFT SCENE PANEL (The Café Scene) ---------------- */
 .sq-cafe-scene-panel {
   position: relative;
-  background: linear-gradient(180deg, #F3EBDD 0%, #E7DAC5 100%);
+  background-size: cover;
+  background-position: center bottom;
+  background-repeat: no-repeat;
   display: flex;
   flex-direction: column;
   justify-content: flex-end;
-  padding: 24px;
   overflow: hidden;
 }
 
-.sq-cafe-shelf {
-  position: absolute;
-  top: 36px;
-  left: 200px;
-  display: flex;
-  align-items: flex-end;
-  gap: 12px;
-}
-
-.sq-shelf-plank {
-  position: absolute;
-  bottom: 0;
-  left: -20px;
-  right: -20px;
-  height: 10px;
-  background: #7D4E2D;
-  border-radius: 3px;
-}
-
-.sq-shelf-jars {
-  display: flex;
-  gap: 8px;
-  z-index: 2;
-  margin-bottom: 6px;
-}
-
-.sq-jar {
-  width: 28px;
-  height: 38px;
-  border-radius: 6px;
-  background: rgba(255, 255, 255, 0.7);
-  border: 2px solid #5A351B;
-  display: grid;
-  place-items: center;
-  font-weight: 900;
-  font-size: 11px;
-  color: #5A351B;
-}
-
-.sq-shelf-plant {
-  font-size: 32px;
-  z-index: 2;
-  margin-bottom: 4px;
-}
-
-.sq-cafe-lamp {
-  position: absolute;
-  top: -36px;
-  right: -60px;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-}
-
-.sq-lamp-cord {
-  width: 2px;
-  height: 48px;
-  background: #333;
-}
-
-.sq-lamp-shade {
-  width: 38px;
-  height: 22px;
-  background: #FAF5EE;
-  border: 2px solid #C4AE91;
-  clip-path: polygon(20% 0%, 80% 0%, 100% 100%, 0% 100%);
-}
-
-.sq-cafe-window {
-  position: absolute;
-  left: 24px;
-  top: 40px;
-  width: 150px;
-  height: 220px;
-  border: 5px solid #8B572A;
-  border-radius: 80px 80px 0 0;
-  background: #E8F4F8;
-  overflow: hidden;
-}
-
-.sq-window-pane {
+.sq-cafe-scene-vignette {
   position: absolute;
   inset: 0;
-  border-right: 3px solid #8B572A;
-  border-bottom: 3px solid #8B572A;
+  background: linear-gradient(
+    180deg,
+    rgba(14, 8, 4, 0.45) 0%,
+    rgba(14, 8, 4, 0.15) 40%,
+    rgba(14, 8, 4, 0.65) 100%
+  );
+  pointer-events: none;
 }
 
 /* Hanging Chalkboard with Tips */
 .sq-cafe-chalkboard {
   position: absolute;
-  top: 48px;
+  top: 32px;
   right: 28px;
-  width: 200px;
-  background: #252422;
-  border: 4px solid #6E492B;
-  border-radius: 12px;
+  width: 210px;
+  background: #242220;
+  border: 5px solid #5A351B;
+  border-radius: 14px;
   padding: 14px 16px;
-  box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.5);
+  z-index: 4;
 }
 
 .sq-chalk-text {
   font-family: "Courier New", monospace;
   font-size: 13px;
-  color: #E2E8F0;
+  color: #F1F5F9;
   line-height: 1.45;
   font-style: italic;
 }
 
-/* Speech Bubble */
+/* Speech Bubble Order from Customer */
 .sq-cafe-speech-bubble {
   position: absolute;
-  left: 170px;
-  bottom: 170px;
-  max-width: 360px;
+  left: 230px;
+  bottom: 180px;
+  max-width: 380px;
   background: #FFFFFF;
   border: 3px solid #3D2111;
-  border-radius: 20px;
-  padding: 16px 20px;
-  box-shadow: 0 6px 0 rgba(61, 33, 17, 0.15);
+  border-radius: 22px;
+  padding: 18px 22px;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.45);
   z-index: 10;
+  animation: sqBubblePop 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+@keyframes sqBubblePop {
+  from { opacity: 0; transform: scale(0.92); }
+  to { opacity: 1; transform: scale(1); }
+}
+
+.sq-bubble-tail {
+  position: absolute;
+  left: -16px;
+  bottom: 24px;
+  width: 0;
+  height: 0;
+  border-top: 10px solid transparent;
+  border-bottom: 10px solid transparent;
+  border-right: 16px solid #3D2111;
+}
+
+.sq-bubble-tail::after {
+  content: "";
+  position: absolute;
+  left: 4px;
+  top: -8px;
+  width: 0;
+  height: 0;
+  border-top: 8px solid transparent;
+  border-bottom: 8px solid transparent;
+  border-right: 13px solid #FFFFFF;
 }
 
 .sq-cafe-speech-bubble.happy {
@@ -404,17 +459,33 @@
   background: #ECFDF5;
 }
 
+.sq-cafe-speech-bubble.happy .sq-bubble-tail {
+  border-right-color: #059669;
+}
+
+.sq-cafe-speech-bubble.happy .sq-bubble-tail::after {
+  border-right-color: #ECFDF5;
+}
+
 .sq-cafe-speech-bubble.wrong {
   border-color: #DC2626;
   background: #FEF2F2;
 }
 
+.sq-cafe-speech-bubble.wrong .sq-bubble-tail {
+  border-right-color: #DC2626;
+}
+
+.sq-cafe-speech-bubble.wrong .sq-bubble-tail::after {
+  border-right-color: #FEF2F2;
+}
+
 .sq-order-prompt-label {
   font-size: 11px;
   font-weight: 900;
-  color: #92400E;
-  letter-spacing: 0.05em;
-  margin-bottom: 4px;
+  color: #B45309;
+  letter-spacing: 0.08em;
+  margin-bottom: 6px;
 }
 
 .sq-order-question {
@@ -426,7 +497,9 @@
 }
 
 .sq-order-feedback {
-  margin-top: 8px;
+  margin-top: 10px;
+  padding-top: 8px;
+  border-top: 1px dashed rgba(0, 0, 0, 0.15);
   font-size: 13.5px;
   font-style: italic;
   font-weight: 700;
@@ -435,178 +508,298 @@
 .sq-praise-text { color: #059669; }
 .sq-remedy-text { color: #DC2626; }
 
-/* Customer at counter */
+/* Floating Reward Badges */
+.sq-floating-star-badge {
+  position: absolute;
+  left: 120px;
+  bottom: 360px;
+  background: #FFA826;
+  color: #2A1600;
+  border: 2px solid #FFF;
+  border-radius: 999px;
+  padding: 6px 14px;
+  font-size: 14px;
+  font-weight: 900;
+  box-shadow: 0 6px 16px rgba(0,0,0,0.3);
+  z-index: 15;
+  animation: sqFloatReward 1.2s ease-out forwards;
+}
+
+.sq-floating-cash-badge {
+  position: absolute;
+  left: 280px;
+  bottom: 80px;
+  background: #10B981;
+  color: #FFF;
+  border: 2px solid #FFF;
+  border-radius: 999px;
+  padding: 5px 12px;
+  font-size: 13px;
+  font-weight: 900;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+  z-index: 15;
+  animation: sqFloatReward 1.2s ease-out forwards;
+}
+
+@keyframes sqFloatReward {
+  0% { transform: translateY(0) scale(0.8); opacity: 0; }
+  20% { transform: translateY(-10px) scale(1.1); opacity: 1; }
+  100% { transform: translateY(-40px) scale(1); opacity: 0; }
+}
+
+/* Customer At Counter */
 .sq-cafe-customer-slot {
   position: absolute;
   left: 36px;
-  bottom: 30px;
+  bottom: 80px;
   z-index: 5;
   display: flex;
   flex-direction: column;
   align-items: center;
 }
 
+.sq-customer-art-box {
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
+}
+
+.sq-customer-portrait-img {
+  max-height: 285px;
+  width: auto;
+  object-fit: contain;
+  filter: drop-shadow(0 14px 28px rgba(0, 0, 0, 0.55));
+}
+
 .sq-customer-nametag {
   background: #FFF8EE;
   border: 2px solid #5A351B;
-  padding: 3px 10px;
-  border-radius: 6px;
+  padding: 4px 12px;
+  border-radius: 8px;
   text-align: center;
-  margin-top: -10px;
-  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+  margin-top: -12px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.35);
+  z-index: 6;
 }
 
 .sq-customer-nametag strong {
   display: block;
   font-size: 13px;
   color: #2D1B11;
+  font-weight: 800;
 }
 
 .sq-customer-nametag small {
   font-size: 10px;
   font-weight: 800;
   color: #B45309;
+  letter-spacing: 0.05em;
 }
 
-/* Wooden Counter */
+/* Wooden Counter Across Bottom */
 .sq-cafe-counter {
   position: relative;
-  height: 90px;
-  background: #8B572A;
-  border-top: 8px solid #5C381B;
-  box-shadow: inset 0 6px 12px rgba(0, 0, 0, 0.2);
+  height: 95px;
+  background: linear-gradient(180deg, #6B4226 0%, #4D2E18 100%);
+  border-top: 8px solid #8C5C38;
+  box-shadow: inset 0 6px 16px rgba(0, 0, 0, 0.4), 0 -4px 20px rgba(0, 0, 0, 0.5);
   display: flex;
-  justify-content: flex-end;
-  padding-right: 48px;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 50px 0 160px;
+  z-index: 7;
+}
+
+.sq-served-coffee-cup {
+  position: absolute;
+  left: 170px;
+  top: -28px;
+  animation: sqCoffeeServed 0.3s ease-out;
+}
+
+@keyframes sqCoffeeServed {
+  from { transform: translateY(-16px) scale(0.9); opacity: 0; }
+  to { transform: translateY(0) scale(1); opacity: 1; }
+}
+
+.sq-coffee-steam-line {
+  animation: sqSteam 1.5s ease-in-out infinite alternate;
+}
+
+@keyframes sqSteam {
+  from { opacity: 0.3; transform: translateY(0); }
+  to { opacity: 0.9; transform: translateY(-3px); }
 }
 
 .sq-cafe-barista {
   position: absolute;
-  bottom: 24px;
-  right: 60px;
-  transition: transform 0.2s ease;
+  bottom: 20px;
+  right: 50px;
+  transition: transform 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+  display: flex;
+  align-items: flex-end;
+}
+
+.sq-barista-char-img {
+  max-height: 220px;
+  width: auto;
+  object-fit: contain;
+  filter: drop-shadow(0 14px 26px rgba(0, 0, 0, 0.6));
 }
 
 .sq-cafe-barista.serving {
-  transform: translateY(-8px) scale(1.05);
+  transform: translateY(-10px) scale(1.05);
 }
 
-/* ---------------- RIGHT SIDE: TODAY'S MENU ---------------- */
+/* ==========================================================================
+   4. REDESIGNED CHOICE / MENU SCREEN (Based on Second Reference Image)
+   ========================================================================== */
 .sq-cafe-menu-panel {
   background: #2B1D14;
+  background-image: linear-gradient(180deg, #322218 0%, #22150D 100%);
   color: #FFF;
   border-left: 3px solid #1C120B;
-  padding: 24px;
+  padding: 26px 22px;
   display: flex;
   flex-direction: column;
   gap: 16px;
+  box-shadow: -10px 0 30px rgba(0, 0, 0, 0.5);
+  box-sizing: border-box;
 }
 
 .sq-menu-header {
-  border-bottom: 1px solid rgba(255, 255, 255, 0.15);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.16);
   padding-bottom: 12px;
-  text-align: center;
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
 }
 
 .sq-menu-header h3 {
-  font-size: 24px;
-  font-weight: 900;
+  font-size: 25px;
+  font-weight: 700;
   margin: 0;
-  font-family: "Gabarito", serif;
-  color: #FFE5B4;
+  font-family: "Newsreader", "Times New Roman", Georgia, serif;
+  font-style: italic;
+  color: #FFF8EE;
+  letter-spacing: -0.01em;
 }
 
 .sq-menu-subtitle {
-  font-size: 12px;
-  letter-spacing: 0.1em;
-  color: #C4AE91;
+  font-size: 11px;
+  letter-spacing: 0.12em;
+  color: #D4B28C;
   font-weight: 800;
 }
 
+/* 2x2 Choice Cards Grid Exactly per Reference Image */
 .sq-menu-items-grid {
   display: grid;
   grid-template-columns: 1fr 1fr;
   gap: 14px;
   flex: 1;
+  align-content: stretch;
 }
 
 .sq-menu-card {
-  background: #FFF;
-  border: 3px solid #3D2619;
+  background: #FBF8F4;
+  border: 2.5px solid #452B19;
   border-radius: 18px;
-  padding: 16px 12px;
+  padding: 20px 14px 16px;
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
   text-align: center;
   cursor: pointer;
-  box-shadow: 0 4px 0 #1A1009;
-  transition: all 0.12s ease;
+  box-shadow: 0 4px 0 #1A1009, 0 8px 16px rgba(0, 0, 0, 0.2);
+  transition: all 0.14s ease;
+  font-family: inherit;
+  box-sizing: border-box;
 }
 
 .sq-menu-card:hover:not(:disabled) {
   transform: translateY(-3px);
-  box-shadow: 0 7px 0 #1A1009;
-  background: #FFFDF9;
+  box-shadow: 0 7px 0 #1A1009, 0 12px 24px rgba(0, 0, 0, 0.3);
+  background: #FFFFFF;
+  border-color: #D97706;
+}
+
+.sq-menu-card:active:not(:disabled) {
+  transform: translateY(0);
+  box-shadow: 0 2px 0 #1A1009;
+}
+
+.sq-menu-card:disabled {
+  cursor: default;
 }
 
 .sq-menu-card.is-correct {
-  border-color: #10B981;
-  background: #ECFDF5;
-  box-shadow: 0 4px 0 #047857;
+  border-color: #10B981 !important;
+  background: #ECFDF5 !important;
+  box-shadow: 0 4px 0 #047857 !important;
 }
 
 .sq-menu-card.is-wrong {
-  border-color: #EF4444;
-  background: #FEF2F2;
-  box-shadow: 0 4px 0 #B91C1C;
+  border-color: #EF4444 !important;
+  background: #FEF2F2 !important;
+  box-shadow: 0 4px 0 #B91C1C !important;
 }
 
+/* Drink Illustration inside Soft Cream Badge */
 .sq-drink-illustration-wrap {
-  width: 64px;
-  height: 64px;
+  width: 72px;
+  height: 72px;
   border-radius: 50%;
-  background: #F5EBE1;
+  background: #EFE5D8;
   display: grid;
   place-items: center;
-  margin-bottom: 10px;
+  margin-bottom: 12px;
+  border: 1px solid rgba(69, 43, 25, 0.08);
+  flex-shrink: 0;
 }
 
 .sq-menu-card-title {
-  font-size: 15px;
+  font-size: 16.5px;
   font-weight: 800;
   color: #2D1B11;
   line-height: 1.3;
+  margin: 0;
+  display: -webkit-box;
+  -webkit-line-clamp: 3;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
 }
 
-/* ---------------- Shift Summary ---------------- */
+/* ---------------- 5. Shift Summary ---------------- */
 .sq-cafe-summary-wrap {
   flex: 1;
   display: grid;
   place-items: center;
   padding: 40px 24px;
+  background: #0B0705;
 }
 
 .sq-cafe-summary-card {
-  background: #141C3D;
-  border: 2px solid rgba(129, 140, 248, 0.3);
+  background: #1E120A;
+  border: 2px solid #5A351B;
   border-radius: 24px;
   max-width: 520px;
   width: 100%;
   padding: 36px 32px;
   text-align: center;
-  box-shadow: 0 16px 48px rgba(0, 0, 0, 0.5);
+  box-shadow: 0 20px 50px rgba(0, 0, 0, 0.7);
 }
 
 .sq-cafe-summary-card h2 {
   font-size: 32px;
   font-weight: 900;
   margin: 0 0 8px;
+  color: #FFE5B4;
 }
 
 .sq-cafe-summary-card p {
-  color: #94A3B8;
+  color: #C4AE91;
   margin: 0 0 24px;
 }
 
@@ -618,7 +811,8 @@
 }
 
 .sq-stat-box {
-  background: #0C122B;
+  background: #140B05;
+  border: 1px solid #382012;
   border-radius: 14px;
   padding: 16px 12px;
   display: flex;
@@ -663,12 +857,54 @@
   font-weight: 800;
 }
 
-/* ---------------- Responsive ---------------- */
+/* ==========================================================================
+   Mobile Responsiveness
+   ========================================================================== */
 @media (max-width: 900px) {
   .sq-cafe-hero-grid {
     grid-template-columns: 1fr;
   }
+
   .sq-cafe-stage-grid {
     grid-template-columns: 1fr;
+    min-height: auto;
+  }
+
+  .sq-cafe-scene-panel {
+    min-height: 380px;
+  }
+
+  .sq-customer-portrait-img {
+    max-height: 220px;
+  }
+
+  .sq-barista-char-img {
+    max-height: 170px;
+  }
+
+  .sq-cafe-speech-bubble {
+    left: 170px;
+    bottom: 120px;
+    max-width: 280px;
+    padding: 12px 16px;
+  }
+
+  .sq-order-question {
+    font-size: 15px;
+  }
+
+  .sq-cafe-menu-panel {
+    border-left: none;
+    border-top: 3px solid #1C120B;
+    padding: 20px 16px;
+  }
+
+  .sq-drink-illustration-wrap {
+    width: 60px;
+    height: 60px;
+  }
+
+  .sq-menu-card-title {
+    font-size: 15px;
   }
 }
