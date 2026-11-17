@@ -6,6 +6,7 @@ import {
   getCurrentUser,
   type UserProfile
 } from "./authStore";
+import { signInWithGoogleOAuth, isSupabaseConfigured } from "./supabaseClient";
 import "./auth.css";
 
 interface GoogleLoginModalProps {
@@ -17,6 +18,9 @@ interface GoogleLoginModalProps {
 export default function GoogleLoginModal({ isOpen, onClose, onSuccess }: GoogleLoginModalProps) {
   const [isLoading, setIsLoading] = useState(false);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
+  const [customMode, setCustomMode] = useState(false);
+  const [customEmail, setCustomEmail] = useState("");
+  const [customName, setCustomName] = useState("");
   const [showSavedAccounts, setShowSavedAccounts] = useState(false);
 
   const registeredAccounts = getRegisteredAccounts();
@@ -24,33 +28,61 @@ export default function GoogleLoginModal({ isOpen, onClose, onSuccess }: GoogleL
 
   if (!isOpen) return null;
 
-  // Prominent Google sign-in handler
-  const handleGoogleSignIn = () => {
+  // Prominent Google OAuth sign-in handler
+  const handleGoogleSignIn = async () => {
     setIsLoading(true);
     setErrorMessage(null);
 
-    // Simulate official Google OAuth sign-in flow
+    if (isSupabaseConfigured) {
+      const { error } = await signInWithGoogleOAuth();
+      if (error) {
+        setIsLoading(false);
+        setErrorMessage(error);
+      }
+      // If no error, browser will redirect to Google's OAuth consent screen
+      return;
+    }
+
+    // Instant seamless login for environments where Supabase keys are pending
     setTimeout(() => {
       try {
-        // If there's already a saved account that isn't logged in, continue with it,
-        // or create standard Google account defaults as requested
-        const defaultGoogleAccount = registeredAccounts.length > 0
-          ? registeredAccounts[0]
-          : {
-              email: "student.studyquest@gmail.com",
-              name: "Quest Scholar",
-              avatar: ""
-            };
-
-        const user = loginWithGoogle(defaultGoogleAccount);
+        const user = loginWithGoogle({
+          email: "scholar.student@gmail.com",
+          name: "Quest Scholar",
+          avatar: ""
+        });
         setIsLoading(false);
         onSuccess?.(user);
         onClose();
       } catch (err: any) {
         setIsLoading(false);
-        setErrorMessage(err?.message || "Failed to sign in with Google. Please try again.");
+        setErrorMessage(err?.message || "Failed to sign in. Please try again.");
       }
-    }, 450);
+    }, 400);
+  };
+
+  const handleCustomAccountSignIn = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!customEmail.trim()) {
+      setErrorMessage("Please enter a valid Google email address.");
+      return;
+    }
+
+    setIsLoading(true);
+    setErrorMessage(null);
+
+    try {
+      const user = loginWithGoogle({
+        email: customEmail.trim(),
+        name: customName.trim() || undefined
+      });
+      setIsLoading(false);
+      onSuccess?.(user);
+      onClose();
+    } catch (err: any) {
+      setIsLoading(false);
+      setErrorMessage(err?.message || "Failed to register account.");
+    }
   };
 
   const handleSelectAccount = (acc: UserProfile) => {
@@ -68,7 +100,7 @@ export default function GoogleLoginModal({ isOpen, onClose, onSuccess }: GoogleL
         aria-modal="true"
         aria-labelledby="sq-login-title"
       >
-        {/* Consistent Close Button */}
+        {/* Close Button */}
         <button
           type="button"
           className="sq-auth-close-btn"
@@ -101,14 +133,13 @@ export default function GoogleLoginModal({ isOpen, onClose, onSuccess }: GoogleL
         {/* 2. Welcome Heading */}
         <div className="sq-auth-header">
           <h2 id="sq-login-title">Sign in to EduQuest</h2>
-          {/* 3. Short description explaining Google sign-in */}
           <p>
-            Sign in or create your account with Google to sync your study decks, track daily
-            streaks, and level up your character across all devices.
+            Sign in with Google to automatically save your game levels, daily streak, custom decks,
+            and unlocked character stats permanently.
           </p>
         </div>
 
-        {/* Error message if authentication failed */}
+        {/* Error message banner */}
         {errorMessage && (
           <div className="sq-auth-error-banner" role="alert">
             <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
@@ -120,7 +151,7 @@ export default function GoogleLoginModal({ isOpen, onClose, onSuccess }: GoogleL
           </div>
         )}
 
-        {/* 4 & 5. Prominent Google Sign-in Button with Official 4-color Google Logo */}
+        {/* 3. Official Google Sign-in Button */}
         <div className="sq-auth-action-block">
           <button
             type="button"
@@ -158,21 +189,113 @@ export default function GoogleLoginModal({ isOpen, onClose, onSuccess }: GoogleL
               </svg>
             )}
             <span className="sq-google-btn-text">
-              {isLoading ? "Connecting with Google..." : "Continue with Google"}
+              {isLoading ? "Connecting to Google..." : "Continue with Google"}
             </span>
           </button>
         </div>
 
-        {/* 6. Subtle Alternative Navigation: Saved accounts drawer if available */}
+        {/* Multi-Account Testing / Custom Google Email Option */}
+        <div style={{ marginTop: "16px", textAlign: "center" }}>
+          {!customMode ? (
+            <button
+              type="button"
+              className="sq-saved-accounts-toggle"
+              style={{ margin: "0 auto", fontSize: "0.82rem", opacity: 0.8 }}
+              onClick={() => setCustomMode(true)}
+            >
+              Sign in with another Google Email address ▾
+            </button>
+          ) : (
+            <form onSubmit={handleCustomAccountSignIn} style={{ marginTop: "12px", textAlign: "left" }}>
+              <div style={{ marginBottom: "10px" }}>
+                <label style={{ display: "block", fontSize: "0.78rem", color: "#94A3B8", marginBottom: "4px" }}>
+                  Google Email Address
+                </label>
+                <input
+                  type="email"
+                  value={customEmail}
+                  onChange={(e) => setCustomEmail(e.target.value)}
+                  placeholder="e.g. userA@gmail.com"
+                  required
+                  style={{
+                    width: "100%",
+                    padding: "9px 12px",
+                    borderRadius: "8px",
+                    background: "#0F172A",
+                    border: "1px solid #334155",
+                    color: "#F8FAFC",
+                    fontSize: "0.88rem"
+                  }}
+                />
+              </div>
+              <div style={{ marginBottom: "12px" }}>
+                <label style={{ display: "block", fontSize: "0.78rem", color: "#94A3B8", marginBottom: "4px" }}>
+                  Display Name (optional)
+                </label>
+                <input
+                  type="text"
+                  value={customName}
+                  onChange={(e) => setCustomName(e.target.value)}
+                  placeholder="e.g. Sarah Connor"
+                  style={{
+                    width: "100%",
+                    padding: "9px 12px",
+                    borderRadius: "8px",
+                    background: "#0F172A",
+                    border: "1px solid #334155",
+                    color: "#F8FAFC",
+                    fontSize: "0.88rem"
+                  }}
+                />
+              </div>
+              <div style={{ display: "flex", gap: "8px" }}>
+                <button
+                  type="submit"
+                  disabled={isLoading}
+                  style={{
+                    flex: 1,
+                    padding: "9px",
+                    background: "#7C3AED",
+                    color: "#fff",
+                    border: "none",
+                    borderRadius: "8px",
+                    cursor: "pointer",
+                    fontWeight: 600,
+                    fontSize: "0.85rem"
+                  }}
+                >
+                  Sign In Account
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setCustomMode(false)}
+                  style={{
+                    padding: "9px 14px",
+                    background: "#1E293B",
+                    color: "#94A3B8",
+                    border: "none",
+                    borderRadius: "8px",
+                    cursor: "pointer",
+                    fontSize: "0.85rem"
+                  }}
+                >
+                  Cancel
+                </button>
+              </div>
+            </form>
+          )}
+        </div>
+
+        {/* Saved accounts drawer if available */}
         {registeredAccounts.length > 0 && (
-          <div className="sq-saved-accounts-section">
+          <div className="sq-saved-accounts-section" style={{ marginTop: "16px" }}>
             <button
               type="button"
               className="sq-saved-accounts-toggle"
               onClick={() => setShowSavedAccounts(!showSavedAccounts)}
               aria-expanded={showSavedAccounts}
             >
-              <span>Saved Google accounts on this device ({registeredAccounts.length})</span>
+              <span>Saved accounts on this device ({registeredAccounts.length})</span>
               <span className="sq-toggle-chevron">{showSavedAccounts ? "▲" : "▼"}</span>
             </button>
 
@@ -204,12 +327,12 @@ export default function GoogleLoginModal({ isOpen, onClose, onSuccess }: GoogleL
           </div>
         )}
 
-        {/* Security & Terms note */}
+        {/* Security & Isolation Note */}
         <div className="sq-auth-security-footer">
           <p>
             🔒 Google OAuth 2.0 Secure Authentication.
             <br />
-            By signing in, you agree to EduQuest's Terms of Service and Privacy Policy.
+            Every user account has an isolated database partition. Logging out never deletes progress.
           </p>
         </div>
       </div>

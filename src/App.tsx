@@ -10,6 +10,8 @@ import StudyPlanPage from "./site/StudyPlanPage";
 import ExplainPage from "./site/ExplainPage";
 import LoginPage from "./site/LoginPage";
 import SiteApp from "./site/SiteApp";
+import { initSupabaseAuth } from "./site/supabaseClient";
+import { restoreProgressFromCloud } from "./site/progressSync";
 
 /**
  * Programmatic client-side navigation helper.
@@ -78,10 +80,16 @@ export default function App() {
     window.addEventListener("sq_navigate", handleCustomNavigate);
     document.addEventListener("click", handleGlobalClick);
 
+    // Initialize Supabase Auth listener to restore Google OAuth user & sync cloud progress
+    const unsubSupabase = initSupabaseAuth((user) => {
+      restoreProgressFromCloud(user.id);
+    });
+
     return () => {
       window.removeEventListener("popstate", handlePopState);
       window.removeEventListener("sq_navigate", handleCustomNavigate);
       document.removeEventListener("click", handleGlobalClick);
+      unsubSupabase();
     };
   }, []);
 

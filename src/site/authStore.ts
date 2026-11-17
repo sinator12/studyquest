@@ -55,7 +55,7 @@ export function getCurrentUser(): UserProfile | null {
  * - If the account email already exists in registry, log into it and update lastLoginAt.
  * - If not, register it as a new distinct Google account with its own data partition.
  */
-export function loginWithGoogle(profile: { email: string; name?: string; avatar?: string }): UserProfile {
+export function loginWithGoogle(profile: { id?: string; email: string; name?: string; avatar?: string }): UserProfile {
   const email = profile.email.trim().toLowerCase();
   const name =
     profile.name?.trim() ||
@@ -73,6 +73,7 @@ export function loginWithGoogle(profile: { email: string; name?: string; avatar?
     // Existing account: update last login and profile
     user = {
       ...accounts[existingIdx],
+      id: profile.id || accounts[existingIdx].id,
       name: name || accounts[existingIdx].name,
       avatar: profile.avatar || accounts[existingIdx].avatar,
       lastLoginAt: new Date().toISOString()
@@ -81,7 +82,7 @@ export function loginWithGoogle(profile: { email: string; name?: string; avatar?
   } else {
     // New account registration
     user = {
-      id: "usr_google_" + Math.random().toString(36).substring(2, 9) + "_" + Date.now().toString(36),
+      id: profile.id || ("usr_google_" + Math.random().toString(36).substring(2, 9) + "_" + Date.now().toString(36)),
       name,
       email,
       avatar: profile.avatar || "",

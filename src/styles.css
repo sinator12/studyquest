@@ -43,20 +43,18 @@ body {
 
 button, a { font: inherit; }
 
-/* Smooth Section Transition (Zero page reload) */
+/* Smooth Section Transition (Zero page reload, pure opacity fade-in to preserve fixed bottom nav) */
 .sq-page-transition {
-  animation: sqPageSlideFade 0.22s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+  animation: sqPageFadeIn 0.22s ease-out forwards;
   width: 100%;
 }
 
-@keyframes sqPageSlideFade {
+@keyframes sqPageFadeIn {
   0% {
     opacity: 0;
-    transform: translateY(6px);
   }
   100% {
     opacity: 1;
-    transform: translateY(0);
   }
 }
 

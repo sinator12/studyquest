@@ -1,12 +1,14 @@
 import { useState, useEffect } from "react";
 import { getActiveDeck, getPlayerStats, type DeckInfo, type PlayerStats } from "./studyStore";
 import { getCurrentUser, logout, type UserProfile } from "./authStore";
+import { signOutOAuth } from "./supabaseClient";
 import { recordCompletedFocusSession } from "./focusStore";
 import GoogleLoginModal from "./GoogleLoginModal";
 import FocusTimerModal from "./FocusTimerModal";
 import LevelModal from "./LevelModal";
 import StreakModal from "./StreakModal";
 import AccountSwitcherModal from "./AccountSwitcherModal";
+import UserProfileModal from "./UserProfileModal";
 import "./topNav.css";
 
 interface TopNavProps {
@@ -25,6 +27,7 @@ export default function TopNav({ activeTab = "dashboard", onOpenReviewerModal }:
   const [isLevelModalOpen, setIsLevelModalOpen] = useState(false);
   const [isStreakModalOpen, setIsStreakModalOpen] = useState(false);
   const [isSwitcherModalOpen, setIsSwitcherModalOpen] = useState(false);
+  const [isProfileModalOpen, setIsProfileModalOpen] = useState(false);
   const [isUserMenuOpen, setIsUserMenuOpen] = useState(false);
 
   // Focus Timer Active State (Default 25 minutes = 1500s)
@@ -250,7 +253,15 @@ export default function TopNav({ activeTab = "dashboard", onOpenReviewerModal }:
                     onClick={() => setIsUserMenuOpen(!isUserMenuOpen)}
                     title={`${user.name} (${user.email}) - Click for account menu`}
                   >
-                    <span className="sq-avatar-initials">{user.name.charAt(0).toUpperCase()}</span>
+                    {user.avatar ? (
+                      <img
+                        src={user.avatar}
+                        alt={user.name}
+                        style={{ width: "100%", height: "100%", borderRadius: "50%", objectFit: "cover" }}
+                      />
+                    ) : (
+                      <span className="sq-avatar-initials">{user.name.charAt(0).toUpperCase()}</span>
+                    )}
                   </button>
 
                   {isUserMenuOpen && (
@@ -260,6 +271,17 @@ export default function TopNav({ activeTab = "dashboard", onOpenReviewerModal }:
                         <span className="sq-user-drop-email">{user.email}</span>
                         <span className="sq-user-drop-tag">✓ Google Account</span>
                       </div>
+
+                      <button
+                        type="button"
+                        className="sq-user-drop-action"
+                        onClick={() => {
+                          setIsUserMenuOpen(false);
+                          setIsProfileModalOpen(true);
+                        }}
+                      >
+                        👤 View Profile & Settings
+                      </button>
 
                       <button
                         type="button"
@@ -286,9 +308,9 @@ export default function TopNav({ activeTab = "dashboard", onOpenReviewerModal }:
                       <button
                         type="button"
                         className="sq-user-drop-signout"
-                        onClick={() => {
-                          logout();
+                        onClick={async () => {
                           setIsUserMenuOpen(false);
+                          await signOutOAuth();
                         }}
                       >
                         Sign Out
@@ -315,48 +337,49 @@ export default function TopNav({ activeTab = "dashboard", onOpenReviewerModal }:
             </div>
           </div>
         </div>
+      </header>
 
-        {/* Mobile Bottom Navigation Bar (Visible only on screens <= 768px) */}
-        <nav className="sq-mobile-bottom-bar" aria-label="Mobile Navigation">
-          <a href="/games" className={`sq-mob-tab ${activeTab === "games" ? "active" : ""}`}>
-            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2">
-              <rect x="2" y="6" width="20" height="12" rx="3" />
-              <line x1="6" y1="12" x2="10" y2="12" />
-              <line x1="8" y1="10" x2="8" y2="14" />
-              <circle cx="15.5" cy="12" r="0.7" fill="currentColor" />
-              <circle cx="18" cy="12" r="0.7" fill="currentColor" />
-            </svg>
-            <span>Games</span>
-          </a>
+      {/* Mobile Bottom Navigation Bar (Fixed to viewport bottom on screens <= 768px) */}
+      <nav className="sq-mobile-bottom-bar" aria-label="Mobile Navigation">
+        <a href="/games" className={`sq-mob-tab ${activeTab === "games" ? "active" : ""}`}>
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2">
+            <rect x="2" y="6" width="20" height="12" rx="3" />
+            <line x1="6" y1="12" x2="10" y2="12" />
+            <line x1="8" y1="10" x2="8" y2="14" />
+            <circle cx="15.5" cy="12" r="0.7" fill="currentColor" />
+            <circle cx="18" cy="12" r="0.7" fill="currentColor" />
+          </svg>
+          <span>Games</span>
+        </a>
 
-          <a href="/dashboard" className={`sq-mob-tab ${activeTab === "dashboard" ? "active" : ""}`}>
-            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2">
-              <rect x="3" y="3" width="7" height="7" rx="1.5" />
-              <rect x="14" y="3" width="7" height="7" rx="1.5" />
-              <rect x="14" y="14" width="7" height="7" rx="1.5" />
-              <rect x="3" y="14" width="7" height="7" rx="1.5" />
-            </svg>
-            <span>Dashboard</span>
-          </a>
+        <a href="/dashboard" className={`sq-mob-tab ${activeTab === "dashboard" ? "active" : ""}`}>
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2">
+            <rect x="3" y="3" width="7" height="7" rx="1.5" />
+            <rect x="14" y="3" width="7" height="7" rx="1.5" />
+            <rect x="14" y="14" width="7" height="7" rx="1.5" />
+            <rect x="3" y="14" width="7" height="7" rx="1.5" />
+          </svg>
+          <span>Dashboard</span>
+        </a>
 
-          <a href="/study-plan" className={`sq-mob-tab ${activeTab === "study-plan" ? "active" : ""}`}>
-            <svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2">
-              <rect x="4" y="2" width="16" height="20" rx="2.5" />
-              <line x1="8" y1="7" x2="16" y2="7" />
-              <line x1="8" y1="11" x2="16" y2="11" />
-              <line x1="8" y1="15" x2="12" y2="15" />
-            </svg>
-            <span>Plan</span>
-          </a>
+        <a href="/study-plan" className={`sq-mob-tab ${activeTab === "study-plan" ? "active" : ""}`}>
+          <svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2">
+            <rect x="4" y="2" width="16" height="20" rx="2.5" />
+            <line x1="8" y1="7" x2="16" y2="7" />
+            <line x1="8" y1="11" x2="16" y2="11" />
+            <line x1="8" y1="15" x2="12" y2="15" />
+          </svg>
+          <span>Plan</span>
+        </a>
 
-          <a href="/explain" className={`sq-mob-tab ${activeTab === "explain" ? "active" : ""}`}>
-            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2">
-              <circle cx="12" cy="12" r="9.5" />
-              <polygon points="10 8 16 12 10 16 10 8" fill="none" stroke="currentColor" strokeWidth="2" strokeLinejoin="round" />
-            </svg>
-            <span>Explain</span>
-          </a>
-        </nav>
+        <a href="/explain" className={`sq-mob-tab ${activeTab === "explain" ? "active" : ""}`}>
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2">
+            <circle cx="12" cy="12" r="9.5" />
+            <polygon points="10 8 16 12 10 16 10 8" fill="none" stroke="currentColor" strokeWidth="2" strokeLinejoin="round" />
+          </svg>
+          <span>Explain</span>
+        </a>
+      </nav>
 
         {/* Focus Timer Modal */}
         <FocusTimerModal
@@ -391,7 +414,14 @@ export default function TopNav({ activeTab = "dashboard", onOpenReviewerModal }:
           onClose={() => setIsLoginModalOpen(false)}
           onSuccess={() => setIsLoginModalOpen(false)}
         />
-      </header>
+
+        {/* User Profile & Account Settings Modal */}
+        <UserProfileModal
+          isOpen={isProfileModalOpen}
+          user={user}
+          onClose={() => setIsProfileModalOpen(false)}
+          onOpenSwitcher={() => setIsSwitcherModalOpen(true)}
+        />
     </>
   );
 }
