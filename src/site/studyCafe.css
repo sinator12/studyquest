@@ -414,15 +414,15 @@
 /* Speech Bubble Order from Customer */
 .sq-cafe-speech-bubble {
   position: absolute;
-  left: 230px;
-  bottom: 180px;
-  max-width: 380px;
+  left: 260px;
+  bottom: 185px;
+  max-width: 370px;
   background: #FFFFFF;
   border: 3px solid #3D2111;
   border-radius: 22px;
-  padding: 18px 22px;
+  padding: 16px 22px;
   box-shadow: 0 10px 30px rgba(0, 0, 0, 0.45);
-  z-index: 10;
+  z-index: 15;
   animation: sqBubblePop 0.25s cubic-bezier(0.16, 1, 0.3, 1);
 }
 
@@ -434,7 +434,7 @@
 .sq-bubble-tail {
   position: absolute;
   left: -16px;
-  bottom: 24px;
+  bottom: 26px;
   width: 0;
   height: 0;
   border-top: 10px solid transparent;
@@ -512,7 +512,7 @@
 .sq-floating-star-badge {
   position: absolute;
   left: 120px;
-  bottom: 360px;
+  bottom: 380px;
   background: #FFA826;
   color: #2A1600;
   border: 2px solid #FFF;
@@ -521,14 +521,14 @@
   font-size: 14px;
   font-weight: 900;
   box-shadow: 0 6px 16px rgba(0,0,0,0.3);
-  z-index: 15;
+  z-index: 20;
   animation: sqFloatReward 1.2s ease-out forwards;
 }
 
 .sq-floating-cash-badge {
   position: absolute;
   left: 280px;
-  bottom: 80px;
+  bottom: 90px;
   background: #10B981;
   color: #FFF;
   border: 2px solid #FFF;
@@ -537,7 +537,7 @@
   font-size: 13px;
   font-weight: 900;
   box-shadow: 0 4px 12px rgba(0,0,0,0.3);
-  z-index: 15;
+  z-index: 20;
   animation: sqFloatReward 1.2s ease-out forwards;
 }
 
@@ -547,73 +547,105 @@
   100% { transform: translateY(-40px) scale(1); opacity: 0; }
 }
 
-/* Customer At Counter */
+/* 1. Customer Seated/Standing AT Counter */
 .sq-cafe-customer-slot {
   position: absolute;
   left: 36px;
-  bottom: 80px;
-  z-index: 5;
+  bottom: 76px;
+  z-index: 12;
   display: flex;
   flex-direction: column;
   align-items: center;
-}
-
-.sq-customer-art-box {
-  display: flex;
-  align-items: flex-end;
-  justify-content: center;
+  pointer-events: none;
 }
 
 .sq-customer-portrait-img {
-  max-height: 285px;
+  max-height: 295px;
   width: auto;
   object-fit: contain;
-  filter: drop-shadow(0 14px 28px rgba(0, 0, 0, 0.55));
-}
-
-.sq-customer-nametag {
-  background: #FFF8EE;
-  border: 2px solid #5A351B;
-  padding: 4px 12px;
-  border-radius: 8px;
-  text-align: center;
-  margin-top: -12px;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.35);
-  z-index: 6;
-}
-
-.sq-customer-nametag strong {
   display: block;
-  font-size: 13px;
+  filter: drop-shadow(0 16px 30px rgba(0, 0, 0, 0.65));
+}
+
+/* Customer Nametag Badge - Mounted on Wooden Counter Front */
+.sq-customer-nametag {
+  position: absolute;
+  bottom: 18px;
+  left: 32px;
+  z-index: 25;
+  background: #FFFDF9;
+  border: 2px solid #5A351B;
+  border-radius: 8px;
+  padding: 6px 14px;
+  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.5);
+  display: flex;
+  align-items: baseline;
+  gap: 8px;
+  white-space: nowrap;
+  pointer-events: none;
+}
+
+.sq-nametag-name {
+  font-size: 14.5px;
+  font-weight: 900;
   color: #2D1B11;
-  font-weight: 800;
+  letter-spacing: -0.01em;
 }
 
-.sq-customer-nametag small {
-  font-size: 10px;
+.sq-nametag-title {
+  font-size: 10.5px;
   font-weight: 800;
-  color: #B45309;
-  letter-spacing: 0.05em;
+  color: #C2410C;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
 }
 
-/* Wooden Counter Across Bottom */
+/* 2. Bartender Standing BEHIND the Counter */
+.sq-cafe-barista {
+  position: absolute;
+  bottom: 55px;
+  right: 44px;
+  z-index: 6;
+  display: flex;
+  align-items: flex-end;
+  pointer-events: none;
+  transition: transform 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.sq-barista-char-img {
+  max-height: 245px;
+  width: auto;
+  object-fit: contain;
+  display: block;
+  filter: drop-shadow(0 14px 26px rgba(0, 0, 0, 0.65));
+}
+
+.sq-cafe-barista.serving {
+  transform: translateY(-10px) scale(1.05);
+}
+
+/* 3. Wooden Coffee Counter Across Bottom */
 .sq-cafe-counter {
-  position: relative;
-  height: 95px;
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  height: 85px;
   background: linear-gradient(180deg, #6B4226 0%, #4D2E18 100%);
   border-top: 8px solid #8C5C38;
   box-shadow: inset 0 6px 16px rgba(0, 0, 0, 0.4), 0 -4px 20px rgba(0, 0, 0, 0.5);
+  z-index: 8;
   display: flex;
   align-items: center;
   justify-content: space-between;
   padding: 0 50px 0 160px;
-  z-index: 7;
+  pointer-events: none;
 }
 
 .sq-served-coffee-cup {
   position: absolute;
-  left: 170px;
-  top: -28px;
+  left: 230px;
+  top: -30px;
   animation: sqCoffeeServed 0.3s ease-out;
 }
 
@@ -629,26 +661,6 @@
 @keyframes sqSteam {
   from { opacity: 0.3; transform: translateY(0); }
   to { opacity: 0.9; transform: translateY(-3px); }
-}
-
-.sq-cafe-barista {
-  position: absolute;
-  bottom: 20px;
-  right: 50px;
-  transition: transform 0.2s cubic-bezier(0.16, 1, 0.3, 1);
-  display: flex;
-  align-items: flex-end;
-}
-
-.sq-barista-char-img {
-  max-height: 220px;
-  width: auto;
-  object-fit: contain;
-  filter: drop-shadow(0 14px 26px rgba(0, 0, 0, 0.6));
-}
-
-.sq-cafe-barista.serving {
-  transform: translateY(-10px) scale(1.05);
 }
 
 /* ==========================================================================

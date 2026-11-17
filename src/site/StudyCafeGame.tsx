@@ -17,15 +17,6 @@ interface CafeCustomer {
 // 1. Integrated Provided Customers from C:\Users\aball\Downloads\assets\customers
 const CAFE_CUSTOMERS: CafeCustomer[] = [
   {
-    id: "zoro",
-    name: "Roronoa Zoro",
-    title: "SWORDSMAN",
-    imageSrc: "/games/study-cafe/customer_zoro.png",
-    greeting: "Huh?! Lost my way to this café. My order is a question from your notes...",
-    praise: "Not bad! My memory is as sharp as my three blades. Delicious brew!",
-    remedy: "Oi! That wasn't what I asked for! Try to remember the right answer."
-  },
-  {
     id: "shanks",
     name: "Red-Haired Shanks",
     title: "YONKO CAPTAIN",
@@ -33,6 +24,15 @@ const CAFE_CUSTOMERS: CafeCustomer[] = [
     greeting: "Ah, what a cozy café! Let's see how well you know your study notes...",
     praise: "Dahahaha! Outstanding brew! You've mastered this subject completely!",
     remedy: "No worries! Even the best pirates make mistakes. Learn from it and push forward!"
+  },
+  {
+    id: "zoro",
+    name: "Roronoa Zoro",
+    title: "SWORDSMAN",
+    imageSrc: "/games/study-cafe/customer_zoro.png",
+    greeting: "Huh?! Lost my way to this café. My order is a question from your notes...",
+    praise: "Not bad! My memory is as sharp as my three blades. Delicious brew!",
+    remedy: "Oi! That wasn't what I asked for! Try to remember the right answer."
   },
   {
     id: "gyro",
@@ -77,7 +77,7 @@ export default function StudyCafeGame() {
   const [customersServed, setCustomersServed] = useState(0);
   const [streak, setStreak] = useState(0);
   const [chalkboardTip, setChalkboardTip] = useState(
-    "Here comes our first regular. Their order is a question from your notes."
+    "Every item on the menu is a possible answer. Tap the one that answers the order."
   );
 
   const [servingAnim, setServingAnim] = useState(false);
@@ -116,7 +116,7 @@ export default function StudyCafeGame() {
         setStarsEarned(0);
         setCustomersServed(0);
         setStreak(0);
-        setChalkboardTip("Here comes our first regular. Their order is a question from your notes.");
+        setChalkboardTip("Every item on the menu is a possible answer. Tap the one that answers the order.");
       }, 2000);
     }
     return () => {
@@ -356,12 +356,12 @@ export default function StudyCafeGame() {
           </div>
 
           <div className="sq-cafe-stage-grid">
-            {/* LEFT SIDE: Coffee Shop Scene with Real Background & Provided Characters */}
+            {/* LEFT SIDE: Coffee Shop Scene with Real Background & Characters */}
             <div
               className="sq-cafe-scene-panel"
               style={{ backgroundImage: `url(${CAFE_BG_IMG})` }}
             >
-              {/* Cozy ambient gradient overlay for contrast */}
+              {/* Cozy ambient gradient overlay */}
               <div className="sq-cafe-scene-vignette" />
 
               {/* Hanging Chalkboard with Tips */}
@@ -404,28 +404,36 @@ export default function StudyCafeGame() {
                 <div className="sq-floating-cash-badge">+$15</div>
               )}
 
-              {/* Customer Standing at Counter (from provided assets) */}
+              {/* 1. Customer Seated/Standing AT Counter (Left) */}
               <div className="sq-cafe-customer-slot">
-                <div className="sq-customer-art-box">
-                  <img
-                    src={currentCustomer.imageSrc}
-                    alt={currentCustomer.name}
-                    className="sq-customer-portrait-img"
-                  />
-                </div>
-
-                <div className="sq-customer-nametag">
-                  <strong>{currentCustomer.name}</strong>
-                  <small>{currentCustomer.title}</small>
-                </div>
+                <img
+                  src={currentCustomer.imageSrc}
+                  alt={currentCustomer.name}
+                  className="sq-customer-portrait-img"
+                />
               </div>
 
-              {/* Wooden Coffee Counter */}
+              {/* Customer Nametag Badge - Mounted on Counter Front */}
+              <div className="sq-customer-nametag">
+                <span className="sq-nametag-name">{currentCustomer.name}</span>
+                <span className="sq-nametag-title">{currentCustomer.title}</span>
+              </div>
+
+              {/* 2. Bartender Standing BEHIND the Counter (Right) */}
+              <div className={`sq-cafe-barista ${servingAnim ? "serving" : ""}`}>
+                <img
+                  src={BARTENDER_IMG}
+                  alt="Luffy Bartender"
+                  className="sq-barista-char-img"
+                />
+              </div>
+
+              {/* 3. Wooden Coffee Counter Across Bottom */}
               <div className="sq-cafe-counter">
                 {/* Steaming Coffee Cup on Counter when served */}
                 {servingAnim && (
                   <div className="sq-served-coffee-cup" title="Freshly brewed coffee served!">
-                    <svg viewBox="0 0 60 50" width="48" height="40">
+                    <svg viewBox="0 0 60 50" width="52" height="42">
                       {/* Steam */}
                       <path
                         d="M20 10 Q24 4 20 -2 M28 10 Q32 4 28 -2"
@@ -444,15 +452,6 @@ export default function StudyCafeGame() {
                     </svg>
                   </div>
                 )}
-
-                {/* Bartender Behind Counter (from provided assets) */}
-                <div className={`sq-cafe-barista ${servingAnim ? "serving" : ""}`}>
-                  <img
-                    src={BARTENDER_IMG}
-                    alt="Luffy Bartender"
-                    className="sq-barista-char-img"
-                  />
-                </div>
               </div>
             </div>
 
