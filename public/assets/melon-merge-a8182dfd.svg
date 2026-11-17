@@ -1,0 +1,138 @@
+<svg width="600" height="400" viewBox="0 0 600 400" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <!-- Melon Merge card art — StudyQuest indigo night, glowing jar of kawaii fruit -->
+  <defs>
+    <linearGradient id="sky" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#0F172A"/>
+      <stop offset="0.55" stop-color="#1B1440"/>
+      <stop offset="1" stop-color="#0C0A1F"/>
+    </linearGradient>
+    <radialGradient id="glow" cx="0.5" cy="0.42" r="0.6">
+      <stop offset="0" stop-color="#8B5CF6" stop-opacity="0.35"/>
+      <stop offset="0.6" stop-color="#6366F1" stop-opacity="0.12"/>
+      <stop offset="1" stop-color="#6366F1" stop-opacity="0"/>
+    </radialGradient>
+    <radialGradient id="cherry" cx="0.35" cy="0.32" r="1">
+      <stop offset="0" stop-color="#FF8A8F"/>
+      <stop offset="0.55" stop-color="#E5484D"/>
+      <stop offset="1" stop-color="#B3323C"/>
+    </radialGradient>
+    <radialGradient id="strawb" cx="0.35" cy="0.32" r="1">
+      <stop offset="0" stop-color="#FFA3AC"/>
+      <stop offset="0.55" stop-color="#FF5D6C"/>
+      <stop offset="1" stop-color="#D63F53"/>
+    </radialGradient>
+    <radialGradient id="grape" cx="0.35" cy="0.32" r="1">
+      <stop offset="0" stop-color="#C9A6F5"/>
+      <stop offset="0.55" stop-color="#A06BE8"/>
+      <stop offset="1" stop-color="#7C4BC4"/>
+    </radialGradient>
+    <radialGradient id="lemon" cx="0.35" cy="0.32" r="1">
+      <stop offset="0" stop-color="#FFF3B0"/>
+      <stop offset="0.55" stop-color="#FFD43B"/>
+      <stop offset="1" stop-color="#E3B420"/>
+    </radialGradient>
+    <radialGradient id="melon" cx="0.35" cy="0.32" r="1">
+      <stop offset="0" stop-color="#7CC98F"/>
+      <stop offset="0.55" stop-color="#3FA35B"/>
+      <stop offset="1" stop-color="#1F6B3A"/>
+    </radialGradient>
+  </defs>
+
+  <rect width="600" height="400" fill="url(#sky)"/>
+  <rect width="600" height="400" fill="url(#glow)"/>
+
+  <!-- stars -->
+  <g fill="#E0E7FF">
+    <circle cx="60" cy="52" r="2" opacity="0.9"/>
+    <circle cx="128" cy="96" r="1.4" opacity="0.6"/>
+    <circle cx="210" cy="40" r="1.7" opacity="0.75"/>
+    <circle cx="388" cy="58" r="1.5" opacity="0.6"/>
+    <circle cx="470" cy="34" r="2.2" opacity="0.9"/>
+    <circle cx="540" cy="90" r="1.5" opacity="0.7"/>
+    <circle cx="502" cy="150" r="1.2" opacity="0.5"/>
+    <circle cx="80" cy="160" r="1.3" opacity="0.5"/>
+    <path d="M330 26 l2.2 5.4 5.4 2.2 -5.4 2.2 -2.2 5.4 -2.2 -5.4 -5.4 -2.2 5.4 -2.2 z" opacity="0.85"/>
+    <path d="M96 236 l1.8 4.4 4.4 1.8 -4.4 1.8 -1.8 4.4 -1.8 -4.4 -4.4 -1.8 4.4 -1.8 z" opacity="0.6"/>
+  </g>
+
+  <!-- jar -->
+  <g>
+    <rect x="196" y="86" width="208" height="272" rx="26" fill="#FFFFFF" fill-opacity="0.05"/>
+    <path d="M200 86 v242 a24 24 0 0 0 24 24 h152 a24 24 0 0 0 24 -24 v-242" stroke="#FFFFFF" stroke-opacity="0.5" stroke-width="6" stroke-linecap="round" fill="none"/>
+    <rect x="214" y="112" width="13" height="200" rx="6.5" fill="#FFFFFF" opacity="0.14"/>
+    <!-- overflow line -->
+    <line x1="198" y1="128" x2="402" y2="128" stroke="#F87171" stroke-opacity="0.65" stroke-width="3" stroke-dasharray="10 8"/>
+    <path d="M402 116 l16 6 -16 6 z" fill="#F87171" fill-opacity="0.7"/>
+  </g>
+
+  <!-- fruits in the jar -->
+  <!-- watermelon (boss) -->
+  <g>
+    <circle cx="298" cy="292" r="62" fill="url(#melon)"/>
+    <path d="M272 236 q6 26 -2 54 q-6 26 4 56 l14 2 q-10 -30 -4 -57 q8 -29 2 -55 z" fill="#1F6B3A" opacity="0.9"/>
+    <path d="M318 234 q8 27 0 55 q-6 27 5 58 l13 -3 q-11 -29 -5 -55 q8 -29 0 -56 z" fill="#1F6B3A" opacity="0.9"/>
+    <ellipse cx="276" cy="264" rx="17" ry="11" fill="#FFFFFF" opacity="0.85" transform="rotate(-25 276 264)"/>
+    <path d="M296 224 q4 -14 -3 -20" stroke="#7A4A2B" stroke-width="5" stroke-linecap="round" fill="none"/>
+    <path d="M296 210 q16 -10 24 2 q-14 8 -24 -2 z" fill="#4E9B3F"/>
+    <circle cx="280" cy="296" r="5.4" fill="#4A2B2B"/>
+    <circle cx="316" cy="296" r="5.4" fill="#4A2B2B"/>
+    <circle cx="278.3" cy="293.9" r="1.7" fill="#FFFFFF"/>
+    <circle cx="314.3" cy="293.9" r="1.7" fill="#FFFFFF"/>
+    <path d="M286 310 a13 13 0 0 0 24 0 z" fill="#7A3B3B"/>
+  </g>
+  <!-- lemon -->
+  <g>
+    <circle cx="228" cy="322" r="30" fill="url(#lemon)"/>
+    <ellipse cx="217" cy="310" rx="9" ry="6" fill="#FFFFFF" opacity="0.85" transform="rotate(-25 217 310)"/>
+    <circle cx="219" cy="324" r="2.8" fill="#4A2B2B"/>
+    <circle cx="237" cy="324" r="2.8" fill="#4A2B2B"/>
+    <path d="M222 332 a8 8 0 0 0 12 0" stroke="#4A2B2B" stroke-width="2.4" stroke-linecap="round" fill="none"/>
+  </g>
+  <!-- grape -->
+  <g>
+    <circle cx="372" cy="326" r="26" fill="url(#grape)"/>
+    <ellipse cx="362" cy="316" rx="8" ry="5.5" fill="#FFFFFF" opacity="0.85" transform="rotate(-25 362 316)"/>
+    <path d="M364 328 a5 5 0 0 1 6 0" stroke="#4A2B2B" stroke-width="2.2" stroke-linecap="round" fill="none"/>
+    <path d="M376 328 a5 5 0 0 1 6 0" stroke="#4A2B2B" stroke-width="2.2" stroke-linecap="round" fill="none"/>
+    <path d="M368 336 a7 7 0 0 0 10 0" stroke="#4A2B2B" stroke-width="2.2" stroke-linecap="round" fill="none"/>
+  </g>
+  <!-- strawberry -->
+  <g>
+    <circle cx="248" cy="252" r="22" fill="url(#strawb)"/>
+    <g fill="#FFEBEE" opacity="0.9">
+      <ellipse cx="240" cy="248" rx="1.6" ry="2.4"/>
+      <ellipse cx="252" cy="244" rx="1.6" ry="2.4"/>
+      <ellipse cx="258" cy="256" rx="1.6" ry="2.4"/>
+      <ellipse cx="244" cy="262" rx="1.6" ry="2.4"/>
+    </g>
+    <path d="M240 234 q8 -8 16 0 q-8 6 -16 0 z" fill="#3E9B4F"/>
+    <ellipse cx="240" cy="244" rx="6.5" ry="4.5" fill="#FFFFFF" opacity="0.8" transform="rotate(-25 240 244)"/>
+    <circle cx="242" cy="254" r="2.4" fill="#4A2B2B"/>
+    <circle cx="256" cy="254" r="2.4" fill="#4A2B2B"/>
+    <path d="M244 260 a8 8 0 0 0 11 0 z" fill="#7A3B3B"/>
+  </g>
+  <!-- twin cherry falling -->
+  <g>
+    <path d="M331 146 q2 -16 9 -24 M347 148 q0 -14 -7 -26" stroke="#7A4A2B" stroke-width="3.4" stroke-linecap="round" fill="none"/>
+    <path d="M340 118 q12 -8 19 1 q-11 7 -19 -1 z" fill="#4E9B3F"/>
+    <circle cx="329" cy="152" r="12" fill="url(#cherry)" opacity="0.92"/>
+    <circle cx="347" cy="155" r="13.5" fill="url(#cherry)"/>
+    <ellipse cx="342" cy="149" rx="4.6" ry="3.2" fill="#FFFFFF" opacity="0.85" transform="rotate(-25 342 149)"/>
+    <circle cx="342.5" cy="156" r="1.9" fill="#4A2B2B"/>
+    <circle cx="352" cy="156" r="1.9" fill="#4A2B2B"/>
+    <path d="M344 161 a5.5 5.5 0 0 0 7 0" stroke="#4A2B2B" stroke-width="1.9" stroke-linecap="round" fill="none"/>
+    <line x1="340" y1="172" x2="340" y2="216" stroke="#A5B4FC" stroke-opacity="0.6" stroke-width="2.5" stroke-dasharray="4 7"/>
+  </g>
+
+  <!-- Next bubble -->
+  <g>
+    <circle cx="486" cy="238" r="36" fill="#FFFFFF" fill-opacity="0.07" stroke="#A5B4FC" stroke-opacity="0.45" stroke-width="2.5" stroke-dasharray="6 6"/>
+    <path d="M480 234 q1 -10 6 -15 M494 235 q0 -9 -5 -16" stroke="#7A4A2B" stroke-width="2.4" stroke-linecap="round" fill="none"/>
+    <circle cx="479" cy="240" r="8.5" fill="url(#cherry)" opacity="0.92"/>
+    <circle cx="492" cy="242" r="9.5" fill="url(#cherry)"/>
+    <ellipse cx="488.5" cy="238" rx="3.2" ry="2.2" fill="#FFFFFF" opacity="0.85" transform="rotate(-25 488.5 238)"/>
+    <circle cx="489" cy="243" r="1.4" fill="#4A2B2B"/>
+    <circle cx="495.5" cy="243" r="1.4" fill="#4A2B2B"/>
+    <path d="M490 246.5 a4 4 0 0 0 5 0" stroke="#4A2B2B" stroke-width="1.4" stroke-linecap="round" fill="none"/>
+  </g>
+</svg>

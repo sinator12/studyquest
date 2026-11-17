@@ -1,0 +1,87 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 600 400" width="600" height="400">
+  <defs>
+    <linearGradient id="sm-floor" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#0b1220"/>
+      <stop offset="1" stop-color="#05080f"/>
+    </linearGradient>
+    <linearGradient id="sm-wallL" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0" stop-color="#0a0f1a"/>
+      <stop offset="1" stop-color="#1c2740"/>
+    </linearGradient>
+    <linearGradient id="sm-wallR" x1="1" y1="0" x2="0" y2="0">
+      <stop offset="0" stop-color="#0a0f1a"/>
+      <stop offset="1" stop-color="#1c2740"/>
+    </linearGradient>
+    <radialGradient id="sm-beam" cx="0.5" cy="0.62" r="0.6">
+      <stop offset="0" stop-color="#cffafe" stop-opacity="0.30"/>
+      <stop offset="0.4" stop-color="#5eead4" stop-opacity="0.12"/>
+      <stop offset="1" stop-color="#5eead4" stop-opacity="0"/>
+    </radialGradient>
+    <radialGradient id="sm-exit" cx="0.5" cy="0.5" r="0.5">
+      <stop offset="0" stop-color="#6ee7b7" stop-opacity="0.95"/>
+      <stop offset="0.5" stop-color="#10b981" stop-opacity="0.55"/>
+      <stop offset="1" stop-color="#065f46" stop-opacity="0"/>
+    </radialGradient>
+    <radialGradient id="sm-orb" cx="0.5" cy="0.5" r="0.5">
+      <stop offset="0" stop-color="#ecfeff" stop-opacity="1"/>
+      <stop offset="0.4" stop-color="#22d3ee" stop-opacity="0.85"/>
+      <stop offset="1" stop-color="#0e7490" stop-opacity="0"/>
+    </radialGradient>
+    <radialGradient id="sm-rune" cx="0.5" cy="0.5" r="0.6">
+      <stop offset="0" stop-color="#fde68a" stop-opacity="0.9"/>
+      <stop offset="0.5" stop-color="#f59e0b" stop-opacity="0.55"/>
+      <stop offset="1" stop-color="#b45309" stop-opacity="0"/>
+    </radialGradient>
+    <radialGradient id="sm-vig" cx="0.5" cy="0.5" r="0.75">
+      <stop offset="0.45" stop-color="#000000" stop-opacity="0"/>
+      <stop offset="1" stop-color="#000000" stop-opacity="0.8"/>
+    </radialGradient>
+  </defs>
+
+  <!-- backdrop -->
+  <rect width="600" height="400" fill="#05080f"/>
+
+  <!-- ceiling -->
+  <polygon points="0,0 600,0 380,168 220,168" fill="#080c16"/>
+  <!-- floor receding to vanishing point -->
+  <polygon points="0,400 600,400 380,232 220,232" fill="url(#sm-floor)"/>
+  <!-- left + right perspective walls -->
+  <polygon points="0,0 220,168 220,232 0,400" fill="url(#sm-wallL)"/>
+  <polygon points="600,0 380,168 380,232 600,400" fill="url(#sm-wallR)"/>
+
+  <!-- brick seams on the walls (perspective lines) -->
+  <g stroke="#2b3a5e" stroke-width="1.2" opacity="0.5">
+    <line x1="0" y1="96" x2="220" y2="180"/>
+    <line x1="0" y1="300" x2="220" y2="222"/>
+    <line x1="600" y1="96" x2="380" y2="180"/>
+    <line x1="600" y1="300" x2="380" y2="222"/>
+    <line x1="74" y1="36" x2="74" y2="362"/>
+    <line x1="150" y1="92" x2="150" y2="306"/>
+    <line x1="526" y1="36" x2="526" y2="362"/>
+    <line x1="450" y1="92" x2="450" y2="306"/>
+  </g>
+
+  <!-- amber rune door set into the left wall -->
+  <g opacity="0.95">
+    <polygon points="150,150 195,166 195,250 150,266" fill="#3a2708"/>
+    <polygon points="158,158 188,168 188,244 158,254" fill="#7c5310"/>
+    <ellipse cx="173" cy="206" rx="52" ry="60" fill="url(#sm-rune)"/>
+    <g stroke="#fde68a" stroke-width="2" opacity="0.85" fill="none">
+      <path d="M168 184 l10 0 l-5 18 l8 0 l-13 22"/>
+    </g>
+  </g>
+
+  <!-- distant exit portal at the vanishing point -->
+  <ellipse cx="300" cy="200" rx="70" ry="78" fill="url(#sm-exit)"/>
+  <path d="M286 232 L286 188 Q300 168 314 188 L314 232 Z" fill="#a7f3d0" opacity="0.9"/>
+
+  <!-- floating memory orb -->
+  <circle cx="396" cy="250" r="30" fill="url(#sm-orb)"/>
+  <circle cx="396" cy="250" r="6" fill="#ecfeff"/>
+
+  <!-- flashlight beam from the viewer -->
+  <ellipse cx="300" cy="250" rx="300" ry="190" fill="url(#sm-beam)"/>
+
+  <!-- vignette -->
+  <rect width="600" height="400" fill="url(#sm-vig)"/>
+</svg>

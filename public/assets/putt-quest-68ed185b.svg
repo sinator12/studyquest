@@ -1,0 +1,99 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 600 400" width="600" height="400">
+  <defs>
+    <linearGradient id="pq-bg" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#86efac"/>
+      <stop offset="1" stop-color="#22c55e"/>
+    </linearGradient>
+    <linearGradient id="pq-green" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#4ade80"/>
+      <stop offset="1" stop-color="#16a34a"/>
+    </linearGradient>
+    <radialGradient id="pq-ball" cx="0.35" cy="0.3" r="1">
+      <stop offset="0" stop-color="#ffffff"/>
+      <stop offset="1" stop-color="#cbd5e1"/>
+    </radialGradient>
+    <filter id="pq-soft" x="-30%" y="-30%" width="160%" height="160%">
+      <feDropShadow dx="0" dy="5" stdDeviation="6" flood-color="#14532d" flood-opacity="0.45"/>
+    </filter>
+  </defs>
+  <!-- meadow backdrop -->
+  <rect width="600" height="400" fill="url(#pq-bg)"/>
+  <!-- scattered flowers -->
+  <g opacity="0.9">
+    <g transform="translate(48,60)"><circle r="4" fill="#fda4af"/><circle r="1.8" fill="#fef9c3"/></g>
+    <g transform="translate(86,330)"><circle r="4" fill="#c4b5fd"/><circle r="1.8" fill="#fef9c3"/></g>
+    <g transform="translate(540,70)"><circle r="4" fill="#fdba74"/><circle r="1.8" fill="#fef9c3"/></g>
+    <g transform="translate(566,320)"><circle r="4" fill="#fda4af"/><circle r="1.8" fill="#fef9c3"/></g>
+    <g transform="translate(30,200)"><circle r="4" fill="#f0abfc"/><circle r="1.8" fill="#fef9c3"/></g>
+  </g>
+  <!-- trees -->
+  <g>
+    <circle cx="60" cy="116" r="26" fill="#15803d"/><rect x="56" y="130" width="8" height="18" rx="3" fill="#854d0e"/>
+    <circle cx="556" cy="220" r="30" fill="#15803d"/><rect x="552" y="238" width="8" height="20" rx="3" fill="#854d0e"/>
+  </g>
+  <!-- fairway -->
+  <g filter="url(#pq-soft)">
+    <rect x="110" y="40" width="380" height="320" rx="48" fill="#a3e635"/>
+    <rect x="124" y="54" width="352" height="292" rx="38" fill="url(#pq-green)"/>
+  </g>
+  <!-- mowing stripes -->
+  <g fill="#ffffff" opacity="0.08">
+    <rect x="124" y="54" width="352" height="36"/>
+    <rect x="124" y="126" width="352" height="36"/>
+    <rect x="124" y="198" width="352" height="36"/>
+    <rect x="124" y="270" width="352" height="36"/>
+  </g>
+  <!-- sand + water hazards -->
+  <ellipse cx="392" cy="288" rx="52" ry="30" fill="#fde68a"/>
+  <ellipse cx="392" cy="288" rx="40" ry="21" fill="#fcd34d"/>
+  <path d="M150 230 Q190 212 224 234 Q244 250 226 268 Q188 286 156 266 Q138 248 150 230 Z" fill="#38bdf8"/>
+  <path d="M162 240 q14 -7 30 0 M170 256 q14 -7 28 0" stroke="#bae6fd" stroke-width="3" fill="none" stroke-linecap="round"/>
+  <!-- bumper -->
+  <circle cx="300" cy="200" r="15" fill="#f97316"/>
+  <circle cx="300" cy="200" r="8" fill="#fdba74"/>
+  <!-- cups with answer flags -->
+  <g font-family="system-ui, sans-serif" font-size="13" font-weight="700">
+    <g transform="translate(180,110)">
+      <ellipse cx="0" cy="3" rx="13" ry="9" fill="#14532d"/>
+      <line x1="0" y1="0" x2="0" y2="-38" stroke="#e2e8f0" stroke-width="3.5"/>
+      <path d="M0 -38 L34 -29 L0 -20 Z" fill="#38bdf8"/>
+      <text x="13" y="-25" fill="#f0f9ff">A</text>
+    </g>
+    <g transform="translate(430,96)">
+      <ellipse cx="0" cy="3" rx="13" ry="9" fill="#14532d"/>
+      <line x1="0" y1="0" x2="0" y2="-38" stroke="#e2e8f0" stroke-width="3.5"/>
+      <path d="M0 -38 L34 -29 L0 -20 Z" fill="#fb7185"/>
+      <text x="13" y="-25" fill="#fff1f2">B</text>
+    </g>
+    <g transform="translate(262,318)">
+      <ellipse cx="0" cy="3" rx="13" ry="9" fill="#14532d"/>
+      <line x1="0" y1="0" x2="0" y2="-38" stroke="#e2e8f0" stroke-width="3.5"/>
+      <path d="M0 -38 L34 -29 L0 -20 Z" fill="#fbbf24"/>
+      <text x="13" y="-25" fill="#451a03">C</text>
+    </g>
+    <g transform="translate(452,212)">
+      <ellipse cx="0" cy="3" rx="13" ry="9" fill="#14532d"/>
+      <line x1="0" y1="0" x2="0" y2="-38" stroke="#e2e8f0" stroke-width="3.5"/>
+      <path d="M0 -38 L34 -29 L0 -20 Z" fill="#a78bfa"/>
+      <text x="13" y="-25" fill="#f5f3ff">D</text>
+    </g>
+  </g>
+  <!-- aim dots toward correct cup -->
+  <g fill="#ffffff" opacity="0.95">
+    <circle cx="222" cy="266" r="4"/>
+    <circle cx="210" cy="234" r="3.6"/>
+    <circle cx="199" cy="202" r="3.2"/>
+    <circle cx="190" cy="170" r="2.8"/>
+    <circle cx="184" cy="140" r="2.4"/>
+  </g>
+  <!-- ball + putter -->
+  <g transform="translate(234,294)">
+    <ellipse cx="2" cy="9" rx="12" ry="5" fill="#14532d" opacity="0.4"/>
+    <circle r="11" fill="url(#pq-ball)"/>
+    <circle cx="-3.5" cy="-3.5" r="3" fill="#ffffff"/>
+  </g>
+  <g transform="translate(268,330) rotate(24)">
+    <rect x="-4" y="-56" width="8" height="58" rx="3.5" fill="#94a3b8"/>
+    <rect x="-19" y="0" width="34" height="13" rx="5" fill="#475569"/>
+  </g>
+</svg>

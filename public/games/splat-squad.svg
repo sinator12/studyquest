@@ -1,0 +1,193 @@
+<svg width="600" height="400" viewBox="0 0 600 400" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <!-- Splat Squad card art — bright Paloona Park recess, Pip the fox mid-splat -->
+  <defs>
+    <linearGradient id="ss-sky" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#6FC6FF"/>
+      <stop offset="0.62" stop-color="#BFE9FF"/>
+      <stop offset="1" stop-color="#FFF6D9"/>
+    </linearGradient>
+    <linearGradient id="ss-grass" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#8FE06A"/>
+      <stop offset="1" stop-color="#3E9B4F"/>
+    </linearGradient>
+    <radialGradient id="ss-sun" cx="0.5" cy="0.5" r="0.5">
+      <stop offset="0" stop-color="#FFF3AE" stop-opacity="0.95"/>
+      <stop offset="1" stop-color="#FFF3AE" stop-opacity="0"/>
+    </radialGradient>
+    <radialGradient id="ss-fox" cx="0.35" cy="0.3" r="0.9">
+      <stop offset="0" stop-color="#FFC08A"/>
+      <stop offset="0.55" stop-color="#FF8A3D"/>
+      <stop offset="1" stop-color="#E06B22"/>
+    </radialGradient>
+  </defs>
+
+  <rect width="600" height="400" fill="url(#ss-sky)"/>
+  <circle cx="76" cy="54" r="120" fill="url(#ss-sun)"/>
+
+  <!-- clouds -->
+  <g fill="#FFFFFF" opacity="0.92">
+    <ellipse cx="228" cy="50" rx="26" ry="16"/>
+    <ellipse cx="206" cy="56" rx="18" ry="12"/>
+    <ellipse cx="252" cy="56" rx="19" ry="12"/>
+    <ellipse cx="432" cy="76" rx="20" ry="12"/>
+    <ellipse cx="414" cy="80" rx="14" ry="9"/>
+    <ellipse cx="450" cy="80" rx="14" ry="9"/>
+  </g>
+
+  <!-- grass -->
+  <path d="M0 254 Q150 240 300 252 T600 250 V400 H0 Z" fill="url(#ss-grass)"/>
+
+  <!-- boundary fence along the horizon -->
+  <g fill="#FFFDF7" opacity="0.95">
+    <rect x="0" y="244" width="600" height="6" fill="#F3EAD3"/>
+    <rect x="10" y="232" width="5" height="24" rx="2.5"/>
+    <rect x="45" y="232" width="5" height="24" rx="2.5"/>
+    <rect x="80" y="232" width="5" height="24" rx="2.5"/>
+    <rect x="115" y="232" width="5" height="24" rx="2.5"/>
+    <rect x="360" y="232" width="5" height="24" rx="2.5"/>
+    <rect x="395" y="232" width="5" height="24" rx="2.5"/>
+    <rect x="550" y="232" width="5" height="24" rx="2.5"/>
+    <rect x="585" y="232" width="5" height="24" rx="2.5"/>
+  </g>
+
+  <!-- distant bushes framing the scene -->
+  <g fill="#4FA84A">
+    <circle cx="24" cy="248" r="17"/>
+    <circle cx="42" cy="252" r="14"/>
+    <circle cx="8" cy="252" r="12"/>
+    <circle cx="580" cy="250" r="16"/>
+    <circle cx="562" cy="253" r="12"/>
+  </g>
+
+  <!-- Big Slide silhouette, mid-ground -->
+  <g>
+    <rect x="430" y="150" width="7" height="92" fill="#7B76B8"/>
+    <rect x="452" y="150" width="7" height="92" fill="#7B76B8"/>
+    <rect x="430" y="160" width="29" height="6" fill="#635FA0"/>
+    <rect x="430" y="178" width="29" height="6" fill="#635FA0"/>
+    <rect x="430" y="196" width="29" height="6" fill="#635FA0"/>
+    <rect x="430" y="214" width="29" height="6" fill="#635FA0"/>
+    <rect x="460" y="118" width="60" height="16" rx="6" fill="#7B76B8"/>
+    <rect x="466" y="132" width="14" height="110" fill="#7B76B8"/>
+    <rect x="500" y="132" width="14" height="110" fill="#7B76B8"/>
+    <path d="M522 126 C556 148,560 196,518 224 C494 240,468 250,448 258" fill="none" stroke="#635FA0" stroke-width="30" stroke-linecap="round"/>
+    <path d="M520 130 C550 150,554 190,516 216" fill="none" stroke="#9C97D6" stroke-width="8" stroke-linecap="round" opacity="0.85"/>
+  </g>
+
+  <!-- grass tufts -->
+  <g stroke="#2E7D3B" stroke-width="3" stroke-linecap="round" opacity="0.5">
+    <path d="M400 300 l-4 14 M406 300 l2 14 M412 300 l6 12"/>
+    <path d="M150 366 l-4 16 M156 366 l2 16 M162 364 l6 14"/>
+    <path d="M566 316 l-3 12 M571 316 l3 12"/>
+    <path d="M30 288 l-3 12 M35 288 l3 12"/>
+  </g>
+
+  <!-- ground paint splats -->
+  <g fill="#9451EC">
+    <ellipse cx="70" cy="325" rx="15" ry="9"/>
+    <circle cx="50" cy="316" r="5"/>
+    <circle cx="90" cy="314" r="4.5"/>
+    <circle cx="86" cy="336" r="5"/>
+    <circle cx="52" cy="336" r="4"/>
+    <circle cx="70" cy="306" r="3.5"/>
+  </g>
+  <g fill="#FAD82E">
+    <ellipse cx="502" cy="372" rx="17" ry="10"/>
+    <circle cx="480" cy="364" r="5.5"/>
+    <circle cx="524" cy="362" r="5"/>
+    <circle cx="520" cy="384" r="5"/>
+    <circle cx="484" cy="384" r="4.5"/>
+  </g>
+  <!-- fresh impact splat on the slide platform -->
+  <g fill="#F64CA1" opacity="0.92">
+    <ellipse cx="500" cy="178" rx="11" ry="7"/>
+    <circle cx="486" cy="172" r="3.5"/>
+    <circle cx="514" cy="173" r="3"/>
+    <circle cx="510" cy="188" r="3.2"/>
+    <circle cx="490" cy="188" r="2.8"/>
+  </g>
+
+  <!-- ground shadow -->
+  <ellipse cx="210" cy="392" rx="95" ry="13" fill="#1F4A2A" opacity="0.18"/>
+
+  <!-- Pip the fox, mid-splat -->
+  <g transform="translate(120,175)">
+    <!-- tail, paint-dipped tip -->
+    <path d="M46 148 C10 145,-18 110,-10 68 C-6 46,14 34,30 40 C14 46,2 66,8 92 C12 112,26 130,52 138 Z" fill="url(#ss-fox)"/>
+    <circle cx="2" cy="50" r="14" fill="#1DC9B2"/>
+    <circle cx="-3" cy="45" r="4" fill="#FFFFFF" opacity="0.6"/>
+
+    <!-- back legs / feet -->
+    <ellipse cx="64" cy="214" rx="20" ry="12" fill="#E06B22"/>
+    <ellipse cx="116" cy="214" rx="20" ry="12" fill="#E06B22"/>
+
+    <!-- body -->
+    <ellipse cx="90" cy="168" rx="56" ry="52" fill="url(#ss-fox)"/>
+    <ellipse cx="90" cy="176" rx="34" ry="38" fill="#FFF1DC"/>
+
+    <!-- arm reaching to the blaster grip -->
+    <rect x="128" y="140" width="72" height="26" rx="13" fill="url(#ss-fox)"/>
+    <circle cx="205" cy="153" r="15" fill="#FFF1DC"/>
+
+    <!-- paint blaster -->
+    <rect x="190" y="130" width="95" height="40" rx="16" fill="#F1EFE8"/>
+    <rect x="190" y="146" width="95" height="7" fill="#399AEF" opacity="0.5"/>
+    <rect x="198" y="168" width="14" height="22" rx="6" fill="#C9C4D6"/>
+    <rect x="276" y="138" width="34" height="24" rx="8" fill="#C9C4D6"/>
+    <circle cx="222" cy="150" r="15" fill="#F64CA1"/>
+    <circle cx="222" cy="150" r="15" fill="none" stroke="#FFFFFF" stroke-width="2" opacity="0.7"/>
+
+    <!-- head -->
+    <circle cx="90" cy="75" r="62" fill="url(#ss-fox)"/>
+
+    <!-- ears -->
+    <g transform="translate(48,40) rotate(-18)">
+      <path d="M0 -46 C16 -30 20 -8 14 8 C8 16 -8 16 -14 8 C-20 -8 -16 -30 0 -46 Z" fill="#FF8A3D"/>
+      <path d="M0 -30 C9 -20 11 -6 7 4 C4 8 -4 8 -7 4 C-11 -6 -9 -20 0 -30 Z" fill="#FFF1DC"/>
+    </g>
+    <g transform="translate(132,40) rotate(18)">
+      <path d="M0 -46 C16 -30 20 -8 14 8 C8 16 -8 16 -14 8 C-20 -8 -16 -30 0 -46 Z" fill="#FF8A3D"/>
+      <path d="M0 -30 C9 -20 11 -6 7 4 C4 8 -4 8 -7 4 C-11 -6 -9 -20 0 -30 Z" fill="#FFF1DC"/>
+    </g>
+
+    <!-- muzzle patch -->
+    <ellipse cx="90" cy="100" rx="34" ry="27" fill="#FFF1DC"/>
+
+    <!-- blush -->
+    <circle cx="52" cy="92" r="9" fill="#F64CA1" opacity="0.35"/>
+    <circle cx="128" cy="92" r="9" fill="#F64CA1" opacity="0.35"/>
+
+    <!-- eyes -->
+    <circle cx="70" cy="68" r="7" fill="#2B1B12"/>
+    <circle cx="110" cy="68" r="7" fill="#2B1B12"/>
+    <circle cx="67.5" cy="65" r="2.2" fill="#FFFFFF"/>
+    <circle cx="112.5" cy="65" r="2.2" fill="#FFFFFF"/>
+
+    <!-- nose + mouth -->
+    <circle cx="90" cy="93" r="5" fill="#2B1B12"/>
+    <path d="M78 105 Q90 113 102 105" stroke="#2B1B12" stroke-width="3" stroke-linecap="round" fill="none"/>
+  </g>
+
+  <!-- flying paint blobs -->
+  <g>
+    <ellipse cx="438" cy="316" rx="8" ry="5" fill="#F64CA1" opacity="0.4" transform="rotate(-24 438 316)"/>
+    <circle cx="452" cy="308" r="15" fill="#F64CA1"/>
+    <ellipse cx="440" cy="303" rx="4.5" ry="3" fill="#FFFFFF" opacity="0.75" transform="rotate(-24 440 303)"/>
+
+    <circle cx="472" cy="270" r="13" fill="#399AEF"/>
+    <ellipse cx="462" cy="266" rx="4" ry="2.6" fill="#FFFFFF" opacity="0.75" transform="rotate(-24 462 266)"/>
+
+    <circle cx="498" cy="320" r="12" fill="#FAD82E"/>
+    <ellipse cx="490" cy="316" rx="3.6" ry="2.4" fill="#FFFFFF" opacity="0.75" transform="rotate(-24 490 316)"/>
+
+    <ellipse cx="475" cy="258" rx="7" ry="4" fill="#F9521F" opacity="0.4" transform="rotate(-30 475 258)"/>
+    <circle cx="490" cy="235" r="14" fill="#F9521F"/>
+    <ellipse cx="480" cy="230" rx="4.2" ry="2.8" fill="#FFFFFF" opacity="0.75" transform="rotate(-24 480 230)"/>
+
+    <circle cx="525" cy="285" r="12" fill="#9451EC"/>
+    <ellipse cx="517" cy="281" rx="3.6" ry="2.4" fill="#FFFFFF" opacity="0.75" transform="rotate(-24 517 281)"/>
+
+    <circle cx="515" cy="205" r="11" fill="#1DC9B2"/>
+    <ellipse cx="508" cy="201" rx="3.2" ry="2.2" fill="#FFFFFF" opacity="0.75" transform="rotate(-24 508 201)"/>
+  </g>
+</svg>

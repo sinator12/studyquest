@@ -1,0 +1,43 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 600 400" width="600" height="400">
+  <defs>
+    <linearGradient id="ss-bg" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#0a0f2a"/>
+      <stop offset="0.6" stop-color="#0b1020"/>
+      <stop offset="1" stop-color="#140a24"/>
+    </linearGradient>
+    <linearGradient id="b1" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#ff5d8f"/><stop offset="1" stop-color="#c026d3"/></linearGradient>
+    <linearGradient id="b2" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#f97316"/><stop offset="1" stop-color="#db2777"/></linearGradient>
+    <linearGradient id="b3" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#facc15"/><stop offset="1" stop-color="#f97316"/></linearGradient>
+    <linearGradient id="b4" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#a3e635"/><stop offset="1" stop-color="#16a34a"/></linearGradient>
+    <linearGradient id="b5" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#22d3ee"/><stop offset="1" stop-color="#0ea5e9"/></linearGradient>
+    <linearGradient id="b6" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#818cf8"/><stop offset="1" stop-color="#7c3aed"/></linearGradient>
+    <filter id="ss-glow" x="-40%" y="-40%" width="180%" height="180%">
+      <feGaussianBlur stdDeviation="3.5" result="b"/>
+      <feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge>
+    </filter>
+  </defs>
+  <rect width="600" height="400" fill="url(#ss-bg)"/>
+  <!-- stars -->
+  <g fill="#cbd5e1">
+    <circle cx="70" cy="60" r="1.5"/><circle cx="140" cy="40" r="1"/><circle cx="500" cy="50" r="1.5"/>
+    <circle cx="540" cy="110" r="1"/><circle cx="60" cy="150" r="1"/><circle cx="470" cy="90" r="1"/>
+    <circle cx="90" cy="100" r="1"/><circle cx="520" cy="170" r="1.2"/><circle cx="40" cy="220" r="1"/>
+  </g>
+  <!-- skyline glow -->
+  <ellipse cx="300" cy="400" rx="320" ry="120" fill="#7c3aed" opacity="0.18" filter="url(#ss-glow)"/>
+  <!-- tower of offset blocks -->
+  <g filter="url(#ss-glow)" stroke="#ffffff" stroke-opacity="0.25" stroke-width="1">
+    <rect x="230" y="350" width="150" height="34" rx="5" fill="url(#b6)"/>
+    <rect x="245" y="316" width="150" height="34" rx="5" fill="url(#b5)"/>
+    <rect x="225" y="282" width="150" height="34" rx="5" fill="url(#b4)"/>
+    <rect x="252" y="248" width="150" height="34" rx="5" fill="url(#b3)"/>
+    <rect x="235" y="214" width="150" height="34" rx="5" fill="url(#b2)"/>
+    <rect x="258" y="180" width="138" height="34" rx="5" fill="url(#b1)"/>
+    <rect x="245" y="146" width="120" height="34" rx="5" fill="url(#b5)"/>
+  </g>
+  <!-- sliding incoming block -->
+  <g filter="url(#ss-glow)">
+    <rect x="120" y="112" width="120" height="32" rx="5" fill="url(#b3)" opacity="0.95"/>
+    <line x1="120" y1="128" x2="60" y2="128" stroke="#facc15" stroke-width="2" stroke-dasharray="6 6" opacity="0.6"/>
+  </g>
+</svg>

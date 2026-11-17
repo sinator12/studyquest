@@ -1,0 +1,205 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 600 400" width="600" height="400">
+  <defs>
+    <linearGradient id="sv-sky" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#f59e0b"/>
+      <stop offset="0.45" stop-color="#fbbf24"/>
+      <stop offset="0.75" stop-color="#fde68a"/>
+      <stop offset="1" stop-color="#fef3c7"/>
+    </linearGradient>
+    <radialGradient id="sv-sun" cx="0.5" cy="0.5" r="0.5">
+      <stop offset="0" stop-color="#fff7ed" stop-opacity="0.95"/>
+      <stop offset="0.5" stop-color="#fde68a" stop-opacity="0.55"/>
+      <stop offset="1" stop-color="#fde68a" stop-opacity="0"/>
+    </radialGradient>
+    <linearGradient id="sv-hillFar" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#4d7c4a"/>
+      <stop offset="1" stop-color="#2f5b31"/>
+    </linearGradient>
+    <linearGradient id="sv-hillNear" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#16803d"/>
+      <stop offset="1" stop-color="#0f5c2c"/>
+    </linearGradient>
+    <linearGradient id="sv-path" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#d9b382"/>
+      <stop offset="1" stop-color="#b9905e"/>
+    </linearGradient>
+    <linearGradient id="sv-roofA" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#d97706"/>
+      <stop offset="1" stop-color="#92400e"/>
+    </linearGradient>
+    <linearGradient id="sv-roofB" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#b45309"/>
+      <stop offset="1" stop-color="#78350f"/>
+    </linearGradient>
+    <linearGradient id="sv-wallA" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#fef3c7"/>
+      <stop offset="1" stop-color="#fcd9a0"/>
+    </linearGradient>
+    <linearGradient id="sv-wallB" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#fde9c8"/>
+      <stop offset="1" stop-color="#f4c98a"/>
+    </linearGradient>
+    <radialGradient id="sv-windowGlow" cx="0.5" cy="0.5" r="0.5">
+      <stop offset="0" stop-color="#fef08a" stop-opacity="0.85"/>
+      <stop offset="1" stop-color="#fef08a" stop-opacity="0"/>
+    </radialGradient>
+    <radialGradient id="sv-vignette" cx="0.5" cy="0.42" r="0.75">
+      <stop offset="0.55" stop-color="#000000" stop-opacity="0"/>
+      <stop offset="1" stop-color="#1c2a12" stop-opacity="0.45"/>
+    </radialGradient>
+    <filter id="sv-glow" x="-40%" y="-40%" width="180%" height="180%">
+      <feGaussianBlur stdDeviation="3.2" result="b"/>
+      <feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge>
+    </filter>
+  </defs>
+
+  <!-- golden-hour sky -->
+  <rect width="600" height="400" fill="url(#sv-sky)"/>
+  <circle cx="470" cy="90" r="140" fill="url(#sv-sun)"/>
+  <circle cx="470" cy="90" r="34" fill="#fffbeb" opacity="0.95"/>
+
+  <!-- soft clouds -->
+  <g fill="#ffffff" opacity="0.4">
+    <ellipse cx="110" cy="70" rx="46" ry="12"/>
+    <ellipse cx="150" cy="64" rx="30" ry="10"/>
+    <ellipse cx="300" cy="50" rx="38" ry="9"/>
+  </g>
+
+  <!-- rolling hills, far -->
+  <path d="M0 230 Q90 200 200 220 T420 210 T600 225 L600 400 L0 400 Z" fill="url(#sv-hillFar)"/>
+  <!-- rolling hills, near -->
+  <path d="M0 275 Q120 240 260 262 T600 255 L600 400 L0 400 Z" fill="url(#sv-hillNear)"/>
+
+  <!-- tree borders -->
+  <g fill="#1f6a34" opacity="0.9">
+    <circle cx="30" cy="248" r="20"/><circle cx="52" cy="256" r="15"/>
+    <circle cx="565" cy="238" r="18"/><circle cx="585" cy="250" r="13"/>
+    <circle cx="20" cy="200" r="13" opacity="0.55"/>
+  </g>
+
+  <!-- winding path from foreground to plaza -->
+  <path d="M300 400 C300 360 250 340 260 305 C268 278 320 270 318 245 C316 222 285 218 288 200"
+        fill="none" stroke="url(#sv-path)" stroke-width="26" stroke-linecap="round" opacity="0.92"/>
+  <path d="M300 400 C300 360 250 340 260 305 C268 278 320 270 318 245 C316 222 285 218 288 200"
+        fill="none" stroke="#8a6539" stroke-width="26" stroke-linecap="round" opacity="0.18" stroke-dasharray="1 14"/>
+
+  <!-- the well, plaza centerpiece -->
+  <g transform="translate(300,238)">
+    <ellipse cx="0" cy="18" rx="30" ry="8" fill="#000000" opacity="0.25"/>
+    <ellipse cx="0" cy="4" rx="26" ry="10" fill="#8a97a3"/>
+    <ellipse cx="0" cy="0" rx="26" ry="10" fill="#c9d2da"/>
+    <ellipse cx="0" cy="0" rx="16" ry="6" fill="#3b4753"/>
+    <rect x="-24" y="-26" width="6" height="28" rx="2" fill="#7a5230"/>
+    <rect x="18" y="-26" width="6" height="28" rx="2" fill="#7a5230"/>
+    <path d="M-24 -26 Q0 -42 24 -26" fill="none" stroke="#7a5230" stroke-width="6" stroke-linecap="round"/>
+    <rect x="-3" y="-30" width="6" height="14" fill="#5b3d22"/>
+  </g>
+
+  <!-- House 1: restored cottage, left -->
+  <g transform="translate(115,270)">
+    <ellipse cx="0" cy="46" rx="58" ry="10" fill="#000000" opacity="0.22"/>
+    <rect x="-46" y="-18" width="92" height="64" rx="4" fill="url(#sv-wallA)"/>
+    <path d="M-56 -18 L0 -60 L56 -18 Z" fill="url(#sv-roofA)"/>
+    <path d="M-56 -18 L0 -60 L56 -18 L56 -10 L0 -50 L-56 -10 Z" fill="#7a3f0d" opacity="0.5"/>
+    <rect x="-10" y="16" width="20" height="30" rx="2" fill="#5b3d22"/>
+    <circle cx="6" cy="31" r="1.6" fill="#2b1c10"/>
+    <g filter="url(#sv-glow)">
+      <circle cx="-26" cy="6" r="14" fill="url(#sv-windowGlow)"/>
+      <circle cx="26" cy="6" r="14" fill="url(#sv-windowGlow)"/>
+    </g>
+    <rect x="-33" y="-1" width="14" height="14" rx="1.5" fill="#fde68a" stroke="#7a3f0d" stroke-width="2"/>
+    <rect x="19" y="-1" width="14" height="14" rx="1.5" fill="#fde68a" stroke="#7a3f0d" stroke-width="2"/>
+    <rect x="-8" y="-58" width="9" height="22" fill="#78350f"/>
+    <ellipse cx="-3" cy="-64" rx="9" ry="5" fill="#c9c9c9" opacity="0.6"/>
+  </g>
+
+  <!-- House 2: half-built, under scaffolding, center-right -->
+  <g transform="translate(300,268)">
+    <ellipse cx="0" cy="48" rx="54" ry="10" fill="#000000" opacity="0.22"/>
+    <!-- rubble base -->
+    <path d="M-42 30 L-30 -6 L-14 26 L2 -10 L18 24 L34 -4 L42 28 Z" fill="#8a7156" opacity="0.85"/>
+    <rect x="-40" y="-4" width="84" height="34" rx="3" fill="#c9a876" opacity="0.8"/>
+    <!-- half wall -->
+    <rect x="-40" y="-4" width="40" height="34" rx="3" fill="url(#sv-wallB)"/>
+    <path d="M-40 -4 L-14 -34 L2 -4 Z" fill="url(#sv-roofB)" opacity="0.9"/>
+    <!-- scaffolding poles -->
+    <g stroke="#6b4a2a" stroke-width="3.5" stroke-linecap="round">
+      <line x1="-48" y1="34" x2="-48" y2="-40"/>
+      <line x1="40" y1="34" x2="40" y2="-40"/>
+      <line x1="-48" y1="-8" x2="40" y2="-8"/>
+      <line x1="-48" y1="14" x2="40" y2="14"/>
+      <line x1="-48" y1="-40" x2="40" y2="-30"/>
+    </g>
+    <!-- planks -->
+    <rect x="-50" y="-2" width="94" height="5" fill="#a97c4f"/>
+    <rect x="-50" y="20" width="94" height="5" fill="#a97c4f"/>
+  </g>
+
+  <!-- House 3: restored bakery-ish, right -->
+  <g transform="translate(468,278)">
+    <ellipse cx="0" cy="40" rx="50" ry="9" fill="#000000" opacity="0.22"/>
+    <rect x="-40" y="-14" width="80" height="56" rx="4" fill="url(#sv-wallB)"/>
+    <path d="M-48 -14 L0 -50 L48 -14 Z" fill="url(#sv-roofA)"/>
+    <rect x="-8" y="12" width="16" height="28" rx="2" fill="#5b3d22"/>
+    <g filter="url(#sv-glow)">
+      <circle cx="-20" cy="6" r="11" fill="url(#sv-windowGlow)"/>
+      <circle cx="20" cy="6" r="11" fill="url(#sv-windowGlow)"/>
+    </g>
+    <rect x="-27" y="-1" width="12" height="12" rx="1.5" fill="#fde68a" stroke="#78350f" stroke-width="2"/>
+    <rect x="15" y="-1" width="12" height="12" rx="1.5" fill="#fde68a" stroke="#78350f" stroke-width="2"/>
+    <!-- little awning -->
+    <path d="M-20 -14 L20 -14 L26 -2 L-26 -2 Z" fill="#166534"/>
+  </g>
+
+  <!-- 4th small house, far background left -->
+  <g transform="translate(190,232)" opacity="0.85">
+    <rect x="-22" y="-8" width="44" height="26" rx="3" fill="#e9c896"/>
+    <path d="M-27 -8 L0 -28 L27 -8 Z" fill="#9a5b1f"/>
+    <circle cx="0" cy="4" r="5" fill="url(#sv-windowGlow)"/>
+  </g>
+
+  <!-- lantern posts along the path -->
+  <g>
+    <g transform="translate(250,320)">
+      <rect x="-2" y="-24" width="4" height="24" fill="#4b3620"/>
+      <circle cx="0" cy="-28" r="6" fill="#fde68a" filter="url(#sv-glow)"/>
+    </g>
+    <g transform="translate(330,225)">
+      <rect x="-2" y="-20" width="4" height="20" fill="#4b3620"/>
+      <circle cx="0" cy="-24" r="5" fill="#fde68a" filter="url(#sv-glow)"/>
+    </g>
+  </g>
+
+  <!-- villager silhouettes -->
+  <g fill="#2f3b23" opacity="0.9">
+    <!-- villager near the well -->
+    <g transform="translate(270,300)">
+      <ellipse cx="0" cy="17" rx="8" ry="3" opacity="0.3" fill="#000000"/>
+      <rect x="-5" y="-2" width="10" height="16" rx="4"/>
+      <circle cx="0" cy="-8" r="5"/>
+    </g>
+    <!-- villager walking the path -->
+    <g transform="translate(330,350)">
+      <ellipse cx="0" cy="19" rx="9" ry="3" opacity="0.3" fill="#000000"/>
+      <rect x="-5" y="-3" width="10" height="18" rx="4"/>
+      <circle cx="0" cy="-10" r="5.5"/>
+      <rect x="-9" y="10" width="6" height="3" rx="1.5" transform="rotate(20 -9 10)"/>
+    </g>
+    <!-- villager by house 1 -->
+    <g transform="translate(150,318)">
+      <ellipse cx="0" cy="15" rx="7" ry="2.6" opacity="0.3" fill="#000000"/>
+      <rect x="-4.5" y="-2" width="9" height="14" rx="3.5"/>
+      <circle cx="0" cy="-7" r="4.5"/>
+    </g>
+  </g>
+
+  <!-- warm foreground grass tufts -->
+  <g stroke="#0c3d1c" stroke-width="3" stroke-linecap="round" opacity="0.55">
+    <path d="M40 392 q4 -14 0 -22"/>
+    <path d="M48 394 q6 -12 2 -20"/>
+    <path d="M520 390 q-4 -14 0 -22"/>
+    <path d="M540 396 q-6 -12 -2 -20"/>
+  </g>
+
+  <rect width="600" height="400" fill="url(#sv-vignette)"/>
+</svg>

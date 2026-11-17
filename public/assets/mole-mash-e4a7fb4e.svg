@@ -1,0 +1,67 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 600 400" width="600" height="400">
+  <defs>
+    <linearGradient id="mm-bg" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#1a0a2e"/>
+      <stop offset="0.6" stop-color="#0b1020"/>
+      <stop offset="1" stop-color="#06140a"/>
+    </linearGradient>
+    <radialGradient id="mm-mole" cx="0.4" cy="0.3" r="0.85">
+      <stop offset="0" stop-color="#bbf7d0"/>
+      <stop offset="0.5" stop-color="#22c55e"/>
+      <stop offset="1" stop-color="#15803d"/>
+    </radialGradient>
+    <radialGradient id="mm-burrow" cx="0.5" cy="0.4" r="0.7">
+      <stop offset="0" stop-color="#1f1410"/>
+      <stop offset="1" stop-color="#3b2414"/>
+    </radialGradient>
+    <linearGradient id="mm-mallet" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#c084fc"/>
+      <stop offset="1" stop-color="#7c3aed"/>
+    </linearGradient>
+    <filter id="mm-glow" x="-60%" y="-60%" width="220%" height="220%">
+      <feGaussianBlur stdDeviation="4" result="b"/>
+      <feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge>
+    </filter>
+    <filter id="mm-soft" x="-80%" y="-80%" width="260%" height="260%"><feGaussianBlur stdDeviation="12"/></filter>
+  </defs>
+  <rect width="600" height="400" fill="url(#mm-bg)"/>
+  <!-- meadow glow -->
+  <ellipse cx="300" cy="380" rx="340" ry="110" fill="#22c55e" opacity="0.18" filter="url(#mm-soft)"/>
+  <!-- night stars -->
+  <g fill="#d9f99d">
+    <circle cx="80" cy="60" r="1.5"/><circle cx="510" cy="50" r="1.5"/><circle cx="430" cy="90" r="1"/>
+    <circle cx="120" cy="110" r="1"/><circle cx="550" cy="120" r="1"/>
+  </g>
+  <!-- mound + burrow -->
+  <ellipse cx="290" cy="320" rx="150" ry="60" fill="#14331c" opacity="0.9" filter="url(#mm-glow)"/>
+  <ellipse cx="290" cy="300" rx="80" ry="34" fill="url(#mm-burrow)" stroke="#4ade80" stroke-width="2" stroke-opacity="0.4" filter="url(#mm-glow)"/>
+  <!-- mole popping out -->
+  <g filter="url(#mm-glow)">
+    <ellipse cx="290" cy="250" rx="58" ry="62" fill="url(#mm-mole)"/>
+    <!-- snout -->
+    <ellipse cx="290" cy="272" rx="22" ry="16" fill="#a7f3d0"/>
+    <circle cx="290" cy="270" r="6" fill="#ec4899"/>
+    <!-- eyes -->
+    <circle cx="272" cy="240" r="9" fill="#0f172a"/>
+    <circle cx="308" cy="240" r="9" fill="#0f172a"/>
+    <circle cx="275" cy="237" r="2.5" fill="#fff"/>
+    <circle cx="311" cy="237" r="2.5" fill="#fff"/>
+    <!-- ears -->
+    <circle cx="252" cy="210" r="10" fill="#16a34a"/>
+    <circle cx="328" cy="210" r="10" fill="#16a34a"/>
+  </g>
+  <!-- swinging mallet -->
+  <g filter="url(#mm-glow)" transform="rotate(-28 420 130)">
+    <rect x="404" y="60" width="32" height="70" rx="8" fill="url(#mm-mallet)"/>
+    <rect x="412" y="128" width="16" height="120" rx="6" fill="#a78bfa"/>
+  </g>
+  <!-- dirt + star particles -->
+  <g fill="#86efac" filter="url(#mm-glow)">
+    <circle cx="220" cy="200" r="4"/><circle cx="360" cy="190" r="4"/>
+    <circle cx="190" cy="250" r="3"/><circle cx="390" cy="250" r="3"/>
+  </g>
+  <g fill="#fde68a" filter="url(#mm-glow)">
+    <path d="M210 175 l3 9 9 3 -9 3 -3 9 -3 -9 -9 -3 9 -3z"/>
+    <path d="M375 165 l2.5 7 7 2.5 -7 2.5 -2.5 7 -2.5 -7 -7 -2.5 7 -2.5z"/>
+  </g>
+</svg>

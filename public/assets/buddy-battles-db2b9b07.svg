@@ -1,0 +1,156 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 600 400" width="600" height="400">
+  <defs>
+    <linearGradient id="bb-sky" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#232049"/>
+      <stop offset="0.55" stop-color="#171321"/>
+      <stop offset="1" stop-color="#0E0C18"/>
+    </linearGradient>
+    <linearGradient id="bb-floor" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#1A1730"/>
+      <stop offset="1" stop-color="#0B0A14"/>
+    </linearGradient>
+    <radialGradient id="bb-fireGlow" cx="50%" cy="50%" r="50%">
+      <stop offset="0" stop-color="#F9C846" stop-opacity="0.30"/>
+      <stop offset="1" stop-color="#F9C846" stop-opacity="0"/>
+    </radialGradient>
+    <radialGradient id="bb-waterGlow" cx="50%" cy="50%" r="50%">
+      <stop offset="0" stop-color="#7FE8DC" stop-opacity="0.30"/>
+      <stop offset="1" stop-color="#7FE8DC" stop-opacity="0"/>
+    </radialGradient>
+    <radialGradient id="bb-clash" cx="50%" cy="50%" r="50%">
+      <stop offset="0" stop-color="#F1EFE8" stop-opacity="0.85"/>
+      <stop offset="0.4" stop-color="#F9C846" stop-opacity="0.4"/>
+      <stop offset="1" stop-color="#7FE8DC" stop-opacity="0"/>
+    </radialGradient>
+  </defs>
+
+  <!-- Arena backdrop -->
+  <rect width="600" height="400" fill="url(#bb-sky)"/>
+  <rect y="300" width="600" height="100" fill="url(#bb-floor)"/>
+  <line x1="0" y1="300" x2="600" y2="300" stroke="#3A335F" stroke-width="1" opacity="0.6"/>
+
+  <!-- Distant stars / arena sparkle -->
+  <g fill="#F1EFE8">
+    <circle cx="55" cy="42" r="1.4" opacity="0.6"/>
+    <circle cx="140" cy="80" r="1" opacity="0.4"/>
+    <circle cx="300" cy="34" r="1.3" opacity="0.55"/>
+    <circle cx="460" cy="70" r="1" opacity="0.4"/>
+    <circle cx="545" cy="46" r="1.5" opacity="0.6"/>
+    <circle cx="230" cy="100" r="1" opacity="0.35"/>
+    <circle cx="400" cy="110" r="1.1" opacity="0.4"/>
+  </g>
+
+  <!-- Type glows behind each fighter -->
+  <circle cx="150" cy="230" r="120" fill="url(#bb-fireGlow)"/>
+  <circle cx="450" cy="230" r="120" fill="url(#bb-waterGlow)"/>
+
+  <!-- Platform ellipses -->
+  <ellipse cx="150" cy="322" rx="98" ry="20" fill="#993C1D" opacity="0.22"/>
+  <ellipse cx="150" cy="322" rx="98" ry="20" fill="none" stroke="#D85A30" stroke-width="2" opacity="0.35"/>
+  <ellipse cx="450" cy="322" rx="98" ry="20" fill="#185FA5" opacity="0.22"/>
+  <ellipse cx="450" cy="322" rx="98" ry="20" fill="none" stroke="#378ADD" stroke-width="2" opacity="0.35"/>
+
+  <!-- ============ Fire fox (left), pixel-block silhouette, facing right ============ -->
+  <g transform="translate(74,150)">
+    <!-- unit = 11px blocks, chunky pixel-art grid -->
+    <!-- tail (bushy, flame-tipped) -->
+    <rect x="0" y="66" width="22" height="22" fill="#993C1D"/>
+    <rect x="-11" y="55" width="22" height="22" fill="#D85A30"/>
+    <rect x="-11" y="33" width="22" height="22" fill="#F0997B"/>
+    <rect x="-11" y="11" width="22" height="22" fill="#F9C846"/>
+    <rect x="-5" y="0" width="16" height="16" fill="#F9C846" opacity="0.85"/>
+    <!-- outline block behind body for chunky silhouette edge -->
+    <rect x="11" y="22" width="132" height="121" rx="6" fill="#1d1830"/>
+    <!-- body base coat -->
+    <rect x="17" y="28" width="120" height="109" rx="4" fill="#D85A30"/>
+    <!-- chest/muzzle white patch -->
+    <rect x="72" y="66" width="56" height="71" fill="#F1EFE8"/>
+    <!-- light shading top-left -->
+    <rect x="17" y="28" width="60" height="40" fill="#F0997B"/>
+    <!-- dark shading underside/right -->
+    <rect x="93" y="99" width="44" height="38" fill="#993C1D"/>
+    <!-- ears (tall, pointed) -->
+    <rect x="24" y="-22" width="26" height="48" fill="#D85A30"/>
+    <rect x="24" y="-22" width="26" height="20" fill="#F0997B"/>
+    <rect x="86" y="-22" width="26" height="48" fill="#D85A30"/>
+    <rect x="86" y="-22" width="12" height="20" fill="#F0997B"/>
+    <rect x="30" y="-14" width="14" height="24" fill="#993C1D"/>
+    <rect x="92" y="-14" width="14" height="24" fill="#993C1D"/>
+    <!-- legs -->
+    <rect x="28" y="132" width="26" height="26" fill="#993C1D"/>
+    <rect x="100" y="132" width="26" height="26" fill="#993C1D"/>
+    <!-- eyes -->
+    <rect x="82" y="50" width="12" height="12" fill="#14101f"/>
+    <rect x="110" y="50" width="12" height="12" fill="#14101f"/>
+    <rect x="84" y="44" width="6" height="6" fill="#F1EFE8" opacity="0.9"/>
+    <!-- outline strokes on key edges -->
+    <rect x="17" y="28" width="120" height="109" rx="4" fill="none" stroke="#1d1830" stroke-width="3"/>
+  </g>
+
+  <!-- Fire attack sparks (orange), streaking toward center -->
+  <g fill="#F9C846">
+    <polygon points="260,190 288,182 268,210"/>
+    <polygon points="272,240 300,236 276,262"/>
+    <circle cx="252" cy="160" r="5"/>
+    <circle cx="240" cy="270" r="4"/>
+  </g>
+
+  <!-- ============ Water axolotl (right), pixel-block silhouette, facing left ============ -->
+  <g transform="translate(454,168) scale(-1,1)">
+    <!-- external gill fronds (three per side, chunky pixel fans) -->
+    <rect x="118" y="-8" width="16" height="30" fill="#7FE8DC"/>
+    <rect x="128" y="-2" width="16" height="30" fill="#378ADD"/>
+    <rect x="118" y="24" width="16" height="30" fill="#7FE8DC"/>
+    <rect x="128" y="30" width="16" height="30" fill="#378ADD"/>
+    <rect x="118" y="56" width="16" height="30" fill="#7FE8DC"/>
+    <rect x="128" y="62" width="16" height="30" fill="#378ADD"/>
+    <!-- tail fin -->
+    <rect x="-34" y="46" width="34" height="46" fill="#185FA5"/>
+    <rect x="-20" y="56" width="20" height="26" fill="#378ADD"/>
+    <!-- outline block behind body -->
+    <rect x="0" y="0" width="122" height="112" rx="18" fill="#1d1830"/>
+    <!-- rounded wide body base coat -->
+    <rect x="6" y="6" width="110" height="100" rx="16" fill="#378ADD"/>
+    <!-- belly light patch -->
+    <rect x="24" y="52" width="72" height="46" rx="10" fill="#85B7EB"/>
+    <!-- light shading top -->
+    <rect x="6" y="6" width="110" height="34" rx="12" fill="#85B7EB"/>
+    <!-- dark shading underside -->
+    <rect x="6" y="82" width="110" height="24" rx="10" fill="#185FA5"/>
+    <!-- stubby legs -->
+    <rect x="14" y="96" width="24" height="20" rx="6" fill="#185FA5"/>
+    <rect x="84" y="96" width="24" height="20" rx="6" fill="#185FA5"/>
+    <!-- wide smile mouth (big grin, chunky blocks) -->
+    <rect x="34" y="70" width="52" height="10" rx="5" fill="#14101f" opacity="0.85"/>
+    <rect x="34" y="66" width="10" height="10" rx="5" fill="#14101f" opacity="0.85"/>
+    <rect x="76" y="66" width="10" height="10" rx="5" fill="#14101f" opacity="0.85"/>
+    <!-- eyes -->
+    <rect x="30" y="34" width="14" height="14" fill="#14101f"/>
+    <rect x="78" y="34" width="14" height="14" fill="#14101f"/>
+    <rect x="33" y="30" width="6" height="6" fill="#F1EFE8" opacity="0.9"/>
+    <rect x="81" y="30" width="6" height="6" fill="#F1EFE8" opacity="0.9"/>
+    <!-- outline stroke on body -->
+    <rect x="6" y="6" width="110" height="100" rx="16" fill="none" stroke="#1d1830" stroke-width="3"/>
+  </g>
+
+  <!-- Water attack sparks (blue/teal), streaking toward center -->
+  <g fill="#7FE8DC">
+    <polygon points="340,196 312,188 332,216"/>
+    <polygon points="328,246 300,242 324,268"/>
+    <circle cx="348" cy="166" r="5"/>
+    <circle cx="360" cy="276" r="4"/>
+  </g>
+
+  <!-- Central clash burst -->
+  <circle cx="300" cy="220" r="46" fill="url(#bb-clash)"/>
+  <g stroke="#F1EFE8" stroke-width="3" stroke-linecap="round" opacity="0.85">
+    <line x1="300" y1="180" x2="300" y2="196"/>
+    <line x1="300" y1="244" x2="300" y2="260"/>
+    <line x1="262" y1="220" x2="278" y2="220"/>
+    <line x1="322" y1="220" x2="338" y2="220"/>
+    <line x1="272" y1="192" x2="283" y2="203"/>
+    <line x1="317" y1="237" x2="328" y2="248"/>
+    <line x1="328" y1="192" x2="317" y2="203"/>
+    <line x1="283" y1="237" x2="272" y2="248"/>
+  </g>
+</svg>

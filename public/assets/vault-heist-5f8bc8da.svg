@@ -1,0 +1,107 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 600 400" width="600" height="400">
+  <defs>
+    <linearGradient id="vh-bg" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#1A2149"/>
+      <stop offset="0.6" stop-color="#101635"/>
+      <stop offset="1" stop-color="#0A0F26"/>
+    </linearGradient>
+    <linearGradient id="vh-floor" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#151B3D"/>
+      <stop offset="1" stop-color="#080C1D"/>
+    </linearGradient>
+    <radialGradient id="vh-face" cx="42%" cy="35%" r="80%">
+      <stop offset="0" stop-color="#2C3468"/>
+      <stop offset="0.55" stop-color="#1E2547"/>
+      <stop offset="1" stop-color="#131A38"/>
+    </radialGradient>
+    <linearGradient id="vh-rim" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#3D478A"/>
+      <stop offset="0.5" stop-color="#242C5A"/>
+      <stop offset="1" stop-color="#10162E"/>
+    </linearGradient>
+    <linearGradient id="vh-gold" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#FCD34D"/>
+      <stop offset="1" stop-color="#D97706"/>
+    </linearGradient>
+    <linearGradient id="vh-bar" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#FDE68A"/>
+      <stop offset="0.45" stop-color="#F59E0B"/>
+      <stop offset="1" stop-color="#B45309"/>
+    </linearGradient>
+    <radialGradient id="vh-glow" cx="50%" cy="45%" r="50%">
+      <stop offset="0" stop-color="#F59E0B" stop-opacity="0.22"/>
+      <stop offset="1" stop-color="#F59E0B" stop-opacity="0"/>
+    </radialGradient>
+  </defs>
+
+  <!-- Room -->
+  <rect width="600" height="400" fill="url(#vh-bg)"/>
+  <rect y="308" width="600" height="92" fill="url(#vh-floor)"/>
+  <line x1="0" y1="308" x2="600" y2="308" stroke="#F59E0B" stroke-opacity="0.18"/>
+
+  <!-- Laser beams -->
+  <line x1="-30" y1="380" x2="180" y2="-20" stroke="#F59E0B" stroke-opacity="0.10" stroke-width="2"/>
+  <line x1="90" y1="420" x2="330" y2="-30" stroke="#EF4444" stroke-opacity="0.08" stroke-width="2"/>
+  <line x1="450" y1="430" x2="620" y2="60" stroke="#F59E0B" stroke-opacity="0.10" stroke-width="2"/>
+  <line x1="540" y1="420" x2="380" y2="-40" stroke="#6366F1" stroke-opacity="0.10" stroke-width="2"/>
+
+  <!-- Vault glow -->
+  <circle cx="300" cy="185" r="200" fill="url(#vh-glow)"/>
+
+  <!-- Vault door -->
+  <g>
+    <circle cx="300" cy="185" r="128" fill="url(#vh-rim)"/>
+    <circle cx="300" cy="185" r="128" fill="none" stroke="#FFFFFF" stroke-opacity="0.10" stroke-width="2"/>
+    <!-- rim bolts -->
+    <g fill="#0C1226" stroke="#FFFFFF" stroke-opacity="0.18">
+      <circle cx="411" cy="139" r="6"/>
+      <circle cx="411" cy="231" r="6"/>
+      <circle cx="346" cy="296" r="6"/>
+      <circle cx="254" cy="296" r="6"/>
+      <circle cx="189" cy="231" r="6"/>
+      <circle cx="189" cy="139" r="6"/>
+      <circle cx="254" cy="74" r="6"/>
+      <circle cx="346" cy="74" r="6"/>
+    </g>
+    <circle cx="300" cy="185" r="96" fill="url(#vh-face)"/>
+    <circle cx="300" cy="185" r="96" fill="none" stroke="#FFFFFF" stroke-opacity="0.12" stroke-width="2"/>
+    <circle cx="300" cy="185" r="76" fill="none" stroke="#FFFFFF" stroke-opacity="0.06" stroke-width="2"/>
+    <!-- spoke handle -->
+    <g>
+      <rect x="294" y="127" width="12" height="116" rx="6" fill="url(#vh-gold)"/>
+      <rect x="294" y="127" width="12" height="116" rx="6" fill="url(#vh-gold)" transform="rotate(60 300 185)"/>
+      <rect x="294" y="127" width="12" height="116" rx="6" fill="url(#vh-gold)" transform="rotate(120 300 185)"/>
+      <circle cx="300" cy="185" r="24" fill="url(#vh-gold)"/>
+      <circle cx="300" cy="185" r="24" fill="none" stroke="#000000" stroke-opacity="0.25" stroke-width="2"/>
+      <circle cx="300" cy="185" r="9" fill="#92400E"/>
+    </g>
+    <!-- door shine -->
+    <path d="M220 110 A110 110 0 0 1 300 75" fill="none" stroke="#FFFFFF" stroke-opacity="0.20" stroke-width="4" stroke-linecap="round"/>
+  </g>
+
+  <!-- Gold bar stacks -->
+  <g stroke="#92400E" stroke-width="1.5">
+    <path d="M60 342 L74 310 L142 310 L156 342 Z" fill="url(#vh-bar)"/>
+    <path d="M92 310 L106 278 L174 278 L188 310 Z" fill="url(#vh-bar)"/>
+    <path d="M124 342 L138 310 L206 310 L220 342 Z" fill="url(#vh-bar)"/>
+    <path d="M418 342 L432 310 L500 310 L514 342 Z" fill="url(#vh-bar)"/>
+    <path d="M462 310 L476 278 L544 278 L558 310 Z" fill="url(#vh-bar)"/>
+    <path d="M486 342 L500 310 L568 310 L582 342 Z" fill="url(#vh-bar)"/>
+  </g>
+  <g fill="#FEF3C7" opacity="0.8">
+    <path d="M74 310 L142 310 L137 317 L79 317 Z"/>
+    <path d="M106 278 L174 278 L169 285 L111 285 Z"/>
+    <path d="M138 310 L206 310 L201 317 L143 317 Z"/>
+    <path d="M432 310 L500 310 L495 317 L437 317 Z"/>
+    <path d="M476 278 L544 278 L539 285 L481 285 Z"/>
+    <path d="M500 310 L568 310 L563 317 L505 317 Z"/>
+  </g>
+
+  <!-- Scattered coins -->
+  <g fill="url(#vh-gold)" stroke="#92400E">
+    <ellipse cx="250" cy="352" rx="14" ry="5"/>
+    <ellipse cx="286" cy="366" rx="14" ry="5"/>
+    <ellipse cx="330" cy="356" rx="14" ry="5"/>
+    <ellipse cx="368" cy="368" rx="14" ry="5"/>
+  </g>
+</svg>

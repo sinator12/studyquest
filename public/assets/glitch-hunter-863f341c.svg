@@ -1,0 +1,157 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 600 400" width="600" height="400">
+  <defs>
+    <linearGradient id="gh-sky" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#05070F"/>
+      <stop offset="0.55" stop-color="#0A1030"/>
+      <stop offset="1" stop-color="#141B47"/>
+    </linearGradient>
+    <linearGradient id="gh-floor" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#101A3C"/>
+      <stop offset="1" stop-color="#070B1C"/>
+    </linearGradient>
+    <radialGradient id="gh-horizon" cx="50%" cy="0%" r="80%">
+      <stop offset="0" stop-color="#22D3EE" stop-opacity="0.35"/>
+      <stop offset="1" stop-color="#22D3EE" stop-opacity="0"/>
+    </radialGradient>
+    <radialGradient id="gh-droneGlow" cx="50%" cy="50%" r="50%">
+      <stop offset="0" stop-color="#FB7185" stop-opacity="0.55"/>
+      <stop offset="1" stop-color="#FB7185" stop-opacity="0"/>
+    </radialGradient>
+    <radialGradient id="gh-coreGlow" cx="50%" cy="50%" r="50%">
+      <stop offset="0" stop-color="#E879F9" stop-opacity="0.5"/>
+      <stop offset="1" stop-color="#E879F9" stop-opacity="0"/>
+    </radialGradient>
+    <linearGradient id="gh-shell" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#BE185D"/>
+      <stop offset="0.5" stop-color="#9D174D"/>
+      <stop offset="1" stop-color="#500724"/>
+    </linearGradient>
+    <linearGradient id="gh-tracer" x1="0" y1="1" x2="1" y2="0">
+      <stop offset="0" stop-color="#22D3EE" stop-opacity="0"/>
+      <stop offset="0.7" stop-color="#22D3EE" stop-opacity="0.9"/>
+      <stop offset="1" stop-color="#A5F3FC"/>
+    </linearGradient>
+    <linearGradient id="gh-crystal" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#F0ABFC"/>
+      <stop offset="0.5" stop-color="#C026D3"/>
+      <stop offset="1" stop-color="#701A75"/>
+    </linearGradient>
+  </defs>
+
+  <!-- Sky -->
+  <rect width="600" height="210" fill="url(#gh-sky)"/>
+  <g fill="#E2E8F0">
+    <circle cx="60" cy="40" r="1.4" opacity="0.8"/>
+    <circle cx="150" cy="88" r="1" opacity="0.5"/>
+    <circle cx="235" cy="30" r="1.2" opacity="0.7"/>
+    <circle cx="330" cy="70" r="1" opacity="0.45"/>
+    <circle cx="420" cy="26" r="1.5" opacity="0.8"/>
+    <circle cx="505" cy="60" r="1" opacity="0.5"/>
+    <circle cx="560" cy="110" r="1.2" opacity="0.6"/>
+    <circle cx="95" cy="130" r="1" opacity="0.4" fill="#A5F3FC"/>
+    <circle cx="470" cy="128" r="1.1" opacity="0.5" fill="#A5F3FC"/>
+    <circle cx="290" cy="115" r="0.9" opacity="0.4" fill="#A5F3FC"/>
+  </g>
+
+  <!-- Floor with perspective grid -->
+  <rect y="210" width="600" height="190" fill="url(#gh-floor)"/>
+  <rect y="196" width="600" height="60" fill="url(#gh-horizon)"/>
+  <g stroke="#22D3EE" stroke-width="1" opacity="0.55">
+    <line x1="300" y1="212" x2="-140" y2="400"/>
+    <line x1="300" y1="212" x2="30" y2="400"/>
+    <line x1="300" y1="212" x2="150" y2="400"/>
+    <line x1="300" y1="212" x2="242" y2="400"/>
+    <line x1="300" y1="212" x2="358" y2="400"/>
+    <line x1="300" y1="212" x2="450" y2="400"/>
+    <line x1="300" y1="212" x2="570" y2="400"/>
+    <line x1="300" y1="212" x2="740" y2="400"/>
+  </g>
+  <g stroke="#22D3EE" opacity="0.4">
+    <line x1="0" y1="226" x2="600" y2="226" stroke-width="0.8"/>
+    <line x1="0" y1="248" x2="600" y2="248" stroke-width="1"/>
+    <line x1="0" y1="282" x2="600" y2="282" stroke-width="1.3"/>
+    <line x1="0" y1="330" x2="600" y2="330" stroke-width="1.6"/>
+    <line x1="0" y1="392" x2="600" y2="392" stroke-width="2"/>
+  </g>
+  <line x1="0" y1="212" x2="600" y2="212" stroke="#67E8F9" stroke-width="1.6" opacity="0.9"/>
+
+  <!-- Boundary pylons -->
+  <g>
+    <rect x="70" y="150" width="4" height="62" fill="#22D3EE" opacity="0.8"/>
+    <circle cx="72" cy="146" r="7" fill="#22D3EE" opacity="0.35"/>
+    <rect x="522" y="158" width="4" height="54" fill="#22D3EE" opacity="0.7"/>
+    <circle cx="524" cy="154" r="6" fill="#22D3EE" opacity="0.3"/>
+  </g>
+
+  <!-- Memory core (left set-piece) -->
+  <g transform="translate(120,150)">
+    <circle cx="0" cy="0" r="46" fill="url(#gh-coreGlow)"/>
+    <polygon points="0,-34 22,0 0,34 -22,0" fill="url(#gh-crystal)" stroke="#F0ABFC" stroke-width="1.5"/>
+    <line x1="0" y1="-34" x2="0" y2="34" stroke="#F0ABFC" stroke-width="0.8" opacity="0.7"/>
+    <ellipse cx="0" cy="0" rx="34" ry="7" fill="none" stroke="#22D3EE" stroke-width="2" opacity="0.8"/>
+    <rect x="-26" y="52" width="52" height="10" rx="3" fill="#1E1B4B" stroke="#312E81"/>
+  </g>
+
+  <!-- Distant drones -->
+  <g transform="translate(452,120)" opacity="0.85">
+    <circle cx="0" cy="0" r="20" fill="url(#gh-droneGlow)"/>
+    <polygon points="0,-13 11,-6 11,6 0,13 -11,6 -11,-6" fill="#155E75" stroke="#22D3EE" stroke-width="1.2"/>
+    <circle cx="0" cy="0" r="4" fill="#A5F3FC"/>
+  </g>
+  <g transform="translate(240,96)" opacity="0.6">
+    <polygon points="0,-9 8,-4 8,4 0,9 -8,4 -8,-4" fill="#4C1D95" stroke="#A78BFA" stroke-width="1"/>
+    <circle cx="0" cy="0" r="3" fill="#C4B5FD"/>
+  </g>
+
+  <!-- Tracer beams converging on the target -->
+  <polygon points="30,400 70,400 350,190 344,182" fill="url(#gh-tracer)" opacity="0.9"/>
+  <polygon points="560,400 596,392 352,192 346,186" fill="url(#gh-tracer)" opacity="0.55"/>
+
+  <!-- Hero drone under fire -->
+  <g transform="translate(348,178)">
+    <circle cx="0" cy="0" r="66" fill="url(#gh-droneGlow)"/>
+    <polygon points="0,-38 33,-19 33,19 0,38 -33,19 -33,-19" fill="url(#gh-shell)" stroke="#FB7185" stroke-width="2"/>
+    <line x1="0" y1="-38" x2="0" y2="38" stroke="#FB7185" stroke-width="1" opacity="0.65"/>
+    <line x1="-33" y1="-19" x2="33" y2="19" stroke="#FB7185" stroke-width="1" opacity="0.5"/>
+    <line x1="33" y1="-19" x2="-33" y2="19" stroke="#FB7185" stroke-width="1" opacity="0.5"/>
+    <circle cx="0" cy="0" r="11" fill="#FB7185"/>
+    <circle cx="0" cy="0" r="5" fill="#FFF1F2"/>
+    <!-- impact sparks -->
+    <g stroke="#A5F3FC" stroke-width="2" stroke-linecap="round">
+      <line x1="-40" y1="26" x2="-50" y2="34"/>
+      <line x1="-36" y1="34" x2="-42" y2="44"/>
+      <line x1="-45" y1="18" x2="-56" y2="20"/>
+    </g>
+  </g>
+
+  <!-- Crosshair -->
+  <g transform="translate(348,178)" stroke="#67E8F9" stroke-width="3" stroke-linecap="round">
+    <circle cx="0" cy="0" r="52" fill="none" opacity="0.9"/>
+    <line x1="0" y1="-66" x2="0" y2="-44"/>
+    <line x1="0" y1="44" x2="0" y2="66"/>
+    <line x1="-66" y1="0" x2="-44" y2="0"/>
+    <line x1="44" y1="0" x2="66" y2="0"/>
+  </g>
+
+  <!-- Ammo pips (bottom-right HUD hint) -->
+  <g transform="translate(482,368)">
+    <rect x="0" y="0" width="7" height="20" rx="3" fill="#E879F9"/>
+    <rect x="12" y="0" width="7" height="20" rx="3" fill="#E879F9"/>
+    <rect x="24" y="0" width="7" height="20" rx="3" fill="#22D3EE"/>
+    <rect x="36" y="0" width="7" height="20" rx="3" fill="#22D3EE"/>
+    <rect x="48" y="6" width="7" height="14" rx="3" fill="#334155"/>
+    <rect x="60" y="6" width="7" height="14" rx="3" fill="#334155"/>
+  </g>
+
+  <!-- Viewmodel blaster silhouette (bottom-right corner) -->
+  <g transform="translate(430,290) rotate(-18)">
+    <rect x="0" y="26" width="150" height="52" rx="10" fill="#1E293B" stroke="#334155" stroke-width="2"/>
+    <rect x="-52" y="36" width="70" height="26" rx="8" fill="#334155"/>
+    <rect x="-84" y="40" width="40" height="18" rx="6" fill="#475569"/>
+    <rect x="8" y="14" width="70" height="18" rx="6" fill="#0F172A" stroke="#22D3EE" stroke-width="1.6"/>
+    <rect x="20" y="40" width="86" height="8" rx="4" fill="#22D3EE" opacity="0.9"/>
+    <circle cx="-88" cy="49" r="14" fill="#A5F3FC" opacity="0.85"/>
+    <circle cx="-88" cy="49" r="24" fill="#22D3EE" opacity="0.28"/>
+    <rect x="96" y="72" width="34" height="58" rx="8" fill="#1E293B" transform="rotate(14 113 101)"/>
+  </g>
+</svg>

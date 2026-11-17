@@ -1,0 +1,91 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 600 400" width="600" height="400">
+  <defs>
+    <linearGradient id="rg-sky" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#7dd3fc"/>
+      <stop offset="1" stop-color="#bae6fd"/>
+    </linearGradient>
+    <linearGradient id="rg-water" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#0891b2"/>
+      <stop offset="0.55" stop-color="#075985"/>
+      <stop offset="1" stop-color="#1e1b4b"/>
+    </linearGradient>
+    <linearGradient id="rg-f1" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#fda4af"/><stop offset="1" stop-color="#be123c"/></linearGradient>
+    <linearGradient id="rg-f2" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#67e8f9"/><stop offset="1" stop-color="#0e7490"/></linearGradient>
+    <linearGradient id="rg-f3" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#fde68a"/><stop offset="1" stop-color="#d97706"/></linearGradient>
+    <linearGradient id="rg-f4" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#c4b5fd"/><stop offset="1" stop-color="#6d28d9"/></linearGradient>
+    <linearGradient id="rg-hull" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#fb923c"/><stop offset="1" stop-color="#c2410c"/></linearGradient>
+    <filter id="rg-glow" x="-40%" y="-40%" width="180%" height="180%">
+      <feGaussianBlur stdDeviation="3.5" result="b"/>
+      <feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge>
+    </filter>
+  </defs>
+  <!-- sky + water -->
+  <rect width="600" height="84" fill="url(#rg-sky)"/>
+  <rect y="84" width="600" height="316" fill="url(#rg-water)"/>
+  <circle cx="470" cy="36" r="22" fill="#fef9c3" opacity="0.9"/>
+  <!-- surface waves -->
+  <path d="M0 84 Q 30 78 60 84 T 120 84 T 180 84 T 240 84 T 300 84 T 360 84 T 420 84 T 480 84 T 540 84 T 600 84" fill="none" stroke="#e0f2fe" stroke-width="4"/>
+  <!-- light rays -->
+  <g opacity="0.18" fill="#e0f2fe">
+    <polygon points="120,86 150,86 60,400 10,400"/>
+    <polygon points="300,86 330,86 250,400 200,400"/>
+    <polygon points="470,86 500,86 430,400 380,400"/>
+  </g>
+  <!-- boat -->
+  <g transform="translate(300,76)">
+    <path d="M-62 -2 L62 -2 Q54 20 28 22 L-28 22 Q-54 20 -62 -2 Z" fill="url(#rg-hull)"/>
+    <rect x="-24" y="-13" width="34" height="11" fill="#fde68a"/>
+    <circle cx="26" cy="-21" r="7" fill="#0ea5e9"/>
+    <path d="M18 -24 A8 8 0 0 1 34 -24 Z" fill="#facc15"/>
+    <line x1="28" y1="-12" x2="52" y2="-38" stroke="#92400e" stroke-width="3"/>
+  </g>
+  <!-- fishing line + hook -->
+  <path d="M352 40 Q358 140 330 218" fill="none" stroke="#f1f5f9" stroke-width="2" opacity="0.85"/>
+  <path d="M330 224 a8 8 0 1 0 8 -10" fill="none" stroke="#e2e8f0" stroke-width="4"/>
+  <!-- answer fish -->
+  <g filter="url(#rg-glow)">
+    <g transform="translate(150,160)">
+      <polygon points="-34,0 -52,-14 -52,14" fill="#be123c"/>
+      <ellipse cx="0" cy="0" rx="36" ry="19" fill="url(#rg-f1)"/>
+      <circle cx="20" cy="-5" r="4.5" fill="#ffffff"/><circle cx="21.5" cy="-5" r="2.4" fill="#0f172a"/>
+      <circle cx="-2" cy="0" r="11" fill="#0f172a" opacity="0.85"/>
+      <text x="-2" y="4.5" font-family="system-ui, sans-serif" font-size="13" font-weight="700" fill="#ffffff" text-anchor="middle">A</text>
+    </g>
+    <g transform="translate(452,210) scale(-1,1)">
+      <polygon points="-34,0 -52,-14 -52,14" fill="#0e7490"/>
+      <ellipse cx="0" cy="0" rx="36" ry="19" fill="url(#rg-f2)"/>
+      <circle cx="20" cy="-5" r="4.5" fill="#ffffff"/><circle cx="21.5" cy="-5" r="2.4" fill="#0f172a"/>
+      <circle cx="-2" cy="0" r="11" fill="#0f172a" opacity="0.85"/>
+      <text x="-2" y="4.5" font-family="system-ui, sans-serif" font-size="13" font-weight="700" fill="#ffffff" text-anchor="middle" transform="scale(-1,1)">B</text>
+    </g>
+    <g transform="translate(330,272)">
+      <polygon points="-34,0 -52,-14 -52,14" fill="#d97706"/>
+      <ellipse cx="0" cy="0" rx="36" ry="19" fill="url(#rg-f3)"/>
+      <circle cx="20" cy="-5" r="4.5" fill="#ffffff"/><circle cx="21.5" cy="-5" r="2.4" fill="#0f172a"/>
+      <circle cx="-2" cy="0" r="11" fill="#0f172a" opacity="0.85"/>
+      <text x="-2" y="4.5" font-family="system-ui, sans-serif" font-size="13" font-weight="700" fill="#ffffff" text-anchor="middle">C</text>
+      <path d="M26 -22 l2 5 5 2 -5 2 -2 5 -2 -5 -5 -2 5 -2 Z" fill="#fef9c3"/>
+    </g>
+    <g transform="translate(170,330) scale(-1,1)">
+      <polygon points="-34,0 -52,-14 -52,14" fill="#6d28d9"/>
+      <ellipse cx="0" cy="0" rx="36" ry="19" fill="url(#rg-f4)"/>
+      <circle cx="20" cy="-5" r="4.5" fill="#ffffff"/><circle cx="21.5" cy="-5" r="2.4" fill="#0f172a"/>
+      <circle cx="-2" cy="0" r="11" fill="#0f172a" opacity="0.85"/>
+      <text x="-2" y="4.5" font-family="system-ui, sans-serif" font-size="13" font-weight="700" fill="#ffffff" text-anchor="middle" transform="scale(-1,1)">D</text>
+    </g>
+  </g>
+  <!-- jellyfish -->
+  <g transform="translate(510,330)" opacity="0.85">
+    <path d="M-20 0 A20 20 0 0 1 20 0 Q12 8 0 7 Q-12 8 -20 0 Z" fill="#f0abfc" opacity="0.8"/>
+    <g stroke="#e879f9" stroke-width="2" fill="none" opacity="0.6">
+      <path d="M-12 6 q-3 12 2 22"/>
+      <path d="M0 8 q2 12 -2 24"/>
+      <path d="M12 6 q4 12 0 22"/>
+    </g>
+  </g>
+  <!-- bubbles -->
+  <g fill="none" stroke="#e0f2fe" opacity="0.5">
+    <circle cx="80" cy="240" r="4"/><circle cx="92" cy="210" r="2.5"/><circle cx="540" cy="150" r="3"/>
+    <circle cx="552" cy="120" r="2"/><circle cx="240" cy="350" r="3.5"/><circle cx="400" cy="320" r="2.5"/>
+  </g>
+</svg>

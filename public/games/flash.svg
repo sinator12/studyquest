@@ -1,0 +1,73 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="600" height="400" viewBox="0 0 600 400" fill="none" role="img" aria-labelledby="title desc">
+  <title id="title">FLASH</title>
+  <desc id="desc">A faceted violet lightning bolt with floating answer cards and memory rings on a midnight-blue background.</desc>
+  <defs>
+    <linearGradient id="bg" x1="35" y1="0" x2="535" y2="420" gradientUnits="userSpaceOnUse"><stop stop-color="#1E2547"/><stop offset=".55" stop-color="#0F172A"/><stop offset="1" stop-color="#161B36"/></linearGradient>
+    <radialGradient id="halo"><stop stop-color="#6366F1" stop-opacity=".26"/><stop offset="1" stop-color="#6366F1" stop-opacity="0"/></radialGradient>
+    <linearGradient id="bolt" x1="310" y1="104" x2="325" y2="342" gradientUnits="userSpaceOnUse"><stop stop-color="#F5F3FF"/><stop offset=".42" stop-color="#C7D2FE"/><stop offset="1" stop-color="#818CF8"/></linearGradient>
+    <linearGradient id="side" x1="285" y1="180" x2="358" y2="299" gradientUnits="userSpaceOnUse"><stop stop-color="#8B5CF6"/><stop offset="1" stop-color="#4338CA"/></linearGradient>
+    <linearGradient id="card" x1="0" y1="0" x2="0" y2="80" gradientUnits="userSpaceOnUse"><stop stop-color="#303964"/><stop offset="1" stop-color="#1E2547"/></linearGradient>
+    <linearGradient id="rim" x1="213" y1="124" x2="407" y2="306" gradientUnits="userSpaceOnUse"><stop stop-color="#C4B5FD"/><stop offset=".5" stop-color="#6366F1"/><stop offset="1" stop-color="#312E81"/></linearGradient>
+    <filter id="shadow" x="-60%" y="-40%" width="220%" height="210%"><feDropShadow dx="0" dy="14" stdDeviation="11" flood-color="#080F22" flood-opacity=".65"/></filter>
+    <filter id="smallShadow" x="-20%" y="-30%" width="150%" height="180%"><feDropShadow dx="0" dy="7" stdDeviation="5" flood-color="#080F22" flood-opacity=".5"/></filter>
+  </defs>
+  <rect width="600" height="400" rx="28" fill="url(#bg)"/>
+  <rect x=".75" y=".75" width="598.5" height="398.5" rx="27.25" stroke="#A5B4FC" stroke-opacity=".16" stroke-width="1.5"/>
+  <ellipse cx="309" cy="223" rx="272" ry="213" fill="url(#halo)"/>
+  <g stroke="#818CF8" stroke-opacity=".15">
+    <ellipse cx="315" cy="232" rx="250" ry="116" transform="rotate(-16 315 232)"/>
+    <ellipse cx="315" cy="232" rx="205" ry="88" transform="rotate(19 315 232)"/>
+    <circle cx="313" cy="224" r="145" stroke-dasharray="2 11"/>
+  </g>
+  <g fill="#A5B4FC"><circle cx="69" cy="212" r="2" opacity=".5"/><circle cx="529" cy="157" r="2.5" opacity=".6"/><circle cx="177" cy="107" r="2" opacity=".6"/><circle cx="392" cy="348" r="2" opacity=".4"/><circle cx="560" cy="342" r="2" opacity=".4"/><circle cx="72" cy="366" r="1.5" opacity=".6"/></g>
+  <text x="34" y="67" fill="#F8FAFC" font-family="Arial, Helvetica, sans-serif" font-size="43" font-weight="900" font-style="italic" letter-spacing="-2">FLASH</text>
+  <g transform="translate(41 145) rotate(-9 75 34)" filter="url(#smallShadow)">
+    <rect y="5" width="143" height="63" rx="16" fill="#0C1226"/>
+    <rect width="143" height="63" rx="16" fill="url(#card)" stroke="#818CF8" stroke-opacity=".65"/>
+    <path d="M16 1H126" stroke="#C7D2FE" stroke-opacity=".28"/>
+    <circle cx="29" cy="31.5" r="11" fill="#818CF8"/>
+    <path d="M21 27C29 23 34 29 38 25M19 34C25 31 34 37 39 32" stroke="#C7D2FE" stroke-width="2"/>
+    <path d="M54 26H119M54 37H101" stroke="#E0E7FF" stroke-width="6" stroke-linecap="round" opacity=".85"/>
+  </g>
+  <g transform="translate(399 77) rotate(8 76 34)" filter="url(#smallShadow)">
+    <rect y="5" width="152" height="63" rx="16" fill="#0C1226"/>
+    <rect width="152" height="63" rx="16" fill="url(#card)" stroke="#A78BFA" stroke-opacity=".65"/>
+    <path d="M16 1H135" stroke="#DDD6FE" stroke-opacity=".28"/>
+    <circle cx="28" cy="31.5" r="11" fill="#A78BFA"/>
+    <ellipse cx="28" cy="31.5" rx="19" ry="5" transform="rotate(-25 28 31.5)" stroke="#DDD6FE" stroke-width="2"/>
+    <path d="M56 26H126M56 37H108" stroke="#E0E7FF" stroke-width="6" stroke-linecap="round" opacity=".85"/>
+  </g>
+  <ellipse cx="310" cy="347" rx="82" ry="11" fill="#0C1226" fill-opacity=".8"/>
+  <g filter="url(#shadow)">
+    <circle cx="310" cy="221" r="102" fill="#0C1226" stroke="#20264A" stroke-width="13"/>
+    <circle cx="310" cy="216" r="101" fill="#20264A" stroke="url(#rim)" stroke-width="2"/>
+    <circle cx="310" cy="216" r="83" fill="#161B36" stroke="#434779"/>
+    <path d="M310 134L360 163L386 212L358 265L310 298L259 269L231 217L259 164Z" stroke="#818CF8" stroke-opacity=".25"/>
+    <path d="M310 134L302 185L360 163M386 212L331 201L358 265M310 298L318 247L259 269M231 217L284 233L259 164" stroke="#818CF8" stroke-opacity=".25"/>
+    <path d="M226 188A89 89 0 0 1 274 135" stroke="#C7D2FE" stroke-width="4" stroke-linecap="round"/>
+    <path d="M389 254A89 89 0 0 1 352 293" stroke="#8B5CF6" stroke-width="4" stroke-linecap="round"/>
+    <path d="M338 99L354 114L327 204L372 204L384 218L282 354L268 340L292 254L249 254L235 240Z" fill="#0C1226" stroke="#0C1226" stroke-width="9" stroke-linejoin="round"/>
+    <path d="M338 99L354 114L327 204L372 204L384 218L282 354L268 340L301 241L249 254L235 240Z" fill="url(#side)"/>
+    <path d="M338 99L313 190L372 204L268 340L291 241L235 240Z" fill="url(#bolt)" stroke="#E0E7FF" stroke-width="1.5" stroke-linejoin="round"/>
+    <path d="M338 99L300 219L235 240Z" fill="#FFFFFF" fill-opacity=".5"/>
+    <path d="M300 219L372 204L268 340Z" fill="#A5B4FC" fill-opacity=".8"/>
+    <path d="M300 219L291 241L268 340L325 234Z" fill="#6366F1" fill-opacity=".4"/>
+    <path d="M313 190L327 204L372 204" fill="#C4B5FD"/>
+    <path d="M372 204L384 218L282 354L268 340Z" fill="#7C3AED" fill-opacity=".65"/>
+    <path d="M240 237L289 238M334 108L314 184" stroke="#FFFFFF" stroke-width="3" stroke-linecap="round"/>
+  </g>
+  <g transform="translate(409 267) rotate(-7 77 35)" filter="url(#smallShadow)">
+    <rect y="5" width="156" height="65" rx="16" fill="#0C1226"/>
+    <rect width="156" height="65" rx="16" fill="url(#card)" stroke="#818CF8" stroke-opacity=".65"/>
+    <circle cx="29" cy="32" r="12" fill="#818CF8"/><path d="M18 29H40M19 36H39" stroke="#E0E7FF" stroke-width="2"/>
+    <path d="M55 27H128M55 38H109" stroke="#E0E7FF" stroke-width="6" stroke-linecap="round" opacity=".85"/>
+  </g>
+  <g transform="translate(80 283) rotate(6 72 33)">
+    <rect width="137" height="62" rx="16" fill="#1E2547" fill-opacity=".45" stroke="#A5B4FC" stroke-opacity=".48" stroke-dasharray="5 7"/>
+    <circle cx="34" cy="31" r="18" stroke="#C7D2FE" stroke-opacity=".35"/>
+    <circle cx="34" cy="31" r="8" stroke="#C7D2FE" stroke-opacity=".55"/>
+    <path d="M92 21L92 48L99 41L105 54L111 51L105 39L115 38Z" fill="#F5F3FF" stroke="#312E81" stroke-width="2" stroke-linejoin="round"/>
+  </g>
+  <path d="M43 119H77M49 110H69" stroke="#A5B4FC" stroke-opacity=".4" stroke-width="2" stroke-linecap="round"/>
+  <path d="M471 362H516M483 370H505" stroke="#A5B4FC" stroke-opacity=".25" stroke-width="2" stroke-linecap="round"/>
+</svg>
