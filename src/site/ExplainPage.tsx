@@ -25,7 +25,7 @@ export default function ExplainPage() {
   const [selectedAnswers, setSelectedAnswers] = useState<{ [key: number]: number }>({});
   const [attachedFileName, setAttachedFileName] = useState<string | null>(null);
   const [activeDeck, setActiveDeckState] = useState<DeckInfo>(getActiveDeck());
-  const [showFeedback, setShowFeedback] = useState(true);
+
 
   const fileInputRef = useRef<HTMLInputElement>(null);
 
@@ -521,26 +521,6 @@ Return ONLY a valid JSON object matching this schema:
           </div>
         </section>
       </main>
-
-      {/* Floating Give Feedback Button (Photo 3 Bottom Right) */}
-      {showFeedback && (
-        <div className="sq-sp-feedback-pill">
-          <button
-            type="button"
-            className="sq-sp-feedback-close"
-            onClick={() => setShowFeedback(false)}
-            title="Dismiss"
-          >
-            ✕
-          </button>
-          <a href="mailto:feedback@studyquest.app" className="sq-sp-feedback-link">
-            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-              <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z" />
-            </svg>
-            <span>Give feedback</span>
-          </a>
-        </div>
-      )}
     </div>
   );
 }

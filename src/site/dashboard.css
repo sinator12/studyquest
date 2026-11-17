@@ -1022,51 +1022,10 @@
 }
 
 /* ---------------- Responsive & Mobile Experience ---------------- */
-.sq-mobile-bottom-bar {
-  display: none;
-  position: fixed;
-  bottom: 0;
-  left: 0;
-  right: 0;
-  height: 60px;
-  background: rgba(17, 23, 46, 0.95);
-  backdrop-filter: blur(12px);
-  -webkit-backdrop-filter: blur(12px);
-  border-top: 1px solid rgba(75, 85, 130, 0.35);
-  z-index: 999;
-  justify-content: space-around;
-  align-items: center;
-  padding: 0 6px;
-}
-
-.sq-mob-tab {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  gap: 3px;
-  color: #94A3B8;
-  text-decoration: none;
-  font-size: 11px;
-  font-weight: 700;
-  padding: 6px 10px;
-  border-radius: 10px;
-  min-width: 58px;
-  transition: all 0.15s ease;
-}
-
-.sq-mob-tab:hover,
-.sq-mob-tab.active {
-  color: #818CF8;
-}
-
-.sq-mob-tab.active svg {
-  stroke: #818CF8;
-}
-
 @media (max-width: 900px) {
   .sq-dash-hero {
     grid-template-columns: 1fr;
+    gap: 20px;
   }
   .sq-method-tabs {
     grid-template-columns: 1fr;
@@ -1077,69 +1036,136 @@
 }
 
 @media (max-width: 768px) {
-  .sq-mobile-bottom-bar {
-    display: flex;
+  html, body {
+    overflow-x: hidden;
+    width: 100%;
+    max-width: 100vw;
   }
 
   body {
-    padding-bottom: 68px;
+    padding-bottom: 74px;
   }
 
-  .sq-main-nav {
-    padding: 0 8px;
+  .sq-dash-container {
+    padding: 16px 12px 80px;
+    gap: 18px;
+    width: 100%;
+    max-width: 100%;
+    box-sizing: border-box;
+    overflow-x: hidden;
   }
 
-  .sq-nav-inner {
-    height: 52px;
-    gap: 6px;
-  }
-
-  .sq-brand-text {
-    font-size: 16px;
-  }
-
-  .sq-nav-right-tools {
-    gap: 4px;
-  }
-
-  /* Compact material pill on phone */
-  .sq-material-pill {
-    padding: 4px 8px;
-    gap: 6px;
-  }
-
-  .sq-material-action {
-    display: none;
-  }
-
-  .sq-material-info .sq-material-line:last-child {
-    display: none;
-  }
-
-  .sq-stat-chip {
-    padding: 5px 7px;
-    font-size: 11px;
-    gap: 4px;
-  }
-
-  .sq-signin-nav-btn {
-    padding: 6px 10px;
-    font-size: 12px;
-    display: inline-flex;
-    align-items: center;
-    gap: 6px;
-  }
-
-  .sq-dash-main {
-    padding: 16px 12px 32px;
-  }
-
-  .sq-welcome-card {
-    padding: 18px 14px;
-  }
-
-  .sq-mode-cards-grid {
+  .sq-dash-hero {
     grid-template-columns: 1fr;
+    gap: 16px;
+    width: 100%;
+  }
+
+  /* Responsive Hero Card: stack mascot and text on mobile to prevent clipping */
+  .sq-dash-hero-left {
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+    padding: 20px 14px;
+    gap: 14px;
+    border-radius: 20px;
+    width: 100%;
+    box-sizing: border-box;
+  }
+
+  .sq-mascot-wrap {
+    width: 68px;
+    height: 68px;
+  }
+
+  .sq-mascot-wrap svg {
+    width: 68px;
+    height: 68px;
+  }
+
+  .sq-hero-bubble {
+    width: 100%;
+    box-sizing: border-box;
+  }
+
+  .sq-hero-bubble h1 {
+    font-size: clamp(20px, 5.2vw, 24px);
+    line-height: 1.25;
+    margin-bottom: 8px;
+    word-break: break-word;
+    text-wrap: balance;
+  }
+
+  .sq-hero-bubble p {
+    font-size: 14px;
+    margin-bottom: 16px;
+    line-height: 1.4;
+  }
+
+  /* Wrap steps row so it never overflows mobile viewport */
+  .sq-steps-row {
+    display: flex;
+    flex-direction: row;
+    flex-wrap: wrap;
+    justify-content: center;
+    align-items: center;
+    gap: 8px 10px;
+    width: 100%;
+    font-size: 13px;
+  }
+
+  .sq-step-line {
+    display: none;
+  }
+
+  .sq-step-item {
+    gap: 6px;
+    font-size: 12.5px;
+    white-space: nowrap;
+  }
+
+  .sq-today-card, .sq-premium-banner {
+    padding: 16px 14px;
+    border-radius: 16px;
+    width: 100%;
+    box-sizing: border-box;
+  }
+
+  .sq-input-card {
+    padding: 20px 14px;
+    border-radius: 20px;
+    gap: 16px;
+    width: 100%;
+    box-sizing: border-box;
+  }
+
+  .sq-input-head h2 {
+    font-size: 20px;
+  }
+
+  .sq-input-head p {
+    font-size: 13.5px;
+  }
+
+  .sq-method-tabs {
+    grid-template-columns: 1fr;
+    gap: 10px;
+  }
+
+  .sq-method-tab {
+    padding: 14px 16px;
+  }
+
+  .sq-textarea {
+    min-height: 140px;
+    padding: 12px;
+    font-size: 14px;
+  }
+
+  .sq-generate-btn {
+    width: 100%;
+    height: 52px;
+    font-size: 16px;
   }
 }
 

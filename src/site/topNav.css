@@ -365,40 +365,78 @@
   bottom: 0;
   left: 0;
   right: 0;
-  height: 60px;
-  background: #0E1326;
-  border-top: 1px solid rgba(255, 255, 255, 0.12);
-  z-index: 85;
+  height: 64px;
+  background: rgba(14, 19, 38, 0.96);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border-top: 1px solid rgba(129, 140, 248, 0.25);
+  z-index: 100;
   justify-content: space-around;
   align-items: center;
-  box-shadow: 0 -4px 16px rgba(0, 0, 0, 0.4);
-  padding-bottom: env(safe-area-inset-bottom);
+  box-shadow: 0 -8px 24px rgba(0, 0, 0, 0.5);
+  padding: 0 10px calc(env(safe-area-inset-bottom) + 2px);
+  box-sizing: border-box;
 }
 
 .sq-mob-tab {
+  position: relative;
   display: flex;
   flex-direction: column;
   align-items: center;
+  justify-content: center;
   gap: 3px;
   color: #94A3B8;
   text-decoration: none;
   font-size: 11px;
   font-weight: 700;
-  padding: 6px 12px;
-  border-radius: 10px;
-  transition: all 0.15s ease;
+  padding: 6px 14px;
+  border-radius: 12px;
+  transition: all 0.18s cubic-bezier(0.16, 1, 0.3, 1);
+  min-width: 60px;
 }
 
 .sq-mob-tab:hover {
   color: #CBD5E1;
 }
 
+/* Photo 3: Prominent Active Tab Indicator */
 .sq-mob-tab.active {
-  color: #818CF8;
+  color: #A5B4FC;
+  background: rgba(99, 102, 241, 0.18);
+  border: 1px solid rgba(129, 140, 248, 0.38);
+  box-shadow: 0 0 16px rgba(99, 102, 241, 0.28), inset 0 1px 1px rgba(255, 255, 255, 0.15);
+  transform: translateY(-2px);
+}
+
+/* Glowing Top Accent Indicator Bar on Active Tab */
+.sq-mob-tab.active::before {
+  content: "";
+  position: absolute;
+  top: -8px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 24px;
+  height: 3.5px;
+  background: #818CF8;
+  background-image: linear-gradient(90deg, #A5B4FC 0%, #818CF8 50%, #6366F1 100%);
+  border-radius: 999px;
+  box-shadow: 0 0 10px 2px #818CF8, 0 1px 4px rgba(0, 0, 0, 0.8);
+}
+
+.sq-mob-tab.active svg {
+  stroke: #A5B4FC;
+  filter: drop-shadow(0 0 6px rgba(129, 140, 248, 0.6));
+  transform: scale(1.06);
+}
+
+.sq-mob-tab.active span {
+  color: #FFFFFF;
+  font-weight: 800;
+  text-shadow: 0 0 8px rgba(129, 140, 248, 0.6);
 }
 
 /* ==========================================================================
-   MOBILE RESPONSIVE BREAKPOINTS FOR TOPNAV
+   MOBILE RESPONSIVE BREAKPOINTS FOR TOPNAV (Fixes Photo 1 Overflow)
    ========================================================================== */
 
 @media (max-width: 900px) {
@@ -411,52 +449,40 @@
   }
 
   body {
-    padding-bottom: 64px;
+    padding-bottom: 74px;
   }
 }
 
-@media (max-width: 680px) {
+@media (max-width: 640px) {
   .sq-main-nav {
-    padding: 0 10px;
+    padding: 0 8px;
+    width: 100%;
+    max-width: 100vw;
+    box-sizing: border-box;
+    overflow-x: hidden;
   }
 
   .sq-nav-inner {
     height: 52px;
-    gap: 8px;
-  }
-
-  .sq-brand-text {
-    font-size: 17px;
-  }
-
-  .sq-material-pill {
-    padding: 4px 8px;
     gap: 6px;
-  }
-
-  .sq-material-action {
-    display: none;
-  }
-
-  .sq-stat-chip {
-    padding: 5px 8px;
-    font-size: 12px;
-    gap: 4px;
-  }
-}
-
-@media (max-width: 440px) {
-  .sq-main-nav {
-    padding: 0 6px;
+    width: 100%;
+    max-width: 100%;
+    box-sizing: border-box;
   }
 
   .sq-brand-text {
-    font-size: 15.5px;
+    font-size: 16px;
+    letter-spacing: -0.02em;
   }
 
-  /* On narrow screens, hide the redundant material pill from the top bar so timer & level never clip */
+  /* Hide redundant material pill on mobile so timer, streak, and account never clip or push boundary */
   .sq-material-pill {
-    display: none;
+    display: none !important;
+  }
+
+  .sq-nav-right-tools {
+    gap: 4px;
+    flex-shrink: 0;
   }
 
   .sq-stat-chip {
@@ -468,6 +494,22 @@
   .sq-signin-nav-btn {
     padding: 5px 9px;
     font-size: 11.5px;
-    gap: 5px;
+    gap: 4px;
+  }
+
+  .sq-avatar-pill {
+    width: 28px;
+    height: 28px;
+    font-size: 12.5px;
+  }
+}
+
+@media (max-width: 400px) {
+  .sq-brand-text {
+    font-size: 14.5px;
+  }
+
+  .sq-stat-chip.sq-level-chip {
+    display: none;
   }
 }

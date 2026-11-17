@@ -46,7 +46,7 @@ export default function StudyPlanPage() {
   const [language, setLanguage] = useState("English");
 
   const [generatingStatus, setGeneratingStatus] = useState("Analyzing your study material with Groq AI...");
-  const [showFeedback, setShowFeedback] = useState(true);
+
 
   const fileInputRef = useRef<HTMLInputElement>(null);
 
@@ -584,26 +584,6 @@ export default function StudyPlanPage() {
           )}
         </section>
       </main>
-
-      {/* Floating Give Feedback Button */}
-      {showFeedback && (
-        <div className="sq-sp-feedback-pill">
-          <button
-            type="button"
-            className="sq-sp-feedback-close"
-            onClick={() => setShowFeedback(false)}
-            title="Dismiss"
-          >
-            ✕
-          </button>
-          <a href="mailto:feedback@studyquest.app" className="sq-sp-feedback-link">
-            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-              <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z" />
-            </svg>
-            <span>Give feedback</span>
-          </a>
-        </div>
-      )}
     </div>
   );
 }
