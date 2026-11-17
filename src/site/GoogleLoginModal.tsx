@@ -78,7 +78,7 @@ export default function GoogleLoginModal({ isOpen, onClose, onSuccess }: GoogleL
           ✕
         </button>
 
-        {/* 1. StudyQuest Branding */}
+        {/* 1. EduQuest Branding */}
         <div className="sq-auth-brand-badge">
           <div className="sq-auth-mascot-icon">
             <svg viewBox="0 0 36 36" width="46" height="46" fill="none" aria-hidden="true">
@@ -95,12 +95,12 @@ export default function GoogleLoginModal({ isOpen, onClose, onSuccess }: GoogleL
               />
             </svg>
           </div>
-          <span className="sq-auth-brand-label">StudyQuest</span>
+          <span className="sq-auth-brand-label">EduQuest</span>
         </div>
 
         {/* 2. Welcome Heading */}
         <div className="sq-auth-header">
-          <h2 id="sq-login-title">Sign in to StudyQuest</h2>
+          <h2 id="sq-login-title">Sign in to EduQuest</h2>
           {/* 3. Short description explaining Google sign-in */}
           <p>
             Sign in or create your account with Google to sync your study decks, track daily
@@ -209,7 +209,7 @@ export default function GoogleLoginModal({ isOpen, onClose, onSuccess }: GoogleL
           <p>
             🔒 Google OAuth 2.0 Secure Authentication.
             <br />
-            By signing in, you agree to StudyQuest's Terms of Service and Privacy Policy.
+            By signing in, you agree to EduQuest's Terms of Service and Privacy Policy.
           </p>
         </div>
       </div>

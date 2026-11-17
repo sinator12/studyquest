@@ -610,7 +610,7 @@ export default function GamesPage() {
             <div>
               <img
                 src="/assets/studyQuestLogo-18735c9a.svg"
-                alt="StudyQuest Logo"
+                alt="EduQuest Logo"
                 width={168}
                 height={40}
                 loading="lazy"
@@ -665,7 +665,7 @@ export default function GamesPage() {
             </div>
           </div>
           <div className="sqh-legal">
-            <span>© 2026 StudyQuest. All rights reserved.</span>
+            <span>© 2026 EduQuest. All rights reserved.</span>
             <a href="mailto:hello@studyquest.app">hello@studyquest.app</a>
           </div>
         </div>
@@ -678,7 +678,7 @@ export default function GamesPage() {
               <div className="sq-modal-title-row">
                 <span className="sq-modal-icon">🎮</span>
                 <div>
-                  <h3>How StudyQuest Games Work</h3>
+                  <h3>How EduQuest Games Work</h3>
                   <p>Turn any study material into an active recall arcade challenge.</p>
                 </div>
               </div>

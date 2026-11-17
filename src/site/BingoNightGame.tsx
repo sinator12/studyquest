@@ -47,7 +47,7 @@ export const BINGO_CHARACTERS: BingoCharacter[] = [
     callQuote: "Dahahaha! Focus your mind and let's see what the hall has for you.",
     correctQuote: "Outstanding recall! That answer is pure mastery. Stamp your square!",
     missQuote: "No worries! Even great pirates miss. Shake it off and try the next ball.",
-    bingoQuote: "Dahahaha! Glorious BINGO! A true champion of StudyQuest!"
+    bingoQuote: "Dahahaha! Glorious BINGO! A true champion of EduQuest!"
   },
   {
     id: "zoro",

@@ -7,6 +7,7 @@ import FocusTimerModal from "./FocusTimerModal";
 import LevelModal from "./LevelModal";
 import StreakModal from "./StreakModal";
 import AccountSwitcherModal from "./AccountSwitcherModal";
+import "./topNav.css";
 
 interface TopNavProps {
   activeTab?: "games" | "dashboard" | "study-plan" | "explain";
@@ -132,7 +133,7 @@ export default function TopNav({ activeTab = "dashboard", onOpenReviewerModal }:
                 <path d="M16 20.5C16.8 21.6 19.2 21.6 20 20.5" stroke="#1E1B4B" strokeWidth="1.3" strokeLinecap="round" />
               </svg>
             </div>
-            <span className="sq-brand-text">StudyQuest</span>
+            <span className="sq-brand-text">EduQuest</span>
           </a>
 
           {/* Desktop center navigation pills */}

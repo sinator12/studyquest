@@ -1,0 +1,473 @@
+/* ==========================================================================
+   TOP NAV COMPONENT STYLES
+   Ensures TopNav is 100% styled, robust, and responsive on all viewports
+   ========================================================================== */
+
+.sq-main-nav {
+  position: sticky;
+  top: 0;
+  z-index: 90;
+  background: #11172E;
+  border-bottom: 1px solid rgba(75, 85, 130, 0.28);
+  padding: 0 16px;
+  width: 100%;
+  max-width: 100vw;
+  box-sizing: border-box;
+}
+
+.sq-nav-inner {
+  max-width: 1380px;
+  margin: 0 auto;
+  height: 58px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  width: 100%;
+  box-sizing: border-box;
+}
+
+/* Brand */
+.sq-nav-brand {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  text-decoration: none;
+  color: #FFFFFF;
+  font-weight: 900;
+  font-size: 19px;
+  flex-shrink: 0;
+}
+
+.sq-brand-icon-box {
+  display: flex;
+  align-items: center;
+  flex-shrink: 0;
+}
+
+.sq-brand-text {
+  font-size: 19px;
+  font-weight: 800;
+  letter-spacing: -0.02em;
+  color: #FFFFFF;
+}
+
+/* Center Navigation Links */
+.sq-nav-links-center {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.sq-nav-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  padding: 7px 13px;
+  border-radius: 12px;
+  font-size: 14px;
+  font-weight: 700;
+  color: #CBD5E1;
+  text-decoration: none;
+  transition: all 0.15s ease;
+  white-space: nowrap;
+}
+
+.sq-nav-pill:hover {
+  color: #FFFFFF;
+  background: rgba(255, 255, 255, 0.08);
+}
+
+.sq-nav-pill.active {
+  background: #232D56;
+  color: #FFFFFF;
+  border: 1px solid rgba(129, 140, 248, 0.25);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.25);
+}
+
+.sq-nav-stacked {
+  display: inline-flex;
+  flex-direction: column;
+  align-items: flex-start;
+  line-height: 1.05;
+  font-size: 12px;
+  font-weight: 700;
+}
+
+/* Right Tools (Timer, Level, Streak, Account) */
+.sq-nav-right-tools {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-shrink: 0;
+}
+
+/* Material / Reviewer Pill */
+.sq-material-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  background: rgba(14, 43, 56, 0.75);
+  border: 1px solid rgba(45, 212, 191, 0.38);
+  padding: 5px 14px;
+  border-radius: 999px;
+  cursor: pointer;
+  transition: all 0.15s ease;
+  white-space: nowrap;
+  color: #FFF;
+}
+
+.sq-material-pill:hover {
+  background: rgba(14, 43, 56, 0.95);
+  border-color: rgba(45, 212, 191, 0.65);
+}
+
+.sq-green-dot {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: #34D399;
+  box-shadow: 0 0 10px #34D399;
+  flex-shrink: 0;
+}
+
+.sq-material-info {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  text-align: left;
+  line-height: 1.15;
+}
+
+.sq-material-info .sq-material-line {
+  color: #FFFFFF;
+  font-size: 11px;
+  font-weight: 700;
+}
+
+.sq-material-action {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  text-align: left;
+  line-height: 1.15;
+}
+
+.sq-material-action .sq-material-line {
+  color: #A7F3D0;
+  font-size: 11px;
+  font-weight: 700;
+}
+
+.sq-material-action .sq-underline {
+  text-decoration: underline;
+  text-underline-offset: 2px;
+}
+
+/* Stat Chips (Timer, Level, Streak) */
+.sq-stat-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  padding: 6px 10px;
+  border-radius: 10px;
+  background: #171E40;
+  border: 1px solid rgba(99, 102, 241, 0.22);
+  color: #FFFFFF;
+  font-size: 13px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.15s ease;
+  white-space: nowrap;
+  flex-shrink: 0;
+}
+
+.sq-stat-chip:hover {
+  background: #202954;
+  border-color: rgba(99, 102, 241, 0.45);
+  transform: translateY(-1px);
+}
+
+.sq-timer-chip {
+  font-variant-numeric: tabular-nums;
+  color: #E2E8F0;
+  position: relative;
+}
+
+.sq-timer-chip.running {
+  background: #1E2954;
+  border-color: #38BDF8;
+  color: #38BDF8;
+}
+
+.sq-timer-pulse-dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: #38BDF8;
+  box-shadow: 0 0 8px #38BDF8;
+  animation: sqTimerBlink 1s infinite alternate ease-in-out;
+}
+
+@keyframes sqTimerBlink {
+  0% { opacity: 0.3; }
+  100% { opacity: 1; }
+}
+
+.sq-level-chip {
+  color: #C4B5FD;
+}
+
+.sq-streak-chip {
+  color: #FBBF24;
+}
+
+.sq-flame-icon {
+  font-size: 13px;
+}
+
+/* User Account & Switcher Dropdown */
+.sq-user-menu-container {
+  position: relative;
+  flex-shrink: 0;
+}
+
+.sq-signin-nav-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  background: #2563EB;
+  border: 1px solid #3B82F6;
+  color: #FFF;
+  padding: 6px 14px;
+  border-radius: 10px;
+  font-size: 13px;
+  font-weight: 800;
+  cursor: pointer;
+  transition: all 0.15s ease;
+  white-space: nowrap;
+}
+
+.sq-signin-nav-btn:hover {
+  background: #1D4ED8;
+  transform: translateY(-1px);
+}
+
+.sq-nav-google-icon {
+  width: 14px;
+  height: 14px;
+  flex-shrink: 0;
+}
+
+.sq-avatar-pill {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  background: #6366F1;
+  display: grid;
+  place-items: center;
+  color: #FFFFFF;
+  font-weight: 800;
+  font-size: 14px;
+  border: none;
+  cursor: pointer;
+  box-shadow: 0 2px 6px rgba(99, 102, 241, 0.3);
+  flex-shrink: 0;
+}
+
+.sq-user-dropdown {
+  position: absolute;
+  top: calc(100% + 10px);
+  right: 0;
+  width: 250px;
+  background: #171E40;
+  border: 1.5px solid rgba(129, 140, 248, 0.3);
+  border-radius: 16px;
+  padding: 12px;
+  box-shadow: 0 16px 36px rgba(0, 0, 0, 0.6);
+  z-index: 100;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.sq-user-drop-info {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+  padding: 4px 6px 10px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.sq-user-drop-name {
+  font-size: 14.5px;
+  font-weight: 800;
+  color: #FFF;
+}
+
+.sq-user-drop-email {
+  font-size: 12px;
+  color: #94A3B8;
+  word-break: break-all;
+}
+
+.sq-user-drop-tag {
+  font-size: 11px;
+  font-weight: 800;
+  color: #34D399;
+}
+
+.sq-user-drop-action {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 10px;
+  padding: 8px 10px;
+  color: #E2E8F0;
+  font-size: 13px;
+  font-weight: 700;
+  cursor: pointer;
+  text-align: left;
+  transition: all 0.15s ease;
+}
+
+.sq-user-drop-action:hover {
+  background: rgba(255, 255, 255, 0.12);
+  color: #FFF;
+}
+
+.sq-user-drop-signout {
+  width: 100%;
+  background: rgba(239, 68, 68, 0.15);
+  border: 1px solid rgba(239, 68, 68, 0.3);
+  border-radius: 10px;
+  padding: 8px 10px;
+  color: #F87171;
+  font-size: 13px;
+  font-weight: 800;
+  cursor: pointer;
+  text-align: center;
+  margin-top: 4px;
+}
+
+.sq-user-drop-signout:hover {
+  background: #EF4444;
+  color: #FFF;
+}
+
+/* Mobile Bottom Navigation Bar (Visible only on screens <= 768px) */
+.sq-mobile-bottom-bar {
+  display: none;
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  height: 60px;
+  background: #0E1326;
+  border-top: 1px solid rgba(255, 255, 255, 0.12);
+  z-index: 85;
+  justify-content: space-around;
+  align-items: center;
+  box-shadow: 0 -4px 16px rgba(0, 0, 0, 0.4);
+  padding-bottom: env(safe-area-inset-bottom);
+}
+
+.sq-mob-tab {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 3px;
+  color: #94A3B8;
+  text-decoration: none;
+  font-size: 11px;
+  font-weight: 700;
+  padding: 6px 12px;
+  border-radius: 10px;
+  transition: all 0.15s ease;
+}
+
+.sq-mob-tab:hover {
+  color: #CBD5E1;
+}
+
+.sq-mob-tab.active {
+  color: #818CF8;
+}
+
+/* ==========================================================================
+   MOBILE RESPONSIVE BREAKPOINTS FOR TOPNAV
+   ========================================================================== */
+
+@media (max-width: 900px) {
+  .sq-nav-links-center {
+    display: none;
+  }
+
+  .sq-mobile-bottom-bar {
+    display: flex;
+  }
+
+  body {
+    padding-bottom: 64px;
+  }
+}
+
+@media (max-width: 680px) {
+  .sq-main-nav {
+    padding: 0 10px;
+  }
+
+  .sq-nav-inner {
+    height: 52px;
+    gap: 8px;
+  }
+
+  .sq-brand-text {
+    font-size: 17px;
+  }
+
+  .sq-material-pill {
+    padding: 4px 8px;
+    gap: 6px;
+  }
+
+  .sq-material-action {
+    display: none;
+  }
+
+  .sq-stat-chip {
+    padding: 5px 8px;
+    font-size: 12px;
+    gap: 4px;
+  }
+}
+
+@media (max-width: 440px) {
+  .sq-main-nav {
+    padding: 0 6px;
+  }
+
+  .sq-brand-text {
+    font-size: 15.5px;
+  }
+
+  /* On narrow screens, hide the redundant material pill from the top bar so timer & level never clip */
+  .sq-material-pill {
+    display: none;
+  }
+
+  .sq-stat-chip {
+    padding: 4px 7px;
+    font-size: 11px;
+    gap: 3px;
+  }
+
+  .sq-signin-nav-btn {
+    padding: 5px 9px;
+    font-size: 11.5px;
+    gap: 5px;
+  }
+}

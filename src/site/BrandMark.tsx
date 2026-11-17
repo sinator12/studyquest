@@ -17,7 +17,7 @@ export function BrandMark({ href = "/", compact = false, light = false }: BrandM
       </span>
       {!compact && (
         <span className="sq-brand-copy">
-          <strong>StudyQuest</strong>
+          <strong>EduQuest</strong>
           <small>Study. Play. Level up.</small>
         </span>
       )}

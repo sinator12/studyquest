@@ -74,7 +74,7 @@ export default function LoginPage() {
 
       <main className="sq-login-main">
         <div className="sq-login-card">
-          {/* StudyQuest Brand / Mascot */}
+          {/* EduQuest Brand / Mascot */}
           <div className="sq-auth-brand-badge">
             <div className="sq-auth-mascot-icon">
               <svg viewBox="0 0 36 36" width="52" height="52" fill="none" aria-hidden="true">
@@ -91,7 +91,7 @@ export default function LoginPage() {
                 />
               </svg>
             </div>
-            <span className="sq-auth-brand-name">StudyQuest</span>
+            <span className="sq-auth-brand-name">EduQuest</span>
           </div>
 
           {/* ACTIVE LOGGED-IN VIEW */}
@@ -163,7 +163,7 @@ export default function LoginPage() {
             /* SIGN-IN EXPERIENCE */
             <div className="sq-login-signed-out">
               <div className="sq-auth-header">
-                <h2>Welcome to StudyQuest</h2>
+                <h2>Welcome to EduQuest</h2>
                 <p>
                   Sign in or create your account with Google to sync your study decks, track daily
                   streaks, and level up your character across all devices.
@@ -252,7 +252,7 @@ export default function LoginPage() {
                 <p>
                   🔒 Google OAuth 2.0 Secure Authentication.
                   <br />
-                  By signing in, you agree to StudyQuest's Terms of Service and Privacy Policy.
+                  By signing in, you agree to EduQuest's Terms of Service and Privacy Policy.
                 </p>
               </div>
             </div>

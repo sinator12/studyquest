@@ -245,7 +245,7 @@ Return ONLY a valid JSON object matching this schema:
         {/* Top Badge matching Photo 3 */}
         <div className="sq-ex-badge-row">
           <div className="sq-ex-badge-pill">
-            <span>New: StudyQuest Explain</span>
+            <span>New: EduQuest Explain</span>
             <span className="sq-ex-badge-beta">BETA</span>
           </div>
         </div>
