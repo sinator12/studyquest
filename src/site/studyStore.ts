@@ -142,8 +142,7 @@ export function getSavedDecks(): DeckInfo[] {
 }
 
 export const DEFAULT_GROQ_KEY =
-  (typeof import.meta !== "undefined" && import.meta.env?.VITE_GROQ_API_KEY) ||
-  ["gsk", "B3yTR7IohYm9HtxFrnYFWGdyb3FYRZR1pVKhpYMZKUTYt7LYGYhG"].join("_");
+  (typeof import.meta !== "undefined" && import.meta.env?.VITE_GROQ_API_KEY) || "";
 
 export function getAIConfig(): AIProviderConfig {
   try {
