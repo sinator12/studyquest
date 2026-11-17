@@ -1,5 +1,7 @@
 import { useState, useEffect } from "react";
 import { getActiveDeck, getPlayerStats, type DeckInfo, type PlayerStats } from "./studyStore";
+import { getCurrentUser, logout, type UserProfile } from "./authStore";
+import GoogleLoginModal from "./GoogleLoginModal";
 
 interface TopNavProps {
   activeTab?: "games" | "dashboard" | "study-plan" | "explain";
@@ -10,16 +12,22 @@ export default function TopNav({ activeTab = "dashboard", onOpenReviewerModal }:
   const [deck, setDeck] = useState<DeckInfo>(getActiveDeck());
   const [stats, setStats] = useState<PlayerStats>(getPlayerStats());
   const [timeRemaining] = useState<string>("25:00");
+  const [user, setUser] = useState<UserProfile | null>(getCurrentUser());
+  const [isLoginModalOpen, setIsLoginModalOpen] = useState(false);
+  const [isUserMenuOpen, setIsUserMenuOpen] = useState(false);
 
   useEffect(() => {
     const handleDeckUpdate = () => setDeck(getActiveDeck());
     const handleStatsUpdate = () => setStats(getPlayerStats());
+    const handleAuthUpdate = () => setUser(getCurrentUser());
 
     window.addEventListener("sq_deck_updated", handleDeckUpdate);
     window.addEventListener("sq_stats_updated", handleStatsUpdate);
+    window.addEventListener("sq_auth_changed", handleAuthUpdate);
     return () => {
       window.removeEventListener("sq_deck_updated", handleDeckUpdate);
       window.removeEventListener("sq_stats_updated", handleStatsUpdate);
+      window.removeEventListener("sq_auth_changed", handleAuthUpdate);
     };
   }, []);
 
@@ -150,12 +158,55 @@ export default function TopNav({ activeTab = "dashboard", onOpenReviewerModal }:
             <img src="https://cdn.jsdelivr.net/gh/lipis/flag-icons/flags/4x3/us.svg" alt="US Flag" width="20" height="14" />
           </div>
 
-          {/* User Profile */}
-          <a href="/dashboard" className="sq-avatar-pill" title="Your Account">
-            <span className="sq-avatar-initials">U</span>
-          </a>
+          {/* User Profile Menu & Google Sign-In */}
+          <div className="sq-user-menu-container">
+            <button
+              type="button"
+              className="sq-avatar-pill"
+              onClick={() => {
+                if (user) {
+                  setIsUserMenuOpen(!isUserMenuOpen);
+                } else {
+                  setIsLoginModalOpen(true);
+                }
+              }}
+              title={user ? `${user.name} (${user.email})` : "Click to Sign In with Google"}
+            >
+              <span className="sq-avatar-initials">
+                {user ? user.name.charAt(0).toUpperCase() : "U"}
+              </span>
+            </button>
+
+            {/* Dropdown menu when signed in */}
+            {user && isUserMenuOpen && (
+              <div className="sq-user-dropdown">
+                <div className="sq-user-drop-info">
+                  <span className="sq-user-drop-name">{user.name}</span>
+                  <span className="sq-user-drop-email">{user.email}</span>
+                  <span className="sq-user-drop-tag">✓ Google Account</span>
+                </div>
+                <button
+                  type="button"
+                  className="sq-user-drop-signout"
+                  onClick={() => {
+                    logout();
+                    setIsUserMenuOpen(false);
+                  }}
+                >
+                  Sign Out
+                </button>
+              </div>
+            )}
+          </div>
         </div>
       </div>
+
+      {/* Google Login Modal */}
+      <GoogleLoginModal
+        isOpen={isLoginModalOpen}
+        onClose={() => setIsLoginModalOpen(false)}
+        onSuccess={() => setIsLoginModalOpen(false)}
+      />
     </header>
   );
 }

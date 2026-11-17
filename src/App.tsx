@@ -6,11 +6,13 @@ import AngryNerdsGame from "./site/AngryNerdsGame";
 import DashboardPage from "./site/DashboardPage";
 import StudyPlanPage from "./site/StudyPlanPage";
 import ExplainPage from "./site/ExplainPage";
+import LoginPage from "./site/LoginPage";
 import SiteApp from "./site/SiteApp";
 
 export default function App() {
   const pathname = window.location.pathname.replace(/\/+$/, "") || "/";
   if (pathname === "/character-lab") return <CharacterLab />;
+  if (pathname === "/login") return <LoginPage />;
   if (pathname === "/dashboard" || pathname === "/app") return <DashboardPage />;
   if (pathname === "/study-plan" || pathname === "/studyplan") return <StudyPlanPage />;
   if (pathname === "/explain") return <ExplainPage />;
