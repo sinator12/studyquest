@@ -10,6 +10,7 @@ interface StudyPlan {
   examDate: string;
   daysRemaining: number;
   materialName: string;
+  language: string;
   sessions: {
     day: number;
     title: string;
@@ -24,27 +25,32 @@ interface StudyPlan {
 const STORAGE_KEY = "sq_study_plan_active";
 
 export default function StudyPlanPage() {
+  // Wizard steps: 1 = Subject & Date, 2 = Study Material (photo), 3 = Generating, 4 = Review
+  const [step, setStep] = useState<number>(2);
+
   const [activePlan, setActivePlan] = useState<StudyPlan | null>(null);
-  const [isModalOpen, setIsModalOpen] = useState(false);
   const [examName, setExamName] = useState("Biology Midterm");
   const [examDate, setExamDate] = useState(() => {
     const d = new Date();
     d.setDate(d.getDate() + 7);
     return d.toISOString().split("T")[0];
   });
+  const [materialTab, setMaterialTab] = useState<"upload" | "notes">("notes");
   const [materialNotes, setMaterialNotes] = useState(
     "Key concepts: Cell division, Mitosis, Meiosis, DNA replication, Photosynthesis"
   );
   const [uploadedDocName, setUploadedDocName] = useState<string | null>(null);
   const [isParsingDoc, setIsParsingDoc] = useState(false);
-  const [isGenerating, setIsGenerating] = useState(false);
-  const [generatingStatus, setGeneratingStatus] = useState("");
-  const [, setActiveDeckState] = useState<DeckInfo>(getActiveDeck());
+  const [urlInput, setUrlInput] = useState("");
+  const [addedUrls, setAddedUrls] = useState<string[]>([]);
+  const [language, setLanguage] = useState("English");
+
+  const [generatingStatus, setGeneratingStatus] = useState("Analyzing your study material with Groq AI...");
   const [showFeedback, setShowFeedback] = useState(true);
 
   const fileInputRef = useRef<HTMLInputElement>(null);
 
-  // Load saved study plan from localStorage
+  // Load saved plan
   useEffect(() => {
     try {
       const saved = localStorage.getItem(STORAGE_KEY);
@@ -56,7 +62,7 @@ export default function StudyPlanPage() {
     }
   }, []);
 
-  // Handle uploading any document format
+  // Handle uploading any document
   const handleDocFile = async (file: File) => {
     if (!file) return;
     setIsParsingDoc(true);
@@ -64,7 +70,7 @@ export default function StudyPlanPage() {
     try {
       const extracted = await extractTextFromFile(file);
       if (extracted && extracted.trim().length > 0) {
-        setMaterialNotes(extracted);
+        setMaterialNotes((prev) => (prev ? prev + "\n\n" + extracted : extracted));
       }
     } catch (err) {
       console.warn("Could not parse file:", err);
@@ -80,11 +86,16 @@ export default function StudyPlanPage() {
     }
   };
 
-  const handleCreatePlan = async (e?: React.FormEvent) => {
-    if (e) e.preventDefault();
+  const handleAddUrl = () => {
+    if (!urlInput.trim()) return;
+    setAddedUrls((prev) => [...prev, urlInput.trim()]);
+    setMaterialNotes((prev) => prev + `\nReference URL: ${urlInput.trim()}`);
+    setUrlInput("");
+  };
 
-    setIsGenerating(true);
-    setGeneratingStatus("Groq AI: Analyzing your document and study notes...");
+  const handleGeneratePlan = async () => {
+    setStep(3); // Go to generating step
+    setGeneratingStatus("Groq AI: Connecting to ultra-fast model (openai/gpt-oss-120b)...");
 
     const targetDate = new Date(examDate);
     const today = new Date();
@@ -95,8 +106,7 @@ export default function StudyPlanPage() {
     const groqKey = aiConfig.groqKey || DEFAULT_GROQ_KEY;
 
     try {
-      // 1. Generate customized study plan using Groq AI
-      setGeneratingStatus("Groq AI: Creating your personalized 3-step study milestones...");
+      setGeneratingStatus("Groq AI: Analyzing notes & creating personalized 3-day milestones...");
       const planResult = await generateStudyPlanWithGroq(
         examName,
         examDate,
@@ -104,7 +114,6 @@ export default function StudyPlanPage() {
         groqKey
       );
 
-      // 2. Generate quiz questions using Groq AI and load them directly into all games!
       setGeneratingStatus("Groq AI: Generating interactive quiz questions for your games...");
       try {
         const deckResult = await generateWithGroq(
@@ -126,7 +135,6 @@ export default function StudyPlanPage() {
             questions: deckResult.questions
           };
           setActiveDeck(newDeck);
-          setActiveDeckState(newDeck);
         }
       } catch (deckErr) {
         console.warn("Deck question generation warning:", deckErr);
@@ -138,18 +146,17 @@ export default function StudyPlanPage() {
         examDate,
         daysRemaining,
         materialName: uploadedDocName || examName,
+        language,
         createdAt: new Date().toISOString(),
         sessions: planResult.sessions
       };
 
       setActivePlan(newPlan);
       localStorage.setItem(STORAGE_KEY, JSON.stringify(newPlan));
-      setIsModalOpen(false);
+      setStep(4); // Go to review step
     } catch (err) {
       console.error("Plan creation error:", err);
-    } finally {
-      setIsGenerating(false);
-      setGeneratingStatus("");
+      setStep(2);
     }
   };
 
@@ -164,6 +171,7 @@ export default function StudyPlanPage() {
   const handleDeletePlan = () => {
     setActivePlan(null);
     localStorage.removeItem(STORAGE_KEY);
+    setStep(2);
   };
 
   return (
@@ -180,420 +188,358 @@ export default function StudyPlanPage() {
       {/* Navigation Header */}
       <TopNav activeTab="study-plan" />
 
-      <main className="sq-sp-main">
-        {/* Breadcrumb matching Photo 2 */}
-        <div className="sq-sp-breadcrumb">
-          <a href="/dashboard">Home</a>
-          <span className="sq-sp-sep">&gt;</span>
-          <span className="sq-sp-current">Study Plan</span>
-        </div>
+      <main className="sq-sp-main-container">
+        {/* ========================================================
+            HERO SECTION: Mascot on Left + Speech Bubble on Right
+            (Exact reproduction of photo)
+           ======================================================== */}
+        <div className="sq-sp-hero-row">
+          {/* Mascot with Brain, Feet, and Waving Hand */}
+          <div className="sq-sp-mascot-wrap">
+            {/* Speed & Sparkle Accents */}
+            <span className="sq-sp-sparkle sq-sp-sp1">✦</span>
+            <span className="sq-sp-sparkle sq-sp-sp2">✦</span>
+            <span className="sq-sp-sparkle sq-sp-sp3">✦</span>
 
-        {/* Hero Section: Mascot on Left + Speech Bubble on Right */}
-        <div className="sq-sp-hero">
-          {/* Mascot Illustration with Brain & Sparks */}
-          <div className="sq-sp-mascot-container">
-            {/* Sparkle stars & floating question badge */}
-            <div className="sq-sp-star sq-sp-star-tl">✦</div>
-            <div className="sq-sp-star sq-sp-star-tr">✦</div>
-            <div className="sq-sp-qmark-badge">?</div>
+            <svg viewBox="0 0 160 160" width="150" height="150" fill="none">
+              {/* Golden Brain Lobes */}
+              <g className="sq-sp-mascot-brain">
+                <ellipse cx="66" cy="38" rx="20" ry="17" fill="#FBBF24" />
+                <ellipse cx="94" cy="38" rx="20" ry="17" fill="#FBBF24" />
+                <ellipse cx="80" cy="40" rx="14" ry="13" fill="#F59E0B" />
+                <path d="M57 36C59 30 70 28 74 34C76 38 68 44 63 42" stroke="#D97706" strokeWidth="2.5" strokeLinecap="round" />
+                <path d="M103 36C101 30 90 28 86 34C84 38 92 44 97 42" stroke="#D97706" strokeWidth="2.5" strokeLinecap="round" />
+                <line x1="80" y1="26" x2="80" y2="48" stroke="#D97706" strokeWidth="2.5" />
+              </g>
 
-            {/* Mascot Graphic (Purple Gamepad + Brain) */}
-            <div className="sq-sp-mascot-art">
-              <svg viewBox="0 0 160 140" width="150" height="135" fill="none">
-                {/* Golden Glowing Brain on Top */}
-                <g className="sq-sp-brain-top">
-                  <ellipse cx="64" cy="38" rx="22" ry="18" fill="#FBBF24" />
-                  <ellipse cx="96" cy="38" rx="22" ry="18" fill="#FBBF24" />
-                  <ellipse cx="80" cy="40" rx="16" ry="14" fill="#F59E0B" />
-                  {/* Brain Folds */}
-                  <path
-                    d="M54 36C56 30 68 28 72 34C74 38 66 44 60 42"
-                    stroke="#D97706"
-                    strokeWidth="2.5"
-                    strokeLinecap="round"
-                  />
-                  <path
-                    d="M106 36C104 30 92 28 88 34C86 38 94 44 100 42"
-                    stroke="#D97706"
-                    strokeWidth="2.5"
-                    strokeLinecap="round"
-                  />
-                  <line x1="80" y1="24" x2="80" y2="50" stroke="#D97706" strokeWidth="2.5" />
-                </g>
+              {/* Legs and Feet */}
+              <rect x="58" y="118" width="8" height="18" rx="4" fill="#6D28D9" />
+              <rect x="94" y="118" width="8" height="18" rx="4" fill="#6D28D9" />
+              <ellipse cx="60" cy="138" rx="12" ry="6" fill="#5B21B6" />
+              <ellipse cx="102" cy="138" rx="12" ry="6" fill="#5B21B6" />
 
-                {/* Gamepad Controller Body */}
-                <path
-                  d="M44 68C32 68 24 78 24 92C24 108 36 122 52 122C62 122 70 114 80 114C90 114 98 122 108 122C124 122 136 108 136 92C136 78 128 68 116 68H44Z"
-                  fill="#7C3AED"
-                />
-                {/* Controller Grips Base */}
-                <rect x="36" y="94" width="22" height="26" rx="10" fill="#6D28D9" />
-                <rect x="102" y="94" width="22" height="26" rx="10" fill="#6D28D9" />
+              {/* Gamepad Controller Body */}
+              <path
+                d="M44 68C32 68 24 78 24 92C24 108 36 122 52 122C62 122 70 114 80 114C90 114 98 122 108 122C124 122 136 108 136 92C136 78 128 68 116 68H44Z"
+                fill="#7C3AED"
+              />
 
-                {/* Golden Smiling Face Badge */}
-                <circle cx="80" cy="88" r="16" fill="#FBBF24" />
-                {/* Eyes */}
-                <ellipse cx="75" cy="86" rx="2.5" ry="3" fill="#1E1B4B" />
-                <ellipse cx="85" cy="86" rx="2.5" ry="3" fill="#1E1B4B" />
-                <circle cx="76" cy="85" r="0.9" fill="#FFFFFF" />
-                <circle cx="86" cy="85" r="0.9" fill="#FFFFFF" />
-                {/* Cute Smile */}
-                <path
-                  d="M76 92C77.5 94.5 82.5 94.5 84 92"
-                  stroke="#1E1B4B"
-                  strokeWidth="2"
-                  strokeLinecap="round"
-                />
-                {/* Rosy Cheeks */}
-                <ellipse cx="72" cy="90" rx="2" ry="1.2" fill="#F87171" opacity="0.8" />
-                <ellipse cx="88" cy="90" rx="2" ry="1.2" fill="#F87171" opacity="0.8" />
+              {/* Left Arm (down/resting) */}
+              <path d="M26 84C18 88 16 98 22 104" stroke="#6D28D9" strokeWidth="6" strokeLinecap="round" fill="none" />
 
-                {/* Left D-pad buttons */}
-                <rect x="42" y="84" width="10" height="4" rx="2" fill="#C4B5FD" />
-                <rect x="45" y="81" width="4" height="10" rx="2" fill="#C4B5FD" />
+              {/* Right Arm (waving happily upward) */}
+              <path d="M134 82C142 74 146 62 138 52" stroke="#6D28D9" strokeWidth="6" strokeLinecap="round" fill="none" />
+              <circle cx="138" cy="52" r="5" fill="#7C3AED" />
 
-                {/* Right Action buttons */}
-                <circle cx="114" cy="83" r="2.5" fill="#C4B5FD" />
-                <circle cx="120" cy="88" r="2.5" fill="#C4B5FD" />
-              </svg>
-            </div>
+              {/* Golden Smiling Face Badge */}
+              <circle cx="80" cy="90" r="15" fill="#FBBF24" />
+              <ellipse cx="75.5" cy="88" rx="2.2" ry="2.8" fill="#1E1B4B" />
+              <ellipse cx="84.5" cy="88" rx="2.2" ry="2.8" fill="#1E1B4B" />
+              <circle cx="76.2" cy="87" r="0.8" fill="#FFFFFF" />
+              <circle cx="85.2" cy="87" r="0.8" fill="#FFFFFF" />
+              <path d="M76 93C77.5 95.5 82.5 95.5 84 93" stroke="#1E1B4B" strokeWidth="2" strokeLinecap="round" />
+              <ellipse cx="73" cy="92" rx="1.8" ry="1.2" fill="#F87171" opacity="0.8" />
+              <ellipse cx="87" cy="92" rx="1.8" ry="1.2" fill="#F87171" opacity="0.8" />
+
+              {/* Controller Details */}
+              <rect x="42" y="86" width="9" height="3.5" rx="1.7" fill="#C4B5FD" />
+              <rect x="45" y="83" width="3.5" height="9" rx="1.7" fill="#C4B5FD" />
+              <circle cx="114" cy="86" r="2.2" fill="#C4B5FD" />
+              <circle cx="120" cy="90" r="2.2" fill="#C4B5FD" />
+            </svg>
           </div>
 
-          {/* Speech Bubble Card matching Photo 2 */}
-          <div className="sq-sp-speech-card">
-            <div className="sq-sp-speech-badge-row">
-              <span className="sq-sp-badge-ai">AI-Powered Study Plans</span>
-              <span className="sq-sp-badge-beta">Beta</span>
-            </div>
-            <h1 className="sq-sp-speech-title">Personalized Learning Plans</h1>
-            <p className="sq-sp-speech-sub">
-              Upload your study material, set your exam date, and let AI create a personalized study plan tailored just for you.
+          {/* Speech Bubble Card matching Photo */}
+          <div className="sq-sp-speech-bubble">
+            <h1 className="sq-sp-speech-heading">
+              {step === 1 && "What exam are you studying for?"}
+              {step === 2 && "Add your study material"}
+              {step === 3 && "Groq AI is building your plan..."}
+              {step === 4 && "Your personalized study plan is ready!"}
+            </h1>
+            <p className="sq-sp-speech-desc">
+              {step === 1 && "Set your subject title and target exam date so AI can schedule your study milestones."}
+              {step === 2 && "Upload documents, add URLs, or write notes. The more material, the better your plan!"}
+              {step === 3 && "Hang tight! High-speed Groq AI is analyzing your notes and crafting your study sessions."}
+              {step === 4 && "Master your material with daily bite-sized sessions and interactive study games!"}
             </p>
           </div>
         </div>
 
-        {/* Main Action Box matching Photo 2 */}
-        <section className="sq-sp-action-box">
-          <div className="sq-sp-box-head">
-            <h2 className="sq-sp-box-title">Got an exam coming up?</h2>
-            <p className="sq-sp-box-sub">Make a plan in three steps.</p>
+        {/* ========================================================
+            STEPPER BAR (Subject & Date -> Study Material -> Generating -> Review)
+            (Exact reproduction of photo)
+           ======================================================== */}
+        <div className="sq-sp-stepper-bar">
+          {/* Step 1: Subject & Date */}
+          <div
+            className={`sq-sp-step-node ${step > 1 ? "completed" : step === 1 ? "active" : ""}`}
+            onClick={() => setStep(1)}
+          >
+            <span className="sq-sp-step-circle sq-sp-step-green">✓</span>
+            <span className="sq-sp-step-name">Subject & Date</span>
           </div>
 
-          {/* Three Step Cards */}
-          <div className="sq-sp-steps-row">
-            {/* Step 1: Tell me the exam date */}
-            <div
-              className="sq-sp-step-card"
-              role="button"
-              tabIndex={0}
-              onClick={() => setIsModalOpen(true)}
-              onKeyDown={(e) => e.key === "Enter" && setIsModalOpen(true)}
-              title="Click to set your exam date"
-            >
-              <div className="sq-sp-step-icon sq-sp-icon-target">
-                <svg width="28" height="28" viewBox="0 0 24 24" fill="none">
-                  <circle cx="12" cy="12" r="10" stroke="#A855F7" strokeWidth="2.5" />
-                  <circle cx="12" cy="12" r="6" stroke="#C084FC" strokeWidth="2" />
-                  <circle cx="12" cy="12" r="2.5" fill="#C084FC" />
-                </svg>
-              </div>
-              <div className="sq-sp-step-text-wrap">
-                <span className="sq-sp-step-label">Tell me the exam date</span>
-                {examDate && <span className="sq-sp-step-hint">{examDate}</span>}
-              </div>
-            </div>
+          <div className="sq-sp-step-connector completed" />
 
-            {/* Step 2: Add your material (Upload any doc or notes) */}
-            <div
-              className="sq-sp-step-card"
-              role="button"
-              tabIndex={0}
-              onClick={() => fileInputRef.current?.click()}
-              onKeyDown={(e) => e.key === "Enter" && fileInputRef.current?.click()}
-              title="Click to upload ANY document (PDF, Word, PPT, Text, etc.)"
-            >
-              <div className="sq-sp-step-icon sq-sp-icon-doc">
-                <svg width="28" height="28" viewBox="0 0 24 24" fill="none">
-                  <rect x="4" y="3" width="16" height="18" rx="3" fill="#6B21A8" stroke="#A855F7" strokeWidth="2" />
-                  <line x1="8" y1="8" x2="16" y2="8" stroke="#FFFFFF" strokeWidth="1.8" strokeLinecap="round" />
-                  <line x1="8" y1="12" x2="16" y2="12" stroke="#FFFFFF" strokeWidth="1.8" strokeLinecap="round" />
-                  <line x1="8" y1="16" x2="13" y2="16" stroke="#FFFFFF" strokeWidth="1.8" strokeLinecap="round" />
-                </svg>
-              </div>
-              <div className="sq-sp-step-text-wrap">
-                <span className="sq-sp-step-label">Add your material</span>
-                <span className="sq-sp-step-hint">
-                  {isParsingDoc
-                    ? "Reading document..."
-                    : uploadedDocName
-                    ? `📄 ${uploadedDocName}`
-                    : "Upload any document (PDF, DOCX, PPTX)"}
-                </span>
-              </div>
-            </div>
-
-            {/* Step 3: Study one session at a time */}
-            <div
-              className="sq-sp-step-card"
-              role="button"
-              tabIndex={0}
-              onClick={() => {
-                if (activePlan) {
-                  window.location.href = activePlan.sessions[0]?.gameUrl || "/games/study-cafe";
-                } else {
-                  setIsModalOpen(true);
-                }
-              }}
-              onKeyDown={(e) => e.key === "Enter" && setIsModalOpen(true)}
-              title="Study one session at a time"
-            >
-              <div className="sq-sp-step-icon sq-sp-icon-play">
-                <svg width="28" height="28" viewBox="0 0 24 24" fill="none">
-                  <circle cx="12" cy="12" r="11" fill="#10B981" />
-                  <polygon points="10 8 16 12 10 16" fill="#FFFFFF" />
-                </svg>
-              </div>
-              <div className="sq-sp-step-text-wrap">
-                <span className="sq-sp-step-label sq-sp-step-stacked">
-                  <span>Study one session at a</span>
-                  <span>time</span>
-                </span>
-              </div>
-            </div>
+          {/* Step 2: Study Material */}
+          <div
+            className={`sq-sp-step-node ${step === 2 ? "active" : step > 2 ? "completed" : ""}`}
+            onClick={() => setStep(2)}
+          >
+            <span className="sq-sp-step-circle sq-sp-step-orange">2</span>
+            <span className="sq-sp-step-name active-text">Study Material</span>
           </div>
 
-          {/* Action Box Footer Bar */}
-          <div className="sq-sp-box-foot">
-            <span className="sq-sp-free-text">Free plan: one study plan</span>
-            <button
-              type="button"
-              className="sq-sp-cta-btn"
-              onClick={() => setIsModalOpen(true)}
-              disabled={isGenerating}
-            >
-              {isGenerating ? "⚡ Groq AI Generating..." : "Create New Study Plan"}
-            </button>
-          </div>
-        </section>
+          <div className={`sq-sp-step-connector ${step >= 3 ? "completed" : "dotted"}`} />
 
-        {/* If Active Study Plan Exists: Display Active Plan Schedule */}
-        {activePlan && (
-          <section className="sq-sp-active-plan-container">
-            <div className="sq-sp-active-card">
-              <div className="sq-sp-active-head">
+          {/* Step 3: Generating */}
+          <div className={`sq-sp-step-node ${step === 3 ? "active" : step > 3 ? "completed" : "inactive"}`}>
+            <span className="sq-sp-step-circle sq-sp-step-gray">3</span>
+            <span className="sq-sp-step-name">Generating</span>
+          </div>
+
+          <div className={`sq-sp-step-connector ${step >= 4 ? "completed" : "dotted"}`} />
+
+          {/* Step 4: Review */}
+          <div className={`sq-sp-step-node ${step === 4 ? "active" : "inactive"}`}>
+            <span className="sq-sp-step-circle sq-sp-step-gray">4</span>
+            <span className="sq-sp-step-name">Review</span>
+          </div>
+        </div>
+
+        {/* ========================================================
+            MAIN ACTION CARD CONTAINER (Matching Photo Exactly)
+           ======================================================== */}
+        <section className="sq-sp-photo-card">
+          {/* ---------------- STEP 1: SUBJECT & DATE ---------------- */}
+          {step === 1 && (
+            <div className="sq-sp-step-body">
+              <div className="sq-sp-field-group">
+                <label className="sq-sp-field-label">Subject or Exam Name</label>
+                <input
+                  type="text"
+                  className="sq-sp-input"
+                  placeholder="e.g. Biology Midterm, Calculus II, World History"
+                  value={examName}
+                  onChange={(e) => setExamName(e.target.value)}
+                />
+              </div>
+
+              <div className="sq-sp-field-group">
+                <label className="sq-sp-field-label">Target Exam Date</label>
+                <input
+                  type="date"
+                  className="sq-sp-input"
+                  value={examDate}
+                  onChange={(e) => setExamDate(e.target.value)}
+                />
+              </div>
+
+              <div className="sq-sp-card-bottom-bar">
+                <div />
+                <button
+                  type="button"
+                  className="sq-sp-btn-gold"
+                  onClick={() => setStep(2)}
+                >
+                  Continue to Study Material →
+                </button>
+              </div>
+            </div>
+          )}
+
+          {/* ---------------- STEP 2: STUDY MATERIAL (PHOTO SCREEN) ---------------- */}
+          {step === 2 && (
+            <div className="sq-sp-step-body">
+              {/* Material Source Selector Tabs matching photo */}
+              <div className="sq-sp-source-toggle-grid">
+                {/* Upload files box */}
+                <div
+                  className={`sq-sp-source-box ${materialTab === "upload" ? "active" : ""}`}
+                  onClick={() => {
+                    setMaterialTab("upload");
+                    fileInputRef.current?.click();
+                  }}
+                >
+                  <div className="sq-sp-source-badge sq-badge-purple">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
+                      <rect x="4" y="3" width="16" height="18" rx="3" fill="#6B21A8" stroke="#A855F7" strokeWidth="1.8" />
+                      <line x1="8" y1="8" x2="16" y2="8" stroke="#FFFFFF" strokeWidth="1.8" strokeLinecap="round" />
+                      <line x1="8" y1="12" x2="16" y2="12" stroke="#FFFFFF" strokeWidth="1.8" strokeLinecap="round" />
+                      <line x1="8" y1="16" x2="12" y2="16" stroke="#FFFFFF" strokeWidth="1.8" strokeLinecap="round" />
+                    </svg>
+                  </div>
+                  <div className="sq-sp-source-texts">
+                    <strong className="sq-sp-source-title">Upload files</strong>
+                    <span className="sq-sp-source-sub">
+                      {isParsingDoc
+                        ? "Reading file contents..."
+                        : uploadedDocName
+                        ? `Loaded: ${uploadedDocName}`
+                        : "PDF, DOCX, PPTX, XLSX, TXT, Images"}
+                    </span>
+                  </div>
+                </div>
+
+                {/* Write notes box (Highlighted with blue border in photo) */}
+                <div
+                  className={`sq-sp-source-box ${materialTab === "notes" ? "active" : ""}`}
+                  onClick={() => setMaterialTab("notes")}
+                >
+                  <div className="sq-sp-source-badge sq-badge-cyan">
+                    <span>T</span>
+                  </div>
+                  <div className="sq-sp-source-texts">
+                    <strong className="sq-sp-source-title">Write notes</strong>
+                    <span className="sq-sp-source-sub">Or describe the topics</span>
+                  </div>
+                </div>
+              </div>
+
+              {/* Your Notes Textarea matching photo */}
+              <div className="sq-sp-field-group">
+                <label className="sq-sp-field-label">Your Notes</label>
+                <textarea
+                  className="sq-sp-textarea"
+                  rows={6}
+                  placeholder="Describe what you need to learn, paste notes, or explain the topics..."
+                  value={materialNotes}
+                  onChange={(e) => setMaterialNotes(e.target.value)}
+                />
+              </div>
+
+              {/* Paste a URL input group matching photo */}
+              <div className="sq-sp-field-group">
+                <div className="sq-sp-url-row">
+                  <input
+                    type="text"
+                    className="sq-sp-url-input"
+                    placeholder="Paste a URL (webpage, Wikipedia, etc.)"
+                    value={urlInput}
+                    onChange={(e) => setUrlInput(e.target.value)}
+                    onKeyDown={(e) => e.key === "Enter" && handleAddUrl()}
+                  />
+                  <button
+                    type="button"
+                    className="sq-sp-url-add-btn"
+                    onClick={handleAddUrl}
+                  >
+                    Add
+                  </button>
+                </div>
+                {addedUrls.length > 0 && (
+                  <div className="sq-sp-added-tags">
+                    {addedUrls.map((u, i) => (
+                      <span key={i} className="sq-sp-url-tag">🔗 {u}</span>
+                    ))}
+                  </div>
+                )}
+              </div>
+
+              {/* Plan Language dropdown matching photo */}
+              <div className="sq-sp-field-group">
+                <label className="sq-sp-field-label">Plan Language</label>
+                <div className="sq-sp-select-wrap">
+                  <select
+                    className="sq-sp-select"
+                    value={language}
+                    onChange={(e) => setLanguage(e.target.value)}
+                  >
+                    <option value="English">English</option>
+                    <option value="Spanish">Spanish</option>
+                    <option value="French">French</option>
+                    <option value="German">German</option>
+                    <option value="Chinese">Chinese</option>
+                    <option value="Japanese">Japanese</option>
+                    <option value="Tagalog">Tagalog</option>
+                  </select>
+                </div>
+                <small className="sq-sp-field-hint">
+                  Your plan, sessions and questions will be written in this language.
+                </small>
+              </div>
+
+              {/* Bottom Action Bar: Back on left, Generate Study Plan on right (matching photo) */}
+              <div className="sq-sp-card-bottom-bar">
+                <button
+                  type="button"
+                  className="sq-sp-btn-back"
+                  onClick={() => setStep(1)}
+                >
+                  Back
+                </button>
+                <button
+                  type="button"
+                  className="sq-sp-btn-gold"
+                  onClick={handleGeneratePlan}
+                >
+                  Generate Study Plan
+                </button>
+              </div>
+            </div>
+          )}
+
+          {/* ---------------- STEP 3: GENERATING (AI Engine) ---------------- */}
+          {step === 3 && (
+            <div className="sq-sp-generating-view">
+              <div className="sq-sp-spinner-large" />
+              <h3>Generating Your Personalized Study Plan</h3>
+              <p className="sq-sp-gen-engine-tag">⚡ Powered by Groq AI · openai/gpt-oss-120b</p>
+              <p className="sq-sp-gen-live-status">{generatingStatus}</p>
+            </div>
+          )}
+
+          {/* ---------------- STEP 4: REVIEW ACTIVE PLAN ---------------- */}
+          {step === 4 && activePlan && (
+            <div className="sq-sp-review-view">
+              <div className="sq-sp-review-head">
                 <div>
-                  <div className="sq-sp-active-pill">Active Study Plan</div>
-                  <h3 className="sq-sp-active-title">{activePlan.examName}</h3>
-                  <p className="sq-sp-active-sub">
-                    Exam Date: <strong>{activePlan.examDate}</strong> ({activePlan.daysRemaining} days left) · Material: {activePlan.materialName}
+                  <span className="sq-sp-review-badge">✓ Plan Ready</span>
+                  <h2>{activePlan.examName}</h2>
+                  <p>
+                    Target Date: <strong>{activePlan.examDate}</strong> · ({activePlan.daysRemaining} days remaining)
                   </p>
                 </div>
                 <button
                   type="button"
-                  className="sq-sp-delete-btn"
+                  className="sq-sp-reset-link"
                   onClick={handleDeletePlan}
-                  title="Remove this plan"
                 >
-                  Reset Plan
+                  Create Another Plan
                 </button>
               </div>
 
-              <div className="sq-sp-sessions-list">
+              <div className="sq-sp-sessions-grid">
                 {activePlan.sessions.map((sess, idx) => (
-                  <div key={idx} className={`sq-sp-session-item ${sess.done ? "done" : ""}`}>
-                    <label className="sq-sp-session-check">
+                  <div key={idx} className={`sq-sp-session-card ${sess.done ? "done" : ""}`}>
+                    <label className="sq-sp-check-label">
                       <input
                         type="checkbox"
                         checked={sess.done}
                         onChange={() => handleToggleSession(idx)}
                       />
-                      <span className="sq-sp-check-box" />
+                      <span className="sq-sp-custom-check" />
                     </label>
-                    <div className="sq-sp-session-info">
-                      <div className="sq-sp-session-top">
-                        <span className="sq-sp-session-day">Day {sess.day}</span>
-                        <h4 className="sq-sp-session-name">{sess.title}</h4>
+                    <div className="sq-sp-sess-content">
+                      <div className="sq-sp-sess-top">
+                        <span className="sq-sp-sess-day">Day {sess.day}</span>
+                        <h4 className="sq-sp-sess-title">{sess.title}</h4>
                       </div>
-                      <p className="sq-sp-session-desc">{sess.description}</p>
+                      <p className="sq-sp-sess-desc">{sess.description}</p>
                     </div>
-                    <a href={sess.gameUrl} className="sq-sp-play-chip">
+                    <a href={sess.gameUrl} className="sq-sp-sess-play-btn">
                       Play {sess.game} →
                     </a>
                   </div>
                 ))}
               </div>
             </div>
-          </section>
-        )}
+          )}
+        </section>
       </main>
 
-      {/* Creation Modal with File Uploader & Groq AI Engine */}
-      {isModalOpen && (
-        <div className="sq-sp-modal-overlay" onClick={() => !isGenerating && setIsModalOpen(false)}>
-          <div
-            className="sq-sp-modal-card"
-            onClick={(e) => e.stopPropagation()}
-            role="dialog"
-            aria-modal="true"
-          >
-            <button
-              type="button"
-              className="sq-sp-modal-close"
-              onClick={() => !isGenerating && setIsModalOpen(false)}
-            >
-              ✕
-            </button>
-            <div className="sq-sp-modal-head">
-              <div className="sq-sp-modal-tags">
-                <span className="sq-sp-badge-ai">Groq AI Powered</span>
-                <span className="sq-sp-badge-model">openai/gpt-oss-120b</span>
-              </div>
-              <h3>Create Your AI Study Plan</h3>
-              <p>Upload any document or study guide. Groq AI generates your custom schedule and quiz deck.</p>
-            </div>
-
-            <form onSubmit={handleCreatePlan} className="sq-sp-form">
-              <div className="sq-sp-form-group">
-                <label>1. Exam / Subject Name:</label>
-                <input
-                  type="text"
-                  required
-                  placeholder="e.g. Biology Midterm, Calculus Final, AP History"
-                  value={examName}
-                  onChange={(e) => setExamName(e.target.value)}
-                  disabled={isGenerating}
-                />
-              </div>
-
-              <div className="sq-sp-form-group">
-                <label>2. Exam Date:</label>
-                <input
-                  type="date"
-                  required
-                  value={examDate}
-                  onChange={(e) => setExamDate(e.target.value)}
-                  disabled={isGenerating}
-                />
-              </div>
-
-              <div className="sq-sp-form-group">
-                <label>3. Upload Study Document (Any format: PDF, DOCX, PPTX, TXT):</label>
-                <div
-                  className="sq-sp-dropzone"
-                  onClick={() => fileInputRef.current?.click()}
-                >
-                  <span className="sq-sp-drop-icon">📁</span>
-                  <div className="sq-sp-drop-info">
-                    {uploadedDocName ? (
-                      <span className="sq-sp-file-ready">✓ Loaded: {uploadedDocName}</span>
-                    ) : (
-                      <span>Click to upload any document file (PDF, Word, PPTX, Text)</span>
-                    )}
-                    <small>Supports all file formats and sizes</small>
-                  </div>
-                </div>
-              </div>
-
-              <div className="sq-sp-form-group">
-                <label>Or paste review notes / topic:</label>
-                <textarea
-                  rows={3}
-                  placeholder="Paste chapter notes, study guides, or key terms..."
-                  value={materialNotes}
-                  onChange={(e) => setMaterialNotes(e.target.value)}
-                  disabled={isGenerating}
-                />
-              </div>
-
-              {isGenerating && (
-                <div className="sq-sp-gen-status">
-                  <div className="sq-sp-spinner" />
-                  <span>{generatingStatus}</span>
-                </div>
-              )}
-
-              <div className="sq-sp-form-actions">
-                <button
-                  type="button"
-                  className="sq-sp-btn-cancel"
-                  onClick={() => setIsModalOpen(false)}
-                  disabled={isGenerating}
-                >
-                  Cancel
-                </button>
-                <button
-                  type="submit"
-                  className="sq-sp-btn-submit"
-                  disabled={isGenerating}
-                >
-                  {isGenerating ? "Generating..." : "⚡ Generate With Groq AI"}
-                </button>
-              </div>
-            </form>
-          </div>
-        </div>
-      )}
-
-      {/* Footer matching Photo 2 */}
-      <footer className="sq-sp-footer">
-        <div className="sq-sp-footer-inner">
-          {/* Brand info */}
-          <div className="sq-sp-footer-brand">
-            <div className="sq-sp-footer-logo">
-              <svg viewBox="0 0 36 36" width="30" height="30" fill="none">
-                <rect width="36" height="36" rx="8" fill="#7C3AED" />
-                <circle cx="18" cy="18" r="7.5" fill="#FFA500" />
-                <circle cx="15.5" cy="17" r="1.3" fill="#1E1B4B" />
-                <circle cx="20.5" cy="17" r="1.3" fill="#1E1B4B" />
-                <path d="M16 20C16.8 21 19.2 21 20 20" stroke="#1E1B4B" strokeWidth="1.2" strokeLinecap="round" />
-              </svg>
-              <span className="sq-sp-footer-title">StudyQuest</span>
-            </div>
-            <p className="sq-sp-footer-desc">
-              Interactive learning through engaging games and quizzes.
-            </p>
-            <div className="sq-sp-socials">
-              <a href="#linkedin" title="LinkedIn">in</a>
-              <a href="#instagram" title="Instagram">📷</a>
-              <a href="#tiktok" title="TikTok">♪</a>
-              <a href="mailto:support@studyquest.app" title="Email">✉</a>
-            </div>
-          </div>
-
-          {/* Product */}
-          <div className="sq-sp-footer-col">
-            <h4>Product</h4>
-            <ul>
-              <li><a href="/games">Games</a></li>
-              <li><a href="/study-plan">Study Plan</a></li>
-              <li><a href="/explain">Explain</a></li>
-              <li><a href="/dashboard">Dashboard</a></li>
-            </ul>
-          </div>
-
-          {/* Company */}
-          <div className="sq-sp-footer-col">
-            <h4>Company</h4>
-            <ul>
-              <li><a href="#about">About Us</a></li>
-              <li><a href="#reviews">Reviews</a></li>
-              <li><a href="#blog">Blog</a></li>
-            </ul>
-          </div>
-
-          {/* Legal */}
-          <div className="sq-sp-footer-col">
-            <h4>Legal</h4>
-            <ul>
-              <li><a href="#terms">Terms of Service</a></li>
-              <li><a href="#privacy">Privacy Policy</a></li>
-              <li><a href="#refund">Refund Policy</a></li>
-            </ul>
-          </div>
-        </div>
-      </footer>
-
-      {/* Floating Give Feedback Button (Photo 2 Bottom Right) */}
+      {/* Floating Give Feedback Button */}
       {showFeedback && (
         <div className="sq-sp-feedback-pill">
           <button
