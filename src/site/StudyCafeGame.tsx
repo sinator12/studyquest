@@ -51,6 +51,24 @@ const CAFE_CUSTOMERS: CafeCustomer[] = [
     greeting: "WOAAAH! What's on the menu today?! Make me something delicious from your notes!",
     praise: "SUGEEEE!! That's the best drink on the entire ocean! Full energy!",
     remedy: "EHHHH?! That's not what I ordered! My stomach is rumbling!"
+  },
+  {
+    id: "giorno",
+    name: "Giorno Giovanna",
+    title: "PASSIONE BOSS",
+    imageSrc: "/games/study-cafe/customer_giorno.png",
+    greeting: "I, Giorno Giovanna, have a dream. Brew me an Italian espresso that resolves this query.",
+    praise: "Muda to doubt you! That taste has the resolve of Gold Experience. Truly sublime!",
+    remedy: "This order lacks resolve. Turn your mistake into wisdom and attempt it once more."
+  },
+  {
+    id: "chopper",
+    name: "Tony Tony Chopper",
+    title: "COTTON CANDY LOVER",
+    imageSrc: "/games/study-cafe/customer_chopper.png",
+    greeting: "Hey! Does this café have sweet drinks? Answer my study question correctly!",
+    praise: "Hehehe, calling me a genius won't make me happy, you bastard! It's so sweet and delicious!",
+    remedy: "Wahhh! That wasn't the right ingredient at all! Check your medical notes!"
   }
 ];
 
