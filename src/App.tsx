@@ -10,6 +10,7 @@ import StudyPlanPage from "./site/StudyPlanPage";
 import ExplainPage from "./site/ExplainPage";
 import LoginPage from "./site/LoginPage";
 import SiteApp from "./site/SiteApp";
+import AuthGate from "./site/AuthGate";
 import { initSupabaseAuth } from "./site/supabaseClient";
 import { restoreProgressFromCloud } from "./site/progressSync";
 
@@ -109,8 +110,10 @@ export default function App() {
   };
 
   return (
-    <div key={pathname} className="sq-page-transition">
-      {renderContent()}
-    </div>
+    <AuthGate>
+      <div key={pathname} className="sq-page-transition">
+        {renderContent()}
+      </div>
+    </AuthGate>
   );
 }
