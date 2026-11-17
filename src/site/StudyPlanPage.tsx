@@ -1,6 +1,7 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import TopNav from "./TopNav";
-import { getActiveDeck, type DeckInfo } from "./studyStore";
+import { getActiveDeck, setActiveDeck, getAIConfig, DEFAULT_GROQ_KEY, type DeckInfo } from "./studyStore";
+import { extractTextFromFile, generateStudyPlanWithGroq, generateWithGroq } from "./aiService";
 import "./studyPlan.css";
 
 interface StudyPlan {
@@ -34,8 +35,14 @@ export default function StudyPlanPage() {
   const [materialNotes, setMaterialNotes] = useState(
     "Key concepts: Cell division, Mitosis, Meiosis, DNA replication, Photosynthesis"
   );
-  const [activeDeck] = useState<DeckInfo>(getActiveDeck());
+  const [uploadedDocName, setUploadedDocName] = useState<string | null>(null);
+  const [isParsingDoc, setIsParsingDoc] = useState(false);
+  const [isGenerating, setIsGenerating] = useState(false);
+  const [generatingStatus, setGeneratingStatus] = useState("");
+  const [, setActiveDeckState] = useState<DeckInfo>(getActiveDeck());
   const [showFeedback, setShowFeedback] = useState(true);
+
+  const fileInputRef = useRef<HTMLInputElement>(null);
 
   // Load saved study plan from localStorage
   useEffect(() => {
@@ -49,51 +56,101 @@ export default function StudyPlanPage() {
     }
   }, []);
 
-  const handleCreatePlan = (e: React.FormEvent) => {
-    e.preventDefault();
+  // Handle uploading any document format
+  const handleDocFile = async (file: File) => {
+    if (!file) return;
+    setIsParsingDoc(true);
+    setUploadedDocName(file.name);
+    try {
+      const extracted = await extractTextFromFile(file);
+      if (extracted && extracted.trim().length > 0) {
+        setMaterialNotes(extracted);
+      }
+    } catch (err) {
+      console.warn("Could not parse file:", err);
+    } finally {
+      setIsParsingDoc(false);
+    }
+  };
+
+  const handleFileInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (file) {
+      handleDocFile(file);
+    }
+  };
+
+  const handleCreatePlan = async (e?: React.FormEvent) => {
+    if (e) e.preventDefault();
+
+    setIsGenerating(true);
+    setGeneratingStatus("Groq AI: Analyzing your document and study notes...");
+
     const targetDate = new Date(examDate);
     const today = new Date();
     const diffTime = Math.max(0, targetDate.getTime() - today.getTime());
     const daysRemaining = Math.max(1, Math.ceil(diffTime / (1000 * 60 * 60 * 24)));
 
-    const newPlan: StudyPlan = {
-      id: "plan-" + Date.now(),
-      examName: examName.trim() || "Upcoming Exam",
-      examDate,
-      daysRemaining,
-      materialName: activeDeck?.title || examName,
-      createdAt: new Date().toISOString(),
-      sessions: [
-        {
-          day: 1,
-          title: "Warm-up & Core Concepts",
-          description: "Review fundamentals and build foundational memory.",
-          game: "Study Cafe",
-          gameUrl: "/games/study-cafe",
-          done: false
-        },
-        {
-          day: 2,
-          title: "Speed Challenge & Retention",
-          description: "Test your quick recall with trajectory physics.",
-          game: "Angry Nerds",
-          gameUrl: "/games/angry-nerds",
-          done: false
-        },
-        {
-          day: 3,
-          title: "Comprehensive Review & Exam Readiness",
-          description: "Full-speed review session to master all questions.",
-          game: "Study Cafe",
-          gameUrl: "/games/study-cafe",
-          done: false
-        }
-      ]
-    };
+    const aiConfig = getAIConfig();
+    const groqKey = aiConfig.groqKey || DEFAULT_GROQ_KEY;
 
-    setActivePlan(newPlan);
-    localStorage.setItem(STORAGE_KEY, JSON.stringify(newPlan));
-    setIsModalOpen(false);
+    try {
+      // 1. Generate customized study plan using Groq AI
+      setGeneratingStatus("Groq AI: Creating your personalized 3-step study milestones...");
+      const planResult = await generateStudyPlanWithGroq(
+        examName,
+        examDate,
+        materialNotes,
+        groqKey
+      );
+
+      // 2. Generate quiz questions using Groq AI and load them directly into all games!
+      setGeneratingStatus("Groq AI: Generating interactive quiz questions for your games...");
+      try {
+        const deckResult = await generateWithGroq(
+          materialNotes,
+          uploadedDocName ? "file" : "text",
+          8,
+          groqKey
+        );
+
+        if (deckResult && deckResult.questions.length > 0) {
+          const newDeck: DeckInfo = {
+            id: "deck-" + Date.now(),
+            title: deckResult.title || `${examName} Review`,
+            sourceType: uploadedDocName ? "file" : "text",
+            fileName: uploadedDocName || undefined,
+            contentPreview: materialNotes.slice(0, 200),
+            createdAt: new Date().toISOString(),
+            questionCount: deckResult.questions.length,
+            questions: deckResult.questions
+          };
+          setActiveDeck(newDeck);
+          setActiveDeckState(newDeck);
+        }
+      } catch (deckErr) {
+        console.warn("Deck question generation warning:", deckErr);
+      }
+
+      const newPlan: StudyPlan = {
+        id: "plan-" + Date.now(),
+        examName: examName.trim() || "Upcoming Exam",
+        examDate,
+        daysRemaining,
+        materialName: uploadedDocName || examName,
+        createdAt: new Date().toISOString(),
+        sessions: planResult.sessions
+      };
+
+      setActivePlan(newPlan);
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(newPlan));
+      setIsModalOpen(false);
+    } catch (err) {
+      console.error("Plan creation error:", err);
+    } finally {
+      setIsGenerating(false);
+      setGeneratingStatus("");
+    }
   };
 
   const handleToggleSession = (index: number) => {
@@ -111,6 +168,15 @@ export default function StudyPlanPage() {
 
   return (
     <div className="sq-study-plan-body">
+      {/* Hidden file input supporting ANY document type */}
+      <input
+        ref={fileInputRef}
+        type="file"
+        style={{ display: "none" }}
+        accept="*/*"
+        onChange={handleFileInputChange}
+      />
+
       {/* Navigation Header */}
       <TopNav activeTab="study-plan" />
 
@@ -222,6 +288,7 @@ export default function StudyPlanPage() {
               tabIndex={0}
               onClick={() => setIsModalOpen(true)}
               onKeyDown={(e) => e.key === "Enter" && setIsModalOpen(true)}
+              title="Click to set your exam date"
             >
               <div className="sq-sp-step-icon sq-sp-icon-target">
                 <svg width="28" height="28" viewBox="0 0 24 24" fill="none">
@@ -230,16 +297,20 @@ export default function StudyPlanPage() {
                   <circle cx="12" cy="12" r="2.5" fill="#C084FC" />
                 </svg>
               </div>
-              <span className="sq-sp-step-label">Tell me the exam date</span>
+              <div className="sq-sp-step-text-wrap">
+                <span className="sq-sp-step-label">Tell me the exam date</span>
+                {examDate && <span className="sq-sp-step-hint">{examDate}</span>}
+              </div>
             </div>
 
-            {/* Step 2: Add your material */}
+            {/* Step 2: Add your material (Upload any doc or notes) */}
             <div
               className="sq-sp-step-card"
               role="button"
               tabIndex={0}
-              onClick={() => setIsModalOpen(true)}
-              onKeyDown={(e) => e.key === "Enter" && setIsModalOpen(true)}
+              onClick={() => fileInputRef.current?.click()}
+              onKeyDown={(e) => e.key === "Enter" && fileInputRef.current?.click()}
+              title="Click to upload ANY document (PDF, Word, PPT, Text, etc.)"
             >
               <div className="sq-sp-step-icon sq-sp-icon-doc">
                 <svg width="28" height="28" viewBox="0 0 24 24" fill="none">
@@ -249,7 +320,16 @@ export default function StudyPlanPage() {
                   <line x1="8" y1="16" x2="13" y2="16" stroke="#FFFFFF" strokeWidth="1.8" strokeLinecap="round" />
                 </svg>
               </div>
-              <span className="sq-sp-step-label">Add your material</span>
+              <div className="sq-sp-step-text-wrap">
+                <span className="sq-sp-step-label">Add your material</span>
+                <span className="sq-sp-step-hint">
+                  {isParsingDoc
+                    ? "Reading document..."
+                    : uploadedDocName
+                    ? `📄 ${uploadedDocName}`
+                    : "Upload any document (PDF, DOCX, PPTX)"}
+                </span>
+              </div>
             </div>
 
             {/* Step 3: Study one session at a time */}
@@ -257,8 +337,15 @@ export default function StudyPlanPage() {
               className="sq-sp-step-card"
               role="button"
               tabIndex={0}
-              onClick={() => setIsModalOpen(true)}
+              onClick={() => {
+                if (activePlan) {
+                  window.location.href = activePlan.sessions[0]?.gameUrl || "/games/study-cafe";
+                } else {
+                  setIsModalOpen(true);
+                }
+              }}
               onKeyDown={(e) => e.key === "Enter" && setIsModalOpen(true)}
+              title="Study one session at a time"
             >
               <div className="sq-sp-step-icon sq-sp-icon-play">
                 <svg width="28" height="28" viewBox="0 0 24 24" fill="none">
@@ -266,10 +353,12 @@ export default function StudyPlanPage() {
                   <polygon points="10 8 16 12 10 16" fill="#FFFFFF" />
                 </svg>
               </div>
-              <span className="sq-sp-step-label sq-sp-step-stacked">
-                <span>Study one session at a</span>
-                <span>time</span>
-              </span>
+              <div className="sq-sp-step-text-wrap">
+                <span className="sq-sp-step-label sq-sp-step-stacked">
+                  <span>Study one session at a</span>
+                  <span>time</span>
+                </span>
+              </div>
             </div>
           </div>
 
@@ -280,8 +369,9 @@ export default function StudyPlanPage() {
               type="button"
               className="sq-sp-cta-btn"
               onClick={() => setIsModalOpen(true)}
+              disabled={isGenerating}
             >
-              Create New Study Plan
+              {isGenerating ? "⚡ Groq AI Generating..." : "Create New Study Plan"}
             </button>
           </div>
         </section>
@@ -337,9 +427,9 @@ export default function StudyPlanPage() {
         )}
       </main>
 
-      {/* Creation Modal */}
+      {/* Creation Modal with File Uploader & Groq AI Engine */}
       {isModalOpen && (
-        <div className="sq-sp-modal-overlay" onClick={() => setIsModalOpen(false)}>
+        <div className="sq-sp-modal-overlay" onClick={() => !isGenerating && setIsModalOpen(false)}>
           <div
             className="sq-sp-modal-card"
             onClick={(e) => e.stopPropagation()}
@@ -349,58 +439,94 @@ export default function StudyPlanPage() {
             <button
               type="button"
               className="sq-sp-modal-close"
-              onClick={() => setIsModalOpen(false)}
+              onClick={() => !isGenerating && setIsModalOpen(false)}
             >
               ✕
             </button>
             <div className="sq-sp-modal-head">
-              <span className="sq-sp-badge-ai">Step-by-Step Generator</span>
+              <div className="sq-sp-modal-tags">
+                <span className="sq-sp-badge-ai">Groq AI Powered</span>
+                <span className="sq-sp-badge-model">openai/gpt-oss-120b</span>
+              </div>
               <h3>Create Your AI Study Plan</h3>
-              <p>Personalize your schedule around your actual exam date and notes.</p>
+              <p>Upload any document or study guide. Groq AI generates your custom schedule and quiz deck.</p>
             </div>
 
             <form onSubmit={handleCreatePlan} className="sq-sp-form">
               <div className="sq-sp-form-group">
-                <label>1. What exam are you preparing for?</label>
+                <label>1. Exam / Subject Name:</label>
                 <input
                   type="text"
                   required
                   placeholder="e.g. Biology Midterm, Calculus Final, AP History"
                   value={examName}
                   onChange={(e) => setExamName(e.target.value)}
+                  disabled={isGenerating}
                 />
               </div>
 
               <div className="sq-sp-form-group">
-                <label>2. When is your exam date?</label>
+                <label>2. Exam Date:</label>
                 <input
                   type="date"
                   required
                   value={examDate}
                   onChange={(e) => setExamDate(e.target.value)}
+                  disabled={isGenerating}
                 />
               </div>
 
               <div className="sq-sp-form-group">
-                <label>3. Add your study material or key concepts:</label>
+                <label>3. Upload Study Document (Any format: PDF, DOCX, PPTX, TXT):</label>
+                <div
+                  className="sq-sp-dropzone"
+                  onClick={() => fileInputRef.current?.click()}
+                >
+                  <span className="sq-sp-drop-icon">📁</span>
+                  <div className="sq-sp-drop-info">
+                    {uploadedDocName ? (
+                      <span className="sq-sp-file-ready">✓ Loaded: {uploadedDocName}</span>
+                    ) : (
+                      <span>Click to upload any document file (PDF, Word, PPTX, Text)</span>
+                    )}
+                    <small>Supports all file formats and sizes</small>
+                  </div>
+                </div>
+              </div>
+
+              <div className="sq-sp-form-group">
+                <label>Or paste review notes / topic:</label>
                 <textarea
-                  rows={4}
+                  rows={3}
                   placeholder="Paste chapter notes, study guides, or key terms..."
                   value={materialNotes}
                   onChange={(e) => setMaterialNotes(e.target.value)}
+                  disabled={isGenerating}
                 />
               </div>
+
+              {isGenerating && (
+                <div className="sq-sp-gen-status">
+                  <div className="sq-sp-spinner" />
+                  <span>{generatingStatus}</span>
+                </div>
+              )}
 
               <div className="sq-sp-form-actions">
                 <button
                   type="button"
                   className="sq-sp-btn-cancel"
                   onClick={() => setIsModalOpen(false)}
+                  disabled={isGenerating}
                 >
                   Cancel
                 </button>
-                <button type="submit" className="sq-sp-btn-submit">
-                  Generate My Plan
+                <button
+                  type="submit"
+                  className="sq-sp-btn-submit"
+                  disabled={isGenerating}
+                >
+                  {isGenerating ? "Generating..." : "⚡ Generate With Groq AI"}
                 </button>
               </div>
             </form>

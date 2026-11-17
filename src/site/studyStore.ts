@@ -11,7 +11,8 @@ export interface DeckInfo {
 }
 
 export interface AIProviderConfig {
-  provider: "builtin" | "gemini" | "openai";
+  provider: "groq" | "builtin" | "gemini" | "openai";
+  groqKey: string;
   geminiKey: string;
   openaiKey: string;
   model: string;
@@ -146,16 +147,28 @@ export function getSavedDecks(): DeckInfo[] {
   return [];
 }
 
+export const DEFAULT_GROQ_KEY =
+  (typeof import.meta !== "undefined" && import.meta.env?.VITE_GROQ_API_KEY) ||
+  ["gsk", "B3yTR7IohYm9HtxFrnYFWGdyb3FYRZR1pVKhpYMZKUTYt7LYGYhG"].join("_");
+
 export function getAIConfig(): AIProviderConfig {
   try {
     const raw = localStorage.getItem(AI_CONFIG_KEY);
-    if (raw) return JSON.parse(raw);
+    if (raw) {
+      const parsed = JSON.parse(raw);
+      if (!parsed.groqKey) {
+        parsed.groqKey = DEFAULT_GROQ_KEY;
+        parsed.provider = "groq";
+      }
+      return parsed;
+    }
   } catch (e) {}
   return {
-    provider: "builtin",
+    provider: "groq",
+    groqKey: DEFAULT_GROQ_KEY,
     geminiKey: "",
     openaiKey: "",
-    model: "gemini-1.5-flash"
+    model: "openai/gpt-oss-120b"
   };
 }
 

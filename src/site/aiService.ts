@@ -1,5 +1,5 @@
 import { type Question } from "./quizData";
-import { getAIConfig } from "./studyStore";
+import { getAIConfig, DEFAULT_GROQ_KEY } from "./studyStore";
 
 export interface GenerateOptions {
   count?: number;
@@ -8,81 +8,315 @@ export interface GenerateOptions {
 }
 
 /**
- * Extracts plain text from various file formats (.txt, .md, .csv, .json, .pdf, .docx)
+ * Extracts plain text from any document format (.pdf, .docx, .doc, .pptx, .ppt, .xlsx, .txt, .md, .csv, .json, .rtf, etc.)
  */
 export async function extractTextFromFile(file: File): Promise<string> {
   const extension = file.name.split(".").pop()?.toLowerCase() || "";
 
-  // Plain text formats
-  if (["txt", "md", "markdown", "csv", "json", "html", "htm"].includes(extension)) {
-    return await file.text();
-  }
-
-  // PDF basic text extraction from buffer
-  if (extension === "pdf") {
-    try {
-      const arrayBuffer = await file.arrayBuffer();
-      const bytes = new Uint8Array(arrayBuffer);
-      const decoder = new TextDecoder("utf-8", { fatal: false });
-      const raw = decoder.decode(bytes);
-
-      // Search for PDF text streams (/Length and stream ... endstream) or text in parentheses (text) Tj
-      const textMatches: string[] = [];
-      const tjRegex = /\(([^)]+)\)\s*Tj/g;
-      let match;
-      while ((match = tjRegex.exec(raw)) !== null) {
-        if (match[1] && match[1].length > 1 && !match[1].startsWith("\\")) {
-          textMatches.push(match[1]);
-        }
-      }
-
-      if (textMatches.length > 20) {
-        return textMatches.join(" ");
-      }
-
-      // Fallback: clean ASCII printable chunks
-      const asciiStrings: string[] = [];
-      let currentStr = "";
-      for (let i = 0; i < bytes.length; i++) {
-        const b = bytes[i];
-        if ((b >= 32 && b <= 126) || b === 10 || b === 13) {
-          currentStr += String.fromCharCode(b);
-        } else {
-          if (currentStr.trim().length > 20) {
-            asciiStrings.push(currentStr.trim());
-          }
-          currentStr = "";
-        }
-      }
-      return asciiStrings.join("\n");
-    } catch (err) {
-      console.warn("Could not parse PDF content, using filename", err);
-      return `Study material for file: ${file.name}`;
-    }
-  }
-
-  // Word docx basic text extraction (docx is a zip containing word/document.xml)
-  if (["docx", "doc"].includes(extension)) {
+  // 1. Plain text and code formats
+  if (
+    ["txt", "md", "markdown", "csv", "tsv", "json", "html", "htm", "xml", "js", "ts", "py", "java", "cpp", "c", "cs"].includes(extension)
+  ) {
     try {
       const text = await file.text();
-      // Look for xml paragraphs <w:t>text</w:t>
-      const wtMatches = text.match(/<w:t[^>]*>([^<]+)<\/w:t>/g);
-      if (wtMatches) {
-        return wtMatches.map(m => m.replace(/<[^>]+>/g, "")).join(" ");
-      }
+      if (text && text.trim().length > 0) return text;
     } catch (e) {}
   }
 
-  // Default fallback to text reading
-  try {
-    return await file.text();
-  } catch (e) {
-    return `Study material: ${file.name}`;
+  // 2. Rich Text Format (.rtf)
+  if (extension === "rtf") {
+    try {
+      const raw = await file.text();
+      // Remove RTF control words and groups
+      return raw.replace(/\\([a-zA-Z]+(-?\d+)? ?|.)/g, " ").replace(/[{}]/g, " ").replace(/\s+/g, " ").trim();
+    } catch (e) {}
   }
+
+  // Read arrayBuffer for binary documents
+  let arrayBuffer: ArrayBuffer;
+  try {
+    arrayBuffer = await file.arrayBuffer();
+  } catch (e) {
+    return `Study material from ${file.name}`;
+  }
+
+  const bytes = new Uint8Array(arrayBuffer);
+  const decoder = new TextDecoder("utf-8", { fatal: false });
+  const rawText = decoder.decode(bytes);
+
+  // 3. Word Documents (.docx, .doc)
+  if (["docx", "doc"].includes(extension)) {
+    // Look for XML tags <w:t>...</w:t>
+    const wtMatches = rawText.match(/<w:t[^>]*>([^<]+)<\/w:t>/g);
+    if (wtMatches && wtMatches.length > 0) {
+      const extracted = wtMatches.map((m) => m.replace(/<[^>]+>/g, "")).join(" ");
+      if (extracted.trim().length > 20) return extracted;
+    }
+  }
+
+  // 4. PowerPoint Presentations (.pptx, .ppt)
+  if (["pptx", "ppt"].includes(extension)) {
+    // Look for slide text tags <a:t>...</a:t>
+    const atMatches = rawText.match(/<a:t[^>]*>([^<]+)<\/a:t>/g);
+    if (atMatches && atMatches.length > 0) {
+      const extracted = atMatches.map((m) => m.replace(/<[^>]+>/g, "")).join(" ");
+      if (extracted.trim().length > 20) return extracted;
+    }
+  }
+
+  // 5. PDF basic and stream text extraction
+  if (extension === "pdf") {
+    // Extract text from parentheses (text) Tj
+    const textMatches: string[] = [];
+    const tjRegex = /\(([^)]+)\)\s*Tj/g;
+    let match;
+    while ((match = tjRegex.exec(rawText)) !== null) {
+      if (match[1] && match[1].length > 1 && !match[1].startsWith("\\")) {
+        textMatches.push(match[1]);
+      }
+    }
+
+    // Extract text from bracket arrays [(text)] TJ
+    const tjArrayRegex = /\[([^\]]+)\]\s*TJ/g;
+    while ((match = tjArrayRegex.exec(rawText)) !== null) {
+      const innerMatches = match[1].match(/\(([^)]+)\)/g);
+      if (innerMatches) {
+        textMatches.push(...innerMatches.map((im) => im.replace(/[()]/g, "")));
+      }
+    }
+
+    if (textMatches.length > 10) {
+      return textMatches.join(" ");
+    }
+  }
+
+  // 6. Generic Binary / Fallback extractor: pull all printable ASCII and UTF-8 words
+  const extractedChunks: string[] = [];
+  let currentWord = "";
+  for (let i = 0; i < bytes.length; i++) {
+    const b = bytes[i];
+    // Printable characters + whitespace
+    if ((b >= 32 && b <= 126) || b === 10 || b === 13) {
+      currentWord += String.fromCharCode(b);
+    } else {
+      if (currentWord.trim().length >= 4 && !currentWord.includes("<?xml") && !currentWord.includes("http://")) {
+        extractedChunks.push(currentWord.trim());
+      }
+      currentWord = "";
+    }
+  }
+
+  const combined = extractedChunks.join(" ");
+  if (combined.length > 30) {
+    return combined.slice(0, 25000);
+  }
+
+  return `Study material extracted from ${file.name}.`;
 }
 
 /**
- * Generates questions using Gemini API, OpenAI API, or the Built-in AI Engine
+ * Groq AI Cloud API integration (Ultra-fast Llama / GPT-OSS)
+ */
+export async function generateWithGroq(
+  content: string,
+  sourceType: "file" | "text" | "topic",
+  count: number,
+  apiKey: string
+): Promise<{ title: string; questions: Question[] }> {
+  const prompt = `You are an expert curriculum educator creating interactive quiz questions.
+Based on the following ${sourceType === "topic" ? "topic" : "study material"}, generate exactly ${count} multiple choice questions with 4 distinct options each.
+Ensure questions test key concepts, definitions, facts, and applications.
+Vary the correct answer positions (0, 1, 2, or 3) evenly across questions.
+
+${sourceType === "topic" ? "Topic: " + content : "Study Material:\n" + content.slice(0, 15000)}
+
+Return ONLY a valid JSON object matching this schema:
+{
+  "title": "A short engaging study deck title (e.g. 'Cell Biology & Mitosis Review')",
+  "questions": [
+    {
+      "id": 1,
+      "subject": "science",
+      "question": "Question text?",
+      "options": ["Option A", "Option B", "Option C", "Option D"],
+      "correctIndex": 0,
+      "explanation": "Clear explanation of why this option is correct."
+    }
+  ]
+}`;
+
+  const modelsToTry = ["openai/gpt-oss-120b", "qwen/qwen3.8-27b", "openai/gpt-oss-20b"];
+  let lastError: any = null;
+
+  for (const model of modelsToTry) {
+    try {
+      const response = await fetch("https://api.groq.com/openai/v1/chat/completions", {
+        method: "POST",
+        headers: {
+          Authorization: `Bearer ${apiKey.trim()}`,
+          "Content-Type": "application/json"
+        },
+        body: JSON.stringify({
+          model,
+          response_format: { type: "json_object" },
+          temperature: 0.3,
+          messages: [
+            {
+              role: "system",
+              content: "You are an educational assistant that strictly outputs valid JSON quiz decks."
+            },
+            {
+              role: "user",
+              content: prompt
+            }
+          ]
+        })
+      });
+
+      if (!response.ok) {
+        const errText = await response.text();
+        console.warn(`Groq model ${model} response not ok (${response.status}):`, errText);
+        continue;
+      }
+
+      const data = await response.json();
+      const rawText = data.choices?.[0]?.message?.content;
+      if (!rawText) continue;
+
+      const parsed = JSON.parse(rawText);
+      if (parsed && Array.isArray(parsed.questions) && parsed.questions.length > 0) {
+        return {
+          title: parsed.title || "StudyQuest Deck",
+          questions: parsed.questions.map((q: any, i: number) => ({
+            id: q.id || 1000 + i,
+            subject: q.subject || "general",
+            question: q.question || "Study Question",
+            options: Array.isArray(q.options) && q.options.length === 4 ? q.options : ["True", "False", "Both", "Neither"],
+            correctIndex:
+              typeof q.correctIndex === "number" && q.correctIndex >= 0 && q.correctIndex <= 3 ? q.correctIndex : 0,
+            explanation: q.explanation || "Review your notes for more details."
+          }))
+        };
+      }
+    } catch (e) {
+      lastError = e;
+      console.warn(`Groq model ${model} attempt failed:`, e);
+    }
+  }
+
+  throw lastError || new Error("Failed to generate questions with Groq AI.");
+}
+
+/**
+ * Groq AI Study Plan Generator
+ */
+export async function generateStudyPlanWithGroq(
+  examName: string,
+  examDate: string,
+  materialNotes: string,
+  apiKey: string
+): Promise<{
+  sessions: {
+    day: number;
+    title: string;
+    description: string;
+    game: string;
+    gameUrl: string;
+    done: boolean;
+  }[];
+}> {
+  const prompt = `You are a study schedule coach.
+The student is preparing for "${examName}" on exam date "${examDate}".
+Their study material and notes are:
+"""
+${materialNotes.slice(0, 10000)}
+"""
+
+Create a structured 3-session study plan to master this material.
+Assign interactive games to each session:
+- Session 1: "Study Cafe" (gameUrl: "/games/study-cafe") for foundational flashcard & order-taking review.
+- Session 2: "Angry Nerds" (gameUrl: "/games/angry-nerds") for trajectory physics speed review.
+- Session 3: "Study Cafe" (gameUrl: "/games/study-cafe") for final comprehensive review.
+
+Return ONLY a valid JSON object matching this schema:
+{
+  "sessions": [
+    {
+      "day": 1,
+      "title": "Short session title",
+      "description": "Specific focus based on student's actual notes",
+      "game": "Study Cafe",
+      "gameUrl": "/games/study-cafe",
+      "done": false
+    }
+  ]
+}`;
+
+  try {
+    const response = await fetch("https://api.groq.com/openai/v1/chat/completions", {
+      method: "POST",
+      headers: {
+        Authorization: `Bearer ${apiKey.trim()}`,
+        "Content-Type": "application/json"
+      },
+      body: JSON.stringify({
+        model: "openai/gpt-oss-120b",
+        response_format: { type: "json_object" },
+        temperature: 0.4,
+        messages: [
+          { role: "system", content: "You strictly output valid JSON study plans." },
+          { role: "user", content: prompt }
+        ]
+      })
+    });
+
+    if (response.ok) {
+      const data = await response.json();
+      const rawText = data.choices?.[0]?.message?.content;
+      if (rawText) {
+        const parsed = JSON.parse(rawText);
+        if (parsed && Array.isArray(parsed.sessions) && parsed.sessions.length > 0) {
+          return { sessions: parsed.sessions };
+        }
+      }
+    }
+  } catch (err) {
+    console.warn("Groq study plan generation error:", err);
+  }
+
+  // Reliable fallback
+  return {
+    sessions: [
+      {
+        day: 1,
+        title: "Foundations & Core Definitions",
+        description: `Review fundamental concepts for ${examName}.`,
+        game: "Study Cafe",
+        gameUrl: "/games/study-cafe",
+        done: false
+      },
+      {
+        day: 2,
+        title: "Speed Challenge & Active Recall",
+        description: `Test quick recall on ${examName} with Angry Nerds.`,
+        game: "Angry Nerds",
+        gameUrl: "/games/angry-nerds",
+        done: false
+      },
+      {
+        day: 3,
+        title: "Mastery Review & Readiness Check",
+        description: `Full run-through to ensure 100% exam readiness.`,
+        game: "Study Cafe",
+        gameUrl: "/games/study-cafe",
+        done: false
+      }
+    ]
+  };
+}
+
+/**
+ * Generates questions using Groq API, Gemini API, OpenAI API, or Built-in AI Engine
  */
 export async function generateQuestionsFromContent(
   content: string,
@@ -93,7 +327,21 @@ export async function generateQuestionsFromContent(
   const config = getAIConfig();
   options.onProgress?.("Reading and analyzing reviewer notes...");
 
-  // 1. Try Gemini API if key is configured
+  // 1. Try Groq API (Primary AI engine with user key)
+  const groqKey = config.groqKey || DEFAULT_GROQ_KEY;
+  if (groqKey) {
+    try {
+      options.onProgress?.("Groq AI: Generating questions with ultra-fast Llama engine...");
+      const result = await generateWithGroq(content, sourceType, count, groqKey);
+      if (result && result.questions.length > 0) {
+        return result;
+      }
+    } catch (err) {
+      console.warn("Groq generation failed, falling back to other providers", err);
+    }
+  }
+
+  // 2. Try Gemini API if key is configured
   if (config.provider === "gemini" && config.geminiKey) {
     try {
       options.onProgress?.("Contacting Google Gemini AI...");
@@ -106,7 +354,7 @@ export async function generateQuestionsFromContent(
     }
   }
 
-  // 2. Try OpenAI API if configured
+  // 3. Try OpenAI API if configured
   if (config.provider === "openai" && config.openaiKey) {
     try {
       options.onProgress?.("Contacting OpenAI AI...");
@@ -119,9 +367,9 @@ export async function generateQuestionsFromContent(
     }
   }
 
-  // 3. Built-in Smart AI Generator (instant, offline, zero-quota)
+  // 4. Built-in Smart AI Generator
   options.onProgress?.("Processing concepts with StudyQuest AI engine...");
-  await new Promise(r => setTimeout(r, 600)); // smooth realistic experience
+  await new Promise((r) => setTimeout(r, 600));
   return generateWithBuiltinAI(content, sourceType, count);
 }
 
