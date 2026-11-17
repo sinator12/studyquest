@@ -1,6 +1,6 @@
 import { useState, useEffect, useRef } from "react";
 import TopNav from "./TopNav";
-import { getActiveDeck, updatePlayerStats, type DeckInfo } from "./studyStore";
+import { getActiveDeck, updatePlayerStats, recordActivityToday, type DeckInfo } from "./studyStore";
 import { type Question } from "./quizData";
 import "./angryNerds.css";
 
@@ -519,6 +519,7 @@ export default function AngryNerdsGame() {
             setScore(sc => sc + points);
             setBestScore(bs => Math.max(bs, score + points));
             updatePlayerStats({ coins: 25 });
+            recordActivityToday("Destroyed Angry Nerds Target", 25);
 
             // Floating Score text
             s.floatingTexts.push({

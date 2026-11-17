@@ -1,6 +1,6 @@
 import { useState, useEffect, useRef } from "react";
 import TopNav from "./TopNav";
-import { getActiveDeck, updatePlayerStats, type DeckInfo } from "./studyStore";
+import { getActiveDeck, updatePlayerStats, recordActivityToday, type DeckInfo } from "./studyStore";
 import { type Question } from "./quizData";
 import "./studyCafe.css";
 
@@ -132,7 +132,8 @@ export default function StudyCafeGame() {
       setStarsEarned(s => s + 1);
       setCustomersServed(n => n + 1);
       setStreak(st => st + 1);
-      updatePlayerStats({ coins: earned, stars: 1, streak: streak + 1 });
+      updatePlayerStats({ coins: earned, stars: 1 });
+      recordActivityToday("Study Café Order Served", 15);
       setChalkboardTip("Get the order right and you'll earn a star and money for the till!");
 
       setTimeout(() => {

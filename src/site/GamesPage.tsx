@@ -85,7 +85,7 @@ function GameCard({ game, rank }: { game: Game; rank?: number }) {
 /*  FeaturedCard                                                       */
 /* ------------------------------------------------------------------ */
 
-function FeaturedCard({ game, rank }: { game: Game; rank: number }) {
+function FeaturedCard({ game, rank, onHowItWorks }: { game: Game; rank: number; onHowItWorks?: () => void }) {
   return (
     <article className="sqg-feature">
       <span className="sqg-rank">{rank}</span>
@@ -111,8 +111,16 @@ function FeaturedCard({ game, rank }: { game: Game; rank: number }) {
           )}
         </div>
         <div className="sqg-f-cta">
-          <span className="sqh-btn sqh-btn-primary">Play Now</span>
-          <button type="button" className="sqh-btn sqh-btn-ghost">
+          <a href={`/games/${game.slug}`} className="sqh-btn sqh-btn-primary" style={{ textDecoration: 'none' }}>Play Now</a>
+          <button
+            type="button"
+            className="sqh-btn sqh-btn-ghost"
+            onClick={(e) => {
+              e.preventDefault();
+              e.stopPropagation();
+              onHowItWorks?.();
+            }}
+          >
             How It Works
           </button>
         </div>
@@ -151,6 +159,7 @@ export default function GamesPage() {
   const [activeFilter, setActiveFilter] = useState("all");
   const [searchQuery, setSearchQuery] = useState("");
   const [activeDeck, setActiveDeckState] = useState<DeckInfo>(getActiveDeck());
+  const [showHowItWorks, setShowHowItWorks] = useState(false);
 
   useEffect(() => {
     const handleUpdate = () => setActiveDeckState(getActiveDeck());
@@ -492,7 +501,7 @@ export default function GamesPage() {
                 </div>
               </div>
               <div className="sqg-pop">
-                <FeaturedCard game={featuredGame} rank={1} />
+                <FeaturedCard game={featuredGame} rank={1} onHowItWorks={() => setShowHowItWorks(true)} />
                 <div className="sqg-pop-grid">
                   {popularRest.map((game, i) => (
                     <GameCard key={game.slug} game={game} rank={i + 2} />
@@ -661,6 +670,72 @@ export default function GamesPage() {
           </div>
         </div>
       </footer>
+      {/* ---- How It Works Modal ---- */}
+      {showHowItWorks && (
+        <div className="sq-modal-overlay" onClick={() => setShowHowItWorks(false)}>
+          <div className="sq-modal-card" onClick={(e) => e.stopPropagation()} style={{ maxWidth: 520 }}>
+            <div className="sq-modal-head">
+              <div className="sq-modal-title-row">
+                <span className="sq-modal-icon">🎮</span>
+                <div>
+                  <h3>How StudyQuest Games Work</h3>
+                  <p>Turn any study material into an active recall arcade challenge.</p>
+                </div>
+              </div>
+              <button
+                type="button"
+                className="sq-modal-close-btn"
+                onClick={() => setShowHowItWorks(false)}
+              >
+                ✕
+              </button>
+            </div>
+
+            <div style={{ display: 'flex', flexDirection: 'column', gap: 14, textAlign: 'left', marginBottom: 20 }}>
+              <div style={{ display: 'flex', gap: 12, alignItems: 'flex-start', background: '#0A0F24', padding: 14, borderRadius: 12, border: '1px solid #1E294B' }}>
+                <span style={{ fontSize: 24 }}>📝</span>
+                <div>
+                  <strong style={{ display: 'block', color: '#FFF', fontSize: 14 }}>1. Add Your Notes</strong>
+                  <span style={{ color: '#94A3B8', fontSize: 12.5 }}>Upload any file, paste text, or type a topic in the Dashboard.</span>
+                </div>
+              </div>
+
+              <div style={{ display: 'flex', gap: 12, alignItems: 'flex-start', background: '#0A0F24', padding: 14, borderRadius: 12, border: '1px solid #1E294B' }}>
+                <span style={{ fontSize: 24 }}>☕</span>
+                <div>
+                  <strong style={{ display: 'block', color: '#FFF', fontSize: 14 }}>2. Study Café</strong>
+                  <span style={{ color: '#94A3B8', fontSize: 12.5 }}>Run your café! Customers order items that test your notes. Serve matching drinks to earn stars and cash.</span>
+                </div>
+              </div>
+
+              <div style={{ display: 'flex', gap: 12, alignItems: 'flex-start', background: '#0A0F24', padding: 14, borderRadius: 12, border: '1px solid #1E294B' }}>
+                <span style={{ fontSize: 24 }}>🎯</span>
+                <div>
+                  <strong style={{ display: 'block', color: '#FFF', fontSize: 14 }}>3. Angry Nerds</strong>
+                  <span style={{ color: '#94A3B8', fontSize: 12.5 }}>Answer questions to load your slingshot with Nerds. Fling them with physics to smash forts and topple Grumps!</span>
+                </div>
+              </div>
+
+              <div style={{ display: 'flex', gap: 12, alignItems: 'flex-start', background: '#0A0F24', padding: 14, borderRadius: 12, border: '1px solid #1E294B' }}>
+                <span style={{ fontSize: 24 }}>⚡</span>
+                <div>
+                  <strong style={{ display: 'block', color: '#FFF', fontSize: 14 }}>4. Level Up & Keep Streaks</strong>
+                  <span style={{ color: '#94A3B8', fontSize: 12.5 }}>Every correct order, destroyed fort, and 25m Focus session earns XP and keeps your daily streak blazing.</span>
+                </div>
+              </div>
+            </div>
+
+            <button
+              type="button"
+              className="sq-auth-submit-btn"
+              style={{ width: '100%', padding: '12px' }}
+              onClick={() => setShowHowItWorks(false)}
+            >
+              Got it, let's play!
+            </button>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { loginWithGoogle, type UserProfile } from "./authStore";
+import { loginWithGoogle, getRegisteredAccounts, switchAccount, type UserProfile } from "./authStore";
 import "./auth.css";
 
 interface GoogleLoginModalProps {
@@ -9,30 +9,32 @@ interface GoogleLoginModalProps {
 }
 
 export default function GoogleLoginModal({ isOpen, onClose, onSuccess }: GoogleLoginModalProps) {
-  const [customEmail, setCustomEmail] = useState("");
-  const [customName, setCustomName] = useState("");
-  const [showCustomForm, setShowCustomForm] = useState(false);
+  const [googleEmail, setGoogleEmail] = useState("");
+  const [googleName, setGoogleName] = useState("");
   const [isLoading, setIsLoading] = useState(false);
+  const [showEmailInput, setShowEmailInput] = useState(false);
+
+  const registeredAccounts = getRegisteredAccounts();
 
   if (!isOpen) return null;
 
-  const handleInstantGoogleSignIn = () => {
+  const handleSignIn = (email: string, name?: string) => {
     setIsLoading(true);
     setTimeout(() => {
       const user = loginWithGoogle({
-        email: customEmail.trim() || "student@gmail.com",
-        name: customName.trim() || undefined
+        email,
+        name
       });
       setIsLoading(false);
       onSuccess?.(user);
       onClose();
-    }, 400);
+    }, 350);
   };
 
-  const handleCustomSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
-    if (!customEmail.trim()) return;
-    handleInstantGoogleSignIn();
+  const handleSelectExisting = (acc: UserProfile) => {
+    switchAccount(acc.id);
+    onSuccess?.(acc);
+    onClose();
   };
 
   return (
@@ -43,31 +45,9 @@ export default function GoogleLoginModal({ isOpen, onClose, onSuccess }: GoogleL
         </button>
 
         <div className="sq-auth-header">
-          {/* StudyQuest mascot badge */}
-          <div className="sq-auth-mascot-badge">
-            <svg viewBox="0 0 36 36" width="38" height="38" fill="none">
-              <rect width="36" height="36" rx="10" fill="#6D28D9" />
-              <rect x="7" y="16" width="22" height="12" rx="6" fill="#7C3AED" />
-              <circle cx="18" cy="18" r="8.5" fill="#FFA500" />
-              <circle cx="15" cy="17" r="1.6" fill="#1E1B4B" />
-              <circle cx="21" cy="17" r="1.6" fill="#1E1B4B" />
-              <path d="M16 20.5C16.8 21.6 19.2 21.6 20 20.5" stroke="#1E1B4B" strokeWidth="1.3" strokeLinecap="round" />
-            </svg>
-          </div>
-          <h2>Sign in to StudyQuest</h2>
-          <p>Sync your study notes, personalized plans, and game progress across all your devices.</p>
-        </div>
-
-        <div className="sq-auth-content">
-          {/* Main Google Sign-In Button */}
-          <button
-            type="button"
-            className="sq-google-signin-btn"
-            onClick={handleInstantGoogleSignIn}
-            disabled={isLoading}
-          >
-            {/* 4-Color Official Google G Icon */}
-            <svg width="20" height="20" viewBox="0 0 24 24">
+          {/* Official Google G Logo */}
+          <div className="sq-google-logo-wrap">
+            <svg width="40" height="40" viewBox="0 0 24 24">
               <path
                 fill="#4285F4"
                 d="M23.745 12.27c0-.7-.06-1.4-.19-2.07H12v4.51h6.6c-.29 1.52-1.14 2.82-2.4 3.68v3.05h3.88c2.27-2.09 3.66-5.17 3.66-9.17z"
@@ -85,54 +65,111 @@ export default function GoogleLoginModal({ isOpen, onClose, onSuccess }: GoogleL
                 d="M12 4.75c1.77 0 3.35.61 4.6 1.8l3.42-3.42C17.95 1.19 15.24 0 12 0 7.33 0 3.26 2.64 1.25 6.58l4.03 3.15c.95-2.83 3.6-4.98 6.72-4.98z"
               />
             </svg>
-            <span>{isLoading ? "Signing in..." : "Continue with Google"}</span>
-          </button>
+          </div>
+          <h2>Sign in with Google</h2>
+          <p>Choose an account to continue to StudyQuest</p>
+        </div>
 
-          {/* Option to specify custom Google Email */}
-          <div className="sq-auth-custom-toggle">
+        {/* Existing Accounts List (if any) */}
+        {registeredAccounts.length > 0 && !showEmailInput && (
+          <div className="sq-google-accounts-picker">
+            <span className="sq-picker-label">Saved Google Accounts:</span>
+            <div className="sq-picker-list">
+              {registeredAccounts.map((acc) => (
+                <div
+                  key={acc.id}
+                  className="sq-picker-item"
+                  onClick={() => handleSelectExisting(acc)}
+                >
+                  <div className="sq-picker-avatar">{acc.name.charAt(0).toUpperCase()}</div>
+                  <div className="sq-picker-info">
+                    <strong>{acc.name}</strong>
+                    <small>{acc.email}</small>
+                  </div>
+                </div>
+              ))}
+            </div>
+
             <button
               type="button"
-              className="sq-auth-link-btn"
-              onClick={() => setShowCustomForm(!showCustomForm)}
+              className="sq-auth-another-btn"
+              onClick={() => setShowEmailInput(true)}
             >
-              {showCustomForm ? "▲ Hide email options" : "▼ Enter your specific Gmail address"}
+              + Use another Google account
             </button>
           </div>
+        )}
 
-          {showCustomForm && (
-            <form onSubmit={handleCustomSubmit} className="sq-auth-form">
-              <div className="sq-auth-field">
-                <label>Google Account Email</label>
-                <input
-                  type="email"
-                  required
-                  placeholder="yourname@gmail.com"
-                  value={customEmail}
-                  onChange={(e) => setCustomEmail(e.target.value)}
-                />
-              </div>
+        {/* Form to enter Google Account (When no accounts exist or user clicked 'Use another') */}
+        {(registeredAccounts.length === 0 || showEmailInput) && (
+          <form
+            onSubmit={(e) => {
+              e.preventDefault();
+              if (googleEmail.trim()) {
+                handleSignIn(googleEmail.trim(), googleName.trim() || undefined);
+              }
+            }}
+            className="sq-google-auth-form"
+          >
+            <div className="sq-auth-field">
+              <label htmlFor="modal-google-email">Google Email Address</label>
+              <input
+                id="modal-google-email"
+                type="email"
+                required
+                autoFocus
+                placeholder="youremail@gmail.com"
+                value={googleEmail}
+                onChange={(e) => setGoogleEmail(e.target.value)}
+              />
+            </div>
 
-              <div className="sq-auth-field">
-                <label>Display Name (Optional)</label>
-                <input
-                  type="text"
-                  placeholder="e.g. Alex"
-                  value={customName}
-                  onChange={(e) => setCustomName(e.target.value)}
-                />
-              </div>
+            <div className="sq-auth-field">
+              <label htmlFor="modal-google-name">Account Name (Optional)</label>
+              <input
+                id="modal-google-name"
+                type="text"
+                placeholder="e.g. Alex"
+                value={googleName}
+                onChange={(e) => setGoogleName(e.target.value)}
+              />
+            </div>
 
-              <button type="submit" className="sq-auth-submit-btn" disabled={isLoading}>
-                {isLoading ? "Connecting..." : "Sign in with this Google Email"}
+            {/* Quick Demo Google Accounts for testing */}
+            <div className="sq-quick-accounts-row">
+              <span>Quick test accounts:</span>
+              <button
+                type="button"
+                className="sq-quick-acc-btn"
+                onClick={() => handleSignIn("alex.study@gmail.com", "Alex Student")}
+              >
+                Alex (alex.study@gmail.com)
               </button>
-            </form>
-          )}
+              <button
+                type="button"
+                className="sq-quick-acc-btn"
+                onClick={() => handleSignIn("sam.gamer@gmail.com", "Sam Quest")}
+              >
+                Sam (sam.gamer@gmail.com)
+              </button>
+            </div>
 
-          {/* Privacy & Terms footer */}
-          <div className="sq-auth-footer-note">
-            <span>By continuing, you sign in to StudyQuest using Google authentication.</span>
-          </div>
-        </div>
+            <div className="sq-modal-form-actions">
+              {registeredAccounts.length > 0 && (
+                <button
+                  type="button"
+                  className="sq-btn-back-to-picker"
+                  onClick={() => setShowEmailInput(false)}
+                >
+                  ← Back to accounts
+                </button>
+              )}
+              <button type="submit" className="sq-google-submit-btn" disabled={isLoading}>
+                {isLoading ? "Signing in..." : "Continue with Google"}
+              </button>
+            </div>
+          </form>
+        )}
       </div>
     </div>
   );

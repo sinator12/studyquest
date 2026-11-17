@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useRef } from "react";
 import TopNav from "./TopNav";
-import { getActiveDeck, setActiveDeck, getAIConfig, DEFAULT_GROQ_KEY, type DeckInfo } from "./studyStore";
+import { getActiveDeck, setActiveDeck, getAIConfig, DEFAULT_GROQ_KEY, recordActivityToday, type DeckInfo } from "./studyStore";
 import { extractTextFromFile, generateStudyPlanWithGroq, generateWithGroq } from "./aiService";
 import "./studyPlan.css";
 
@@ -163,9 +163,14 @@ export default function StudyPlanPage() {
   const handleToggleSession = (index: number) => {
     if (!activePlan) return;
     const updated = { ...activePlan };
-    updated.sessions[index].done = !updated.sessions[index].done;
+    const nextState = !updated.sessions[index].done;
+    updated.sessions[index].done = nextState;
     setActivePlan(updated);
     localStorage.setItem(STORAGE_KEY, JSON.stringify(updated));
+
+    if (nextState) {
+      recordActivityToday(`Completed Study Plan: ${updated.sessions[index].title}`, 30);
+    }
   };
 
   const handleDeletePlan = () => {
@@ -566,7 +571,10 @@ export default function StudyPlanPage() {
                       </div>
                       <p className="sq-sp-sess-desc">{sess.description}</p>
                     </div>
-                    <a href={sess.gameUrl} className="sq-sp-sess-play-btn">
+                    <a
+                      href={sess.gameUrl || (sess.game?.toLowerCase().includes("nerd") ? "/games/angry-nerds" : "/games/study-cafe")}
+                      className="sq-sp-sess-play-btn"
+                    >
                       Play {sess.game} →
                     </a>
                   </div>

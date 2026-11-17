@@ -1,5 +1,6 @@
-import { useState, useRef, type ChangeEvent } from "react";
+import { useState, useRef, useEffect, type ChangeEvent } from "react";
 import TopNav from "./TopNav";
+import { getCurrentUser, type UserProfile } from "./authStore";
 import { extractTextFromFile, generateQuestionsFromContent } from "./aiService";
 import {
   getActiveDeck,
@@ -13,6 +14,7 @@ import {
 import "./dashboard.css";
 
 export default function DashboardPage() {
+  const [currentUser, setCurrentUser] = useState<UserProfile | null>(getCurrentUser());
   const [activeTab, setActiveTab] = useState<"file" | "text" | "topic">("topic");
   const [topicInput, setTopicInput] = useState("");
   const [pastedText, setPastedText] = useState("");
@@ -34,7 +36,14 @@ export default function DashboardPage() {
   const [generatedDeck, setGeneratedDeck] = useState<DeckInfo | null>(getActiveDeck());
   const fileInputRef = useRef<HTMLInputElement>(null);
 
-  // Warm-up trivia questions while generating
+  useEffect(() => {
+    const handleAuthChange = () => {
+      setCurrentUser(getCurrentUser());
+      setGeneratedDeck(getActiveDeck());
+    };
+    window.addEventListener("sq_auth_changed", handleAuthChange);
+    return () => window.removeEventListener("sq_auth_changed", handleAuthChange);
+  }, []);
   const warmupQuestions = [
     { q: "Which is the largest ocean on Earth?", opts: ["Pacific Ocean", "Atlantic Ocean", "Indian Ocean", "Arctic Ocean"], c: 0 },
     { q: "How many minutes are in one hour?", opts: ["60", "100", "30", "120"], c: 0 },
@@ -156,7 +165,7 @@ export default function DashboardPage() {
             </div>
 
             <div className="sq-hero-bubble">
-              <h1>Ready, Unli? Let's make your first game.</h1>
+              <h1>Ready, {currentUser ? currentUser.name : "Adventurer"}? Let's make your first game.</h1>
               <p>Add something you're studying. I write the questions, you pick the game.</p>
               
               <div className="sq-steps-row">
@@ -258,7 +267,7 @@ export default function DashboardPage() {
               className="sq-ai-settings-toggle"
               onClick={() => setShowSettings(!showSettings)}
             >
-              ⚙️ AI Provider ({aiConfig.provider === "gemini" ? "Gemini" : aiConfig.provider === "openai" ? "OpenAI" : "Built-in"})
+              ⚙️ AI Provider ({aiConfig.provider === "groq" ? "Groq (Ultra-Fast)" : aiConfig.provider === "gemini" ? "Gemini" : aiConfig.provider === "openai" ? "OpenAI" : "Built-in"})
             </button>
           </div>
 
@@ -270,10 +279,17 @@ export default function DashboardPage() {
                 <div className="sq-provider-radios">
                   <button
                     type="button"
+                    className={`sq-provider-pill ${aiConfig.provider === "groq" ? "active" : ""}`}
+                    onClick={() => handleSaveAIConfig({ provider: "groq" })}
+                  >
+                    ⚡ Groq AI (Ultra-fast openai/gpt-oss-120b)
+                  </button>
+                  <button
+                    type="button"
                     className={`sq-provider-pill ${aiConfig.provider === "builtin" ? "active" : ""}`}
                     onClick={() => handleSaveAIConfig({ provider: "builtin" })}
                   >
-                    ⚡ Built-in StudyQuest AI (Free & Offline)
+                    🌱 Built-in AI (Free & Offline)
                   </button>
                   <button
                     type="button"
