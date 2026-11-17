@@ -43,6 +43,23 @@ body {
 
 button, a { font: inherit; }
 
+/* Smooth Section Transition (Zero page reload) */
+.sq-page-transition {
+  animation: sqPageSlideFade 0.22s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+  width: 100%;
+}
+
+@keyframes sqPageSlideFade {
+  0% {
+    opacity: 0;
+    transform: translateY(6px);
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
 button:focus-visible, a:focus-visible, [tabindex]:focus-visible {
   outline: 3px solid #f2b939;
   outline-offset: 3px;
