@@ -7,6 +7,7 @@ import {
   logout,
   type UserProfile
 } from "./authStore";
+import "./auth.css";
 
 interface AccountSwitcherModalProps {
   isOpen: boolean;
@@ -31,7 +32,7 @@ export default function AccountSwitcherModal({
 
   const handleRemove = (e: React.MouseEvent, accId: string) => {
     e.stopPropagation();
-    if (confirm("Remove this account from this device? (Your progress is saved)")) {
+    if (confirm("Remove this account from this device? (Your study data is preserved)")) {
       removeAccount(accId);
     }
   };
@@ -42,19 +43,31 @@ export default function AccountSwitcherModal({
   };
 
   return (
-    <div className="sq-modal-overlay" onClick={onClose}>
-      <div className="sq-modal-card sq-switcher-modal" onClick={(e) => e.stopPropagation()}>
+    <div className="sq-modal-overlay" onClick={onClose} role="presentation">
+      <div
+        className="sq-modal-card sq-switcher-modal"
+        onClick={(e) => e.stopPropagation()}
+        role="dialog"
+        aria-modal="true"
+        aria-labelledby="sq-switcher-title"
+      >
+        <button
+          type="button"
+          className="sq-auth-close-btn"
+          onClick={onClose}
+          aria-label="Close dialog"
+        >
+          ✕
+        </button>
+
         <div className="sq-modal-head">
           <div className="sq-modal-title-row">
             <span className="sq-modal-icon">👤</span>
             <div>
-              <h3>Choose an Account</h3>
-              <p>Switch between your Google study accounts or add another.</p>
+              <h3 id="sq-switcher-title">Choose an Account</h3>
+              <p>Switch between your Google study accounts or connect a new one.</p>
             </div>
           </div>
-          <button type="button" className="sq-modal-close-btn" onClick={onClose}>
-            ✕
-          </button>
         </div>
 
         {/* Registered Accounts List */}
@@ -66,6 +79,8 @@ export default function AccountSwitcherModal({
                 key={acc.id}
                 className={`sq-account-card ${isActive ? "active" : ""}`}
                 onClick={() => handleSelectAccount(acc)}
+                role="button"
+                tabIndex={0}
               >
                 <div className="sq-acc-avatar">
                   <span>{acc.name.charAt(0).toUpperCase()}</span>
@@ -84,6 +99,7 @@ export default function AccountSwitcherModal({
                   className="sq-acc-remove-btn"
                   onClick={(e) => handleRemove(e, acc.id)}
                   title="Remove account from device"
+                  aria-label={`Remove ${acc.name} from device`}
                 >
                   ✕
                 </button>
@@ -103,7 +119,7 @@ export default function AccountSwitcherModal({
             }}
           >
             <span>+</span>
-            <span>Use another Google account</span>
+            <span>Sign in with another Google account</span>
           </button>
 
           {currentUser && (
