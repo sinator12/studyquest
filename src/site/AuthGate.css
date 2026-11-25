@@ -1,36 +1,27 @@
 /* ==========================================================================
-   AuthGate — Full-screen login wall for EduQuest
+   AuthGate — Welcome Sign-In Wall (StudyQuest Dark-Indigo Palette)
    ========================================================================== */
 
-/* ── Loading screen ── */
 .aq-gate-loading {
+  --aq-ease-out: cubic-bezier(0.23, 1, 0.32, 1);
   position: fixed;
   inset: 0;
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  gap: 24px;
-  background: #0D1024;
+  gap: 20px;
+  background: #0A0D22;
   z-index: 9999;
 }
 
-.aq-gate-loading-logo {
-  animation: aqPulse 1.8s ease-in-out infinite;
-}
-
-@keyframes aqPulse {
-  0%, 100% { transform: scale(1); opacity: 1; }
-  50% { transform: scale(1.06); opacity: 0.85; }
-}
-
 .aq-gate-loading-spinner {
-  width: 36px;
-  height: 36px;
-  border: 3px solid rgba(129, 140, 248, 0.2);
+  width: 30px;
+  height: 30px;
+  border: 2.5px solid rgba(129, 140, 248, 0.22);
   border-top-color: #818CF8;
   border-radius: 50%;
-  animation: aqSpin 0.8s linear infinite;
+  animation: aqSpin 0.75s linear infinite;
 }
 
 @keyframes aqSpin {
@@ -39,6 +30,7 @@
 
 /* ── Main gate wrapper ── */
 .aq-gate {
+  --aq-ease-out: cubic-bezier(0.23, 1, 0.32, 1);
   position: fixed;
   inset: 0;
   display: flex;
@@ -48,81 +40,21 @@
   overflow-x: hidden;
   -webkit-overflow-scrolling: touch;
   z-index: 9998;
-  background: #0D1024;
-  animation: aqGateFadeIn 0.4s ease-out;
+  background-color: #0A0D22;
+  background-image: radial-gradient(ellipse 75% 45% at 50% 0%, rgba(99, 102, 241, 0.14) 0%, transparent 72%);
+  color: #F8FAFC;
+  scrollbar-color: #283363 #0A0D22;
+  animation: aqGateFadeIn 220ms var(--aq-ease-out);
+}
+
+.aq-gate ::selection {
+  background: rgba(99, 102, 241, 0.35);
+  color: #FFFFFF;
 }
 
 @keyframes aqGateFadeIn {
   from { opacity: 0; }
   to { opacity: 1; }
-}
-
-/* ── Animated background ── */
-.aq-gate-bg {
-  position: fixed;
-  inset: 0;
-  pointer-events: none;
-  overflow: hidden;
-  z-index: 0;
-}
-
-.aq-orb {
-  position: absolute;
-  border-radius: 50%;
-  filter: blur(80px);
-  opacity: 0.45;
-}
-
-.aq-orb-1 {
-  width: 600px;
-  height: 600px;
-  background: radial-gradient(circle, #6D28D9 0%, transparent 70%);
-  top: -150px;
-  right: -100px;
-  animation: aqOrb1 12s ease-in-out infinite alternate;
-}
-
-.aq-orb-2 {
-  width: 500px;
-  height: 500px;
-  background: radial-gradient(circle, #2563EB 0%, transparent 70%);
-  bottom: -100px;
-  left: -120px;
-  animation: aqOrb2 15s ease-in-out infinite alternate;
-}
-
-.aq-orb-3 {
-  width: 300px;
-  height: 300px;
-  background: radial-gradient(circle, #7C3AED 0%, transparent 70%);
-  top: 50%;
-  left: 40%;
-  transform: translate(-50%, -50%);
-  animation: aqOrb3 10s ease-in-out infinite alternate;
-}
-
-@keyframes aqOrb1 {
-  from { transform: translate(0, 0) scale(1); }
-  to { transform: translate(-40px, 60px) scale(1.1); }
-}
-
-@keyframes aqOrb2 {
-  from { transform: translate(0, 0) scale(1); }
-  to { transform: translate(50px, -40px) scale(1.08); }
-}
-
-@keyframes aqOrb3 {
-  from { transform: translate(-50%, -50%) scale(1); opacity: 0.3; }
-  to { transform: translate(-50%, -50%) scale(1.2); opacity: 0.5; }
-}
-
-.aq-grid-pattern {
-  position: absolute;
-  inset: 0;
-  background-image:
-    linear-gradient(rgba(129, 140, 248, 0.04) 1px, transparent 1px),
-    linear-gradient(90deg, rgba(129, 140, 248, 0.04) 1px, transparent 1px);
-  background-size: 48px 48px;
 }
 
 /* ── Content layout ── */
@@ -131,151 +63,140 @@
   z-index: 1;
   display: flex;
   align-items: center;
-  justify-content: center;
+  justify-content: space-between;
   gap: 64px;
   width: 100%;
-  max-width: 1100px;
+  max-width: 1020px;
   margin: 0 auto;
-  padding: 40px 24px;
+  padding: 48px 28px;
   min-height: 100vh;
   min-height: 100dvh;
   box-sizing: border-box;
 }
 
-/* ── Left Panel ── */
+/* ── Left column ── */
 .aq-gate-left {
   flex: 1;
-  max-width: 480px;
+  max-width: 470px;
   display: flex;
   flex-direction: column;
-  gap: 36px;
-  color: #F8FAFC;
+  gap: 28px;
 }
 
 .aq-gate-brand {
-  display: flex;
+  display: inline-flex;
   align-items: center;
-  gap: 14px;
+  gap: 12px;
 }
 
 .aq-gate-logo-wrap {
   flex-shrink: 0;
-  filter: drop-shadow(0 0 20px rgba(109, 40, 217, 0.5));
+  display: grid;
+  place-items: center;
 }
 
 .aq-gate-brand-name {
-  font-size: 26px;
-  font-weight: 900;
+  font-size: 21px;
+  font-weight: 800;
   color: #FFFFFF;
-  letter-spacing: -0.03em;
-}
-
-.aq-gate-brand-tag {
-  display: block;
-  font-size: 11.5px;
-  font-weight: 600;
-  color: #818CF8;
-  letter-spacing: 0.08em;
-  text-transform: uppercase;
-  margin-top: 2px;
+  letter-spacing: -0.025em;
 }
 
 .aq-gate-headline h1 {
   margin: 0 0 14px 0;
-  font-size: clamp(2rem, 4vw, 3rem);
-  font-weight: 900;
-  line-height: 1.1;
-  letter-spacing: -0.04em;
-  color: #F8FAFC;
-}
-
-.aq-gradient-text {
-  background: linear-gradient(135deg, #A78BFA 0%, #60A5FA 50%, #34D399 100%);
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-  background-clip: text;
+  font-size: clamp(2rem, 3.6vw, 2.75rem);
+  font-weight: 800;
+  line-height: 1.12;
+  letter-spacing: -0.035em;
+  color: #FFFFFF;
 }
 
 .aq-gate-sub {
   margin: 0;
   font-size: 1rem;
-  color: #94A3B8;
-  line-height: 1.65;
+  color: #CBD5E1;
+  line-height: 1.6;
+  max-width: 42ch;
 }
 
-.aq-gate-features {
-  display: flex;
-  flex-direction: column;
-  gap: 16px;
+/* Clean hairline-divided capability list instead of blurred cards */
+.aq-gate-capabilities {
+  list-style: none;
+  margin: 4px 0 0;
+  padding: 0;
+  border-top: 1px solid rgba(255, 255, 255, 0.08);
 }
 
-.aq-gate-feature {
+.aq-gate-cap-item {
   display: flex;
-  align-items: center;
+  align-items: flex-start;
   gap: 14px;
-  padding: 14px 18px;
-  background: rgba(255, 255, 255, 0.04);
-  border: 1px solid rgba(255, 255, 255, 0.07);
-  border-radius: 14px;
-  backdrop-filter: blur(8px);
-  transition: background 0.2s ease, border-color 0.2s ease;
+  padding: 14px 0;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
 }
 
-.aq-gate-feature:hover {
-  background: rgba(255, 255, 255, 0.07);
-  border-color: rgba(129, 140, 248, 0.2);
-}
-
-.aq-gate-feature-icon {
-  font-size: 24px;
+.aq-cap-icon {
+  width: 34px;
+  height: 34px;
+  border-radius: 9px;
+  background: rgba(99, 102, 241, 0.14);
+  border: 1px solid rgba(129, 140, 248, 0.25);
+  color: #A5B4FC;
+  display: grid;
+  place-items: center;
   flex-shrink: 0;
+  margin-top: 1px;
 }
 
-.aq-gate-feature-title {
-  font-size: 0.9rem;
+.aq-gate-cap-item strong {
+  display: block;
+  font-size: 0.92rem;
   font-weight: 700;
-  color: #F1F5F9;
+  color: #F8FAFC;
   margin-bottom: 2px;
 }
 
-.aq-gate-feature-desc {
-  font-size: 0.8rem;
-  color: #64748B;
+.aq-gate-cap-item span {
+  display: block;
+  font-size: 0.84rem;
+  color: #94A3B8;
+  line-height: 1.45;
 }
 
-/* ── Right Panel / Sign-in Card ── */
+/* ── Right column: Sign-in Card ── */
 .aq-gate-right {
   flex-shrink: 0;
   width: 100%;
-  max-width: 400px;
+  max-width: 410px;
 }
 
 .aq-signin-card {
-  background: rgba(17, 24, 51, 0.85);
-  border: 1px solid rgba(129, 140, 248, 0.2);
-  border-radius: 24px;
-  padding: 36px 32px 28px;
-  box-shadow:
-    0 32px 80px rgba(0, 0, 0, 0.6),
-    0 0 0 1px rgba(255, 255, 255, 0.04),
-    0 0 60px rgba(99, 102, 241, 0.12);
-  backdrop-filter: blur(20px);
+  background: #111833;
+  border: 1px solid #283363;
+  border-radius: 20px;
+  padding: 32px 28px 26px;
+  box-shadow: 0 24px 48px rgba(4, 7, 20, 0.65);
   color: #F8FAFC;
-  animation: aqCardIn 0.5s cubic-bezier(0.16, 1, 0.3, 1) both;
+  animation: aqCardIn 240ms var(--aq-ease-out) both;
 }
 
 @keyframes aqCardIn {
-  from { opacity: 0; transform: translateY(20px) scale(0.97); }
-  to { opacity: 1; transform: translateY(0) scale(1); }
+  from {
+    opacity: 0;
+    transform: translateY(10px) scale(0.98);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
 }
 
 .aq-signin-card-top {
-  text-align: center;
-  margin-bottom: 28px;
+  margin-bottom: 24px;
 }
 
 .aq-signin-title {
-  margin: 0 0 8px 0;
+  margin: 0 0 6px 0;
   font-size: 1.35rem;
   font-weight: 800;
   color: #FFFFFF;
@@ -285,70 +206,117 @@
 .aq-signin-sub {
   margin: 0;
   font-size: 0.875rem;
-  color: #64748B;
+  color: #94A3B8;
+  line-height: 1.5;
 }
 
-/* Error banner */
 .aq-signin-error {
   display: flex;
   align-items: center;
   gap: 8px;
-  padding: 10px 14px;
-  background: rgba(239, 68, 68, 0.1);
-  border: 1px solid rgba(239, 68, 68, 0.3);
+  padding: 10px 12px;
+  background: rgba(239, 68, 68, 0.14);
+  border: 1px solid rgba(248, 113, 113, 0.35);
   border-radius: 10px;
-  color: #F87171;
-  font-size: 0.82rem;
+  color: #FCA5A5;
+  font-size: 0.83rem;
+  font-weight: 500;
   margin-bottom: 16px;
 }
 
-/* ── Google Button ── */
+/* ── Primary Google Button ── */
 .aq-google-btn {
   display: flex;
   align-items: center;
   justify-content: center;
-  gap: 12px;
+  gap: 10px;
   width: 100%;
-  padding: 14px 20px;
+  min-height: 48px;
+  padding: 12px 18px;
   background: #FFFFFF;
-  color: #1E293B;
-  border: none;
+  color: #111827;
+  border: 1px solid #E5E7EB;
   border-radius: 12px;
-  font-size: 0.95rem;
+  font-family: inherit;
+  font-size: 0.94rem;
   font-weight: 700;
   cursor: pointer;
-  transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
-  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.3);
-  position: relative;
-  letter-spacing: -0.01em;
+  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.25);
+  transition: background-color 160ms ease, transform 160ms var(--aq-ease-out), box-shadow 160ms ease;
 }
 
-.aq-google-btn:hover:not(:disabled) {
-  background: #F1F5F9;
-  transform: translateY(-2px);
-  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.4);
+@media (hover: hover) and (pointer: fine) {
+  .aq-google-btn:hover:not(:disabled) {
+    background: #F1F5F9;
+    transform: translateY(-1px);
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.35);
+  }
 }
 
 .aq-google-btn:active:not(:disabled) {
-  transform: translateY(0);
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+  transform: scale(0.97);
 }
 
-.aq-google-btn:disabled {
-  opacity: 0.75;
-  cursor: not-allowed;
+.aq-google-btn:focus-visible,
+.aq-alt-btn:focus-visible,
+.aq-demo-btn:focus-visible,
+.aq-primary-submit-btn:focus-visible {
+  outline: 2px solid #818CF8;
+  outline-offset: 2px;
 }
 
-/* Spinner inside button */
+.aq-google-btn:disabled,
+.aq-primary-submit-btn:disabled {
+  opacity: 0.72;
+  cursor: wait;
+}
+
 .aq-btn-spinner {
   display: inline-block;
-  width: 20px;
-  height: 20px;
-  border: 2.5px solid rgba(30, 41, 59, 0.2);
-  border-top-color: #1E293B;
+  width: 18px;
+  height: 18px;
+  border: 2px solid rgba(17, 24, 39, 0.2);
+  border-top-color: #111827;
   border-radius: 50%;
   animation: aqSpin 0.7s linear infinite;
   flex-shrink: 0;
+}
+
+.aq-btn-spinner-light {
+  border-color: rgba(255, 255, 255, 0.25);
+  border-top-color: #FFFFFF;
+}
+
+/* ── Secondary Email Toggle ── */
+.aq-alt-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  min-height: 44px;
+  margin-top: 10px;
+  padding: 10px 16px;
+  background: #171F42;
+  color: #CBD5E1;
+  border: 1px solid #2B3868;
+  border-radius: 12px;
+  font-family: inherit;
+  font-size: 0.875rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background-color 160ms ease, border-color 160ms ease, color 160ms ease, transform 160ms var(--aq-ease-out);
+}
+
+@media (hover: hover) and (pointer: fine) {
+  .aq-alt-btn:hover {
+    background: #1E2952;
+    border-color: #6366F1;
+    color: #FFFFFF;
+  }
+}
+
+.aq-alt-btn:active {
+  transform: scale(0.97);
 }
 
 /* Divider */
@@ -357,9 +325,11 @@
   align-items: center;
   gap: 12px;
   margin: 18px 0;
-  color: #334155;
-  font-size: 0.8rem;
-  font-weight: 500;
+  color: #64748B;
+  font-size: 0.78rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
 }
 
 .aq-signin-divider::before,
@@ -367,37 +337,53 @@
   content: "";
   flex: 1;
   height: 1px;
-  background: rgba(255, 255, 255, 0.07);
+  background: rgba(255, 255, 255, 0.09);
 }
 
-/* ── Alt / email button ── */
-.aq-alt-btn {
+/* ── Demo Preview Button (Amber-Gold Accent) ── */
+.aq-demo-btn {
   display: flex;
   align-items: center;
   justify-content: center;
   width: 100%;
-  padding: 12px 20px;
-  background: rgba(255, 255, 255, 0.05);
-  color: #94A3B8;
-  border: 1px solid rgba(255, 255, 255, 0.1);
+  min-height: 44px;
+  padding: 10px 16px;
+  background: rgba(245, 158, 11, 0.14);
+  color: #FCD34D;
+  border: 1px solid rgba(245, 158, 11, 0.38);
   border-radius: 12px;
+  font-family: inherit;
   font-size: 0.88rem;
-  font-weight: 600;
+  font-weight: 700;
   cursor: pointer;
-  transition: all 0.2s ease;
+  transition: background-color 160ms ease, border-color 160ms ease, color 160ms ease, transform 160ms var(--aq-ease-out);
 }
 
-.aq-alt-btn:hover {
-  background: rgba(255, 255, 255, 0.09);
-  color: #F1F5F9;
-  border-color: rgba(255, 255, 255, 0.18);
+@media (hover: hover) and (pointer: fine) {
+  .aq-demo-btn:hover {
+    background: rgba(245, 158, 11, 0.22);
+    border-color: rgba(252, 211, 77, 0.65);
+    color: #FEF3C7;
+  }
+}
+
+.aq-demo-btn:active {
+  transform: scale(0.97);
+}
+
+.aq-demo-note {
+  margin: 10px 0 0 0;
+  font-size: 0.76rem;
+  line-height: 1.5;
+  color: #94A3B8;
+  text-align: center;
 }
 
 /* ── Custom email form ── */
 .aq-custom-form {
   display: flex;
   flex-direction: column;
-  gap: 12px;
+  gap: 14px;
 }
 
 .aq-form-group {
@@ -407,259 +393,158 @@
 }
 
 .aq-form-label {
-  font-size: 0.78rem;
+  font-size: 0.8rem;
   font-weight: 600;
-  color: #94A3B8;
-  letter-spacing: 0.03em;
-  text-transform: uppercase;
+  color: #CBD5E1;
+}
+
+.aq-optional-label {
+  color: #64748B;
+  font-weight: 500;
 }
 
 .aq-form-input {
   padding: 11px 14px;
-  background: rgba(255, 255, 255, 0.05);
-  border: 1px solid rgba(255, 255, 255, 0.1);
+  background: #0A0F24;
+  border: 1px solid #283363;
   border-radius: 10px;
-  color: #F8FAFC;
+  color: #FFFFFF;
   font-size: 0.9rem;
   font-family: inherit;
+  caret-color: #818CF8;
   outline: none;
-  transition: border-color 0.2s ease, box-shadow 0.2s ease;
+  transition: border-color 160ms ease, box-shadow 160ms ease;
 }
 
 .aq-form-input::placeholder {
-  color: #475569;
+  color: #64748B;
 }
 
 .aq-form-input:focus {
-  border-color: rgba(129, 140, 248, 0.5);
-  box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.15);
+  border-color: #6366F1;
+  box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.18);
 }
 
-/* ── Terms text ── */
-.aq-signin-terms {
-  margin: 20px 0 0 0;
-  font-size: 0.75rem;
-  color: #475569;
-  line-height: 1.6;
-  text-align: center;
-}
-
-/* ── Stats bar ── */
-.aq-signin-stats {
+.aq-primary-submit-btn {
   display: flex;
   align-items: center;
   justify-content: center;
-  gap: 0;
-  margin-top: 20px;
-  padding: 14px 16px;
-  background: rgba(255, 255, 255, 0.03);
-  border: 1px solid rgba(255, 255, 255, 0.06);
+  gap: 8px;
+  width: 100%;
+  min-height: 46px;
+  margin-top: 2px;
+  padding: 11px 16px;
+  background: #6D28D9;
+  color: #FFFFFF;
+  border: 1px solid #7C3AED;
   border-radius: 12px;
+  font-family: inherit;
+  font-size: 0.92rem;
+  font-weight: 700;
+  cursor: pointer;
+  transition: background-color 160ms ease, transform 160ms var(--aq-ease-out);
 }
 
-.aq-signin-stat {
-  flex: 1;
+@media (hover: hover) and (pointer: fine) {
+  .aq-primary-submit-btn:hover:not(:disabled) {
+    background: #7C3AED;
+  }
+}
+
+.aq-primary-submit-btn:active:not(:disabled) {
+  transform: scale(0.97);
+}
+
+/* ── Footer note ── */
+.aq-signin-terms {
   display: flex;
-  flex-direction: column;
   align-items: center;
-  gap: 2px;
+  justify-content: center;
+  gap: 6px;
+  margin: 22px 0 0 0;
+  padding-top: 16px;
+  border-top: 1px solid rgba(255, 255, 255, 0.08);
+  font-size: 0.76rem;
+  color: #94A3B8;
+  line-height: 1.45;
+  text-align: center;
 }
 
-.aq-signin-stat-value {
-  font-size: 1.1rem;
-  font-weight: 800;
-  color: #A78BFA;
-  letter-spacing: -0.02em;
-}
-
-.aq-signin-stat-label {
-  font-size: 0.72rem;
-  font-weight: 600;
+.aq-signin-terms svg {
+  flex-shrink: 0;
   color: #64748B;
-  text-transform: uppercase;
-  letter-spacing: 0.05em;
-}
-
-.aq-signin-stat-divider {
-  width: 1px;
-  height: 32px;
-  background: rgba(255, 255, 255, 0.07);
-  margin: 0 8px;
 }
 
 /* ════════════════════════════════════════
-   RESPONSIVE — Mobile First
-════════════════════════════════════════ */
-
-/* Tablet & small desktop */
-@media (max-width: 860px) {
+   RESPONSIVE
+   ════════════════════════════════════════ */
+@media (max-width: 880px) {
   .aq-gate-content {
     flex-direction: column;
     align-items: center;
     justify-content: flex-start;
-    padding: 28px 16px 48px;
-    gap: 28px;
-    min-height: 100dvh;
+    padding: 28px 18px 48px;
+    gap: 32px;
+  }
+
+  .aq-gate-right {
+    order: 1;
+    max-width: 440px;
   }
 
   .aq-gate-left {
-    max-width: 100%;
-    gap: 18px;
-    text-align: center;
-    order: 2; /* Sign-in card first on mobile */
-  }
-
-  .aq-gate-right {
-    width: 100%;
-    max-width: 460px;
-    order: 1; /* Card at top */
-  }
-
-  .aq-gate-brand {
-    justify-content: center;
-  }
-
-  .aq-gate-features {
-    display: grid;
-    grid-template-columns: repeat(3, 1fr);
-    gap: 10px;
-  }
-
-  .aq-gate-feature {
-    flex-direction: column;
-    text-align: center;
-    padding: 12px 8px;
-    gap: 6px;
+    order: 2;
+    max-width: 440px;
+    gap: 20px;
   }
 
   .aq-gate-headline h1 {
-    font-size: 1.9rem;
-    margin-bottom: 10px;
-  }
-
-  .aq-signin-card {
-    padding: 28px 24px 24px;
+    font-size: 1.85rem;
   }
 }
 
-/* Mobile phones */
 @media (max-width: 540px) {
-  .aq-gate {
-    overflow-y: auto;
-  }
-
   .aq-gate-content {
-    padding: 20px 12px 60px;
-    gap: 20px;
-    min-height: 100dvh;
-  }
-
-  .aq-gate-right {
-    max-width: 100%;
+    padding: 20px 14px 56px;
+    gap: 24px;
   }
 
   .aq-signin-card {
     padding: 24px 18px 20px;
-    border-radius: 20px;
-  }
-
-  .aq-signin-title {
-    font-size: 1.15rem;
-  }
-
-  .aq-signin-sub {
-    font-size: 0.82rem;
-  }
-
-  .aq-signin-card-top {
-    margin-bottom: 20px;
-  }
-
-  .aq-google-btn {
-    padding: 13px 16px;
-    font-size: 0.9rem;
-  }
-
-  .aq-alt-btn {
-    padding: 11px 16px;
-    font-size: 0.84rem;
-  }
-
-  .aq-gate-features {
-    grid-template-columns: 1fr;
-    gap: 8px;
-  }
-
-  .aq-gate-feature {
-    flex-direction: row;
-    text-align: left;
-    padding: 11px 14px;
-    gap: 12px;
+    border-radius: 18px;
   }
 
   .aq-gate-headline h1 {
-    font-size: 1.6rem;
-    margin-bottom: 8px;
-  }
-
-  .aq-gate-sub {
-    font-size: 0.875rem;
-  }
-
-  .aq-gate-brand-name {
-    font-size: 22px;
-  }
-
-  .aq-signin-stats {
-    padding: 10px 12px;
-  }
-
-  .aq-signin-stat-value {
-    font-size: 1rem;
-  }
-
-  .aq-signin-stat-label {
-    font-size: 0.65rem;
-  }
-
-  .aq-signin-terms {
-    font-size: 0.7rem;
-    margin-top: 14px;
-  }
-
-  /* Hide features section on very small screens to save space */
-  .aq-gate-left {
-    gap: 14px;
+    font-size: 1.55rem;
   }
 }
 
-/* Very small phones (iPhone SE etc.) */
-@media (max-width: 380px) {
-  .aq-gate-content {
-    padding: 16px 10px 56px;
-  }
-
-  .aq-signin-card {
-    padding: 20px 14px 18px;
-    border-radius: 16px;
-  }
-
-  .aq-gate-headline h1 {
-    font-size: 1.4rem;
-  }
-
-  .aq-gate-features {
-    display: none; /* Hide on tiny screens to give the sign-in card full attention */
-  }
-
-  .aq-signin-title {
-    font-size: 1.05rem;
-  }
-}
-
-/* Safe area for iPhone notch / home bar */
 @supports (padding-bottom: env(safe-area-inset-bottom)) {
   .aq-gate-content {
     padding-bottom: calc(48px + env(safe-area-inset-bottom));
   }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .aq-gate,
+  .aq-signin-card {
+    animation: aqFadeOnly 180ms ease;
+  }
+
+  .aq-gate-loading-spinner,
+  .aq-btn-spinner {
+    animation: none;
+  }
+
+  .aq-google-btn,
+  .aq-alt-btn,
+  .aq-demo-btn,
+  .aq-primary-submit-btn {
+    transition: background-color 150ms ease, border-color 150ms ease, color 150ms ease;
+  }
+}
+
+@keyframes aqFadeOnly {
+  from { opacity: 0; }
+  to { opacity: 1; }
 }

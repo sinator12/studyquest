@@ -1,7 +1,10 @@
 import { useState, useEffect, useRef } from "react";
 import TopNav from "./TopNav";
-import { getActiveDeck, updatePlayerStats, recordActivityToday, type DeckInfo } from "./studyStore";
-import { type Question } from "./quizData";
+import { getActiveDeck, setActiveDeck, updatePlayerStats, recordActivityToday, type DeckInfo } from "./studyStore";
+import { isDemoMode, DEMO_LIMITS } from "./authStore";
+import { generateQuestionsFromContent } from "./aiService";
+import { type Question, shuffle } from "./quizData";
+import GoogleLoginModal from "./GoogleLoginModal";
 import "./studyCafe.css";
 
 interface CafeCustomer {
@@ -100,15 +103,29 @@ export default function StudyCafeGame() {
 
   const [servingAnim, setServingAnim] = useState(false);
   const [soundEnabled, setSoundEnabled] = useState(true);
+  const [demoMode, setDemoMode] = useState<boolean>(isDemoMode());
+  const [demoLoginOpen, setDemoLoginOpen] = useState(false);
+  const [isRefreshingQuestions, setIsRefreshingQuestions] = useState(false);
 
+  const shiftCap = demoMode ? DEMO_LIMITS.maxCafeOrders : Math.min(questions.length, 12);
   const currentCustomer = CAFE_CUSTOMERS[customerIndex % CAFE_CUSTOMERS.length];
   const currentQ = questions[currentQIndex % questions.length];
 
   // Refresh deck if updated
   useEffect(() => {
-    const d = getActiveDeck();
-    setDeck(d);
-    setQuestions(d.questions);
+    const sync = () => {
+      const d = getActiveDeck();
+      setDeck(d);
+      setQuestions(shuffle([...d.questions]));
+      setDemoMode(isDemoMode());
+    };
+    sync();
+    window.addEventListener("sq_auth_changed", sync);
+    window.addEventListener("sq_deck_updated", sync);
+    return () => {
+      window.removeEventListener("sq_auth_changed", sync);
+      window.removeEventListener("sq_deck_updated", sync);
+    };
   }, []);
 
   // Loading animation controller
@@ -202,7 +219,7 @@ export default function StudyCafeGame() {
         setIsAnswerRevealed(false);
         setSelectedAnswer(null);
 
-        if (currentQIndex + 1 >= Math.min(questions.length, 12)) {
+        if (currentQIndex + 1 >= shiftCap) {
           setPhase("summary");
         } else {
           setCurrentQIndex((i) => i + 1);
@@ -216,13 +233,44 @@ export default function StudyCafeGame() {
       setTimeout(() => {
         setIsAnswerRevealed(false);
         setSelectedAnswer(null);
-        if (currentQIndex + 1 >= Math.min(questions.length, 12)) {
+        if (currentQIndex + 1 >= shiftCap) {
           setPhase("summary");
         } else {
           setCurrentQIndex((i) => i + 1);
           setCustomerIndex((c) => c + 1);
         }
       }, 2000);
+    }
+  };
+
+  const handleFreshShiftQuestions = async () => {
+    setIsRefreshingQuestions(true);
+    try {
+      const exclude = questions.map((q) => q.question);
+      const sourceText = deck.contentPreview || deck.title || "General Knowledge";
+      const result = await generateQuestionsFromContent(
+        sourceText,
+        deck.sourceType === "file" ? "file" : deck.sourceType === "text" ? "text" : "topic",
+        {
+          count: demoMode ? DEMO_LIMITS.maxQuestionsPerDeck : Math.max(8, deck.questions.length),
+          seed: Date.now(),
+          excludeQuestions: exclude
+        }
+      );
+      if (result.questions.length > 0) {
+        const freshDeck: DeckInfo = {
+          ...deck,
+          id: "deck-" + Date.now(),
+          questions: result.questions,
+          questionCount: result.questions.length
+        };
+        setActiveDeck(freshDeck);
+        setDeck(freshDeck);
+        setQuestions(shuffle([...result.questions]));
+      }
+    } finally {
+      setIsRefreshingQuestions(false);
+      setPhase("opening");
     }
   };
 
@@ -601,8 +649,12 @@ export default function StudyCafeGame() {
       {phase === "summary" && (
         <div className="sq-cafe-summary-wrap">
           <div className="sq-cafe-summary-card">
-            <h2>☕ Shift Complete!</h2>
-            <p>You paid the café rent and served your regulars with pride!</p>
+            <h2>Shift Complete</h2>
+            <p>
+              {demoMode
+                ? "Demo shift complete (5-order preview). Sign in to run full 12-order shifts and save coins & XP."
+                : "You paid the café rent and served your regulars with pride!"}
+            </p>
 
             <div className="sq-summary-stats-grid">
               <div className="sq-stat-box">
@@ -610,7 +662,7 @@ export default function StudyCafeGame() {
                 <span className="lbl">Till Revenue</span>
               </div>
               <div className="sq-stat-box">
-                <span className="val">⭐ {starsEarned}</span>
+                <span className="val">★ {starsEarned}</span>
                 <span className="lbl">Stars Awarded</span>
               </div>
               <div className="sq-stat-box">
@@ -623,20 +675,39 @@ export default function StudyCafeGame() {
               <button
                 type="button"
                 className="sq-btn-primary"
-                onClick={() => handleStartGame(false)}
+                onClick={handleFreshShiftQuestions}
+                disabled={isRefreshingQuestions}
               >
-                🔄 Next Shift
+                {isRefreshingQuestions ? "Generating Fresh Questions..." : "New Shift with Fresh Questions"}
               </button>
+              {demoMode && (
+                <button
+                  type="button"
+                  className="sq-btn-primary"
+                  onClick={() => setDemoLoginOpen(true)}
+                >
+                  Sign In to Unlock Full Shifts
+                </button>
+              )}
               <a href="/dashboard" className="sq-btn-ghost">
-                📝 Change Notes
+                Change Notes
               </a>
               <a href="/games" className="sq-btn-ghost">
-                🎮 Back to Games
+                Back to Games
               </a>
             </div>
           </div>
         </div>
       )}
+
+      <GoogleLoginModal
+        isOpen={demoLoginOpen}
+        onClose={() => setDemoLoginOpen(false)}
+        onSuccess={() => {
+          setDemoMode(false);
+          setDemoLoginOpen(false);
+        }}
+      />
     </div>
   );
 }

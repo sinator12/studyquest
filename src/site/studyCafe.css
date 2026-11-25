@@ -49,6 +49,7 @@
   line-height: 1.1;
   letter-spacing: -0.02em;
   margin: 0 0 16px;
+  color: #FFFFFF;
 }
 
 .sq-cafe-lede {
@@ -64,6 +65,7 @@
   gap: 8px;
   margin-bottom: 18px;
   font-size: 15px;
+  color: #FFFFFF;
 }
 
 .sq-cafe-stars {
@@ -117,6 +119,7 @@
 .sq-cafe-btn-play:hover {
   transform: translateY(-2px);
   box-shadow: 0 6px 0 #B45309;
+  background: #FFB647;
 }
 
 .sq-cafe-btn-sample {
@@ -146,6 +149,7 @@
   gap: 8px;
   font-size: 13.5px;
   color: #94A3B8;
+  flex-wrap: wrap;
 }
 
 .sq-green-circle {

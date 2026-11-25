@@ -22,7 +22,7 @@ const MODE_LABELS: Record<GameMode, string> = {
 const SPEED_SLUGS = new Set(["quiz-rocket","neon-rush","meteor-storm","phantom-flash","pizza-rush","study-bird","subway-surfers","mountain-climb","snake","quiz-ninja","mole-mash","quiz-wings","pocket-bounce","glow-up","deep-dive","stack"]);
 const TF_SLUGS = new Set(["flashcards","flash","hangman","study-style","tinder"]);
 const MEMORY_SLUGS = new Set(["memory-match","gem-recall","brain-breaker","crossword","bubble-shooter","block-blast"]);
-const SURVIVAL_SLUGS = new Set(["boss-battle","boss-raid","dungeon-depths","vault-heist","spooky-manor","study-sweep","lanternfall","mind-vault","buddy-battles","shadow-maze","angry-nerds","glitch-hunter","super-pip"]);
+const SURVIVAL_SLUGS = new Set(["boss-battle","boss-raid","dungeon-depths","vault-heist","spooky-manor","study-sweep","lanternfall","mind-vault","buddy-battles","shadow-maze","glitch-hunter","super-pip"]);
 
 function getGameMode(slug: string): GameMode {
   if (SPEED_SLUGS.has(slug)) return "speed";

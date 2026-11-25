@@ -45,16 +45,8 @@ function setSecurityHeaders(res, extraHeaders = {}) {
   }
 }
 
-const server = http.createServer((req, res) => {
-  // 1. Method restriction: Allow only GET and HEAD for static serving
-  if (req.method !== "GET" && req.method !== "HEAD") {
-    setSecurityHeaders(res);
-    res.writeHead(405, { "Content-Type": "text/plain" });
-    res.end("Method Not Allowed");
-    return;
-  }
-
-  // 2. Safe URI decoding with error handling (prevents unhandled URIError server crash)
+const server = http.createServer(async (req, res) => {
+  // 0. Parse URI safely first so API proxy and static handler share cleanPath
   let cleanPath = "/";
   try {
     const rawUrl = req.url || "/";
@@ -63,6 +55,78 @@ const server = http.createServer((req, res) => {
     setSecurityHeaders(res);
     res.writeHead(400, { "Content-Type": "text/plain" });
     res.end("Bad Request: Malformed URI");
+    return;
+  }
+
+  // Proxy NVIDIA NIM API requests server-side to avoid browser CORS blocks
+  if (cleanPath === "/api/nvidia/chat/completions") {
+    if (req.method !== "POST") {
+      setSecurityHeaders(res);
+      res.writeHead(405, { "Content-Type": "application/json" });
+      res.end(JSON.stringify({ error: "Method Not Allowed" }));
+      return;
+    }
+
+    const chunks = [];
+    let totalBytes = 0;
+    const MAX_BODY_BYTES = 2 * 1024 * 1024;
+
+    req.on("data", (chunk) => {
+      totalBytes += chunk.length;
+      if (totalBytes <= MAX_BODY_BYTES) {
+        chunks.push(chunk);
+      }
+    });
+
+    req.on("end", async () => {
+      if (totalBytes > MAX_BODY_BYTES) {
+        setSecurityHeaders(res);
+        res.writeHead(413, { "Content-Type": "application/json" });
+        res.end(JSON.stringify({ error: "Payload too large" }));
+        return;
+      }
+
+      const authHeader =
+        req.headers.authorization ||
+        (process.env.NVIDIA_API_KEY ? `Bearer ${process.env.NVIDIA_API_KEY}` : "");
+
+      if (!authHeader) {
+        setSecurityHeaders(res);
+        res.writeHead(401, { "Content-Type": "application/json" });
+        res.end(JSON.stringify({ error: "Missing NVIDIA API key" }));
+        return;
+      }
+
+      try {
+        const upstream = await fetch("https://integrate.api.nvidia.com/v1/chat/completions", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: authHeader
+          },
+          body: Buffer.concat(chunks).toString("utf8")
+        });
+        const text = await upstream.text();
+        setSecurityHeaders(res, {
+          "Content-Type": upstream.headers.get("content-type") || "application/json; charset=utf-8",
+          "Cache-Control": "no-store"
+        });
+        res.writeHead(upstream.status);
+        res.end(text);
+      } catch (err) {
+        setSecurityHeaders(res, { "Content-Type": "application/json; charset=utf-8" });
+        res.writeHead(502);
+        res.end(JSON.stringify({ error: "NVIDIA upstream request failed" }));
+      }
+    });
+    return;
+  }
+
+  // 1. Method restriction: Allow only GET and HEAD for static serving
+  if (req.method !== "GET" && req.method !== "HEAD") {
+    setSecurityHeaders(res);
+    res.writeHead(405, { "Content-Type": "text/plain" });
+    res.end("Method Not Allowed");
     return;
   }
 

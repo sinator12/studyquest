@@ -10,6 +10,75 @@ export interface UserProfile {
 
 const ACCOUNTS_REGISTRY_KEY = "sq_accounts_registry";
 const CURRENT_USER_ID_KEY = "sq_current_user_id";
+const DEMO_MODE_KEY = "sq_demo_mode";
+const DEMO_USAGE_KEY = "sq_demo_usage";
+
+export const DEMO_LIMITS = {
+  maxDecks: 2,
+  maxQuestionsPerDeck: 5,
+  maxExplains: 2,
+  maxCafeOrders: 5
+} as const;
+
+export interface DemoUsage {
+  decksGenerated: number;
+  explainsRun: number;
+}
+
+/**
+ * Whether the visitor is currently browsing in unauthenticated Demo Mode
+ */
+export function isDemoMode(): boolean {
+  try {
+    if (getCurrentUser()) return false;
+    return sessionStorage.getItem(DEMO_MODE_KEY) === "1" || localStorage.getItem(DEMO_MODE_KEY) === "1";
+  } catch {
+    return false;
+  }
+}
+
+export function enterDemoMode(): void {
+  try {
+    sessionStorage.setItem(DEMO_MODE_KEY, "1");
+    localStorage.setItem(DEMO_MODE_KEY, "1");
+    window.dispatchEvent(new Event("sq_auth_changed"));
+  } catch (e) {}
+}
+
+export function exitDemoMode(): void {
+  try {
+    sessionStorage.removeItem(DEMO_MODE_KEY);
+    localStorage.removeItem(DEMO_MODE_KEY);
+    window.dispatchEvent(new Event("sq_auth_changed"));
+  } catch (e) {}
+}
+
+export function getDemoUsage(): DemoUsage {
+  try {
+    const raw = localStorage.getItem(DEMO_USAGE_KEY);
+    if (raw) {
+      const parsed = JSON.parse(raw);
+      return {
+        decksGenerated: Number(parsed.decksGenerated) || 0,
+        explainsRun: Number(parsed.explainsRun) || 0
+      };
+    }
+  } catch {}
+  return { decksGenerated: 0, explainsRun: 0 };
+}
+
+export function incrementDemoUsage(field: keyof DemoUsage): DemoUsage {
+  const current = getDemoUsage();
+  const next: DemoUsage = {
+    ...current,
+    [field]: current[field] + 1
+  };
+  try {
+    localStorage.setItem(DEMO_USAGE_KEY, JSON.stringify(next));
+    window.dispatchEvent(new Event("sq_demo_updated"));
+  } catch {}
+  return next;
+}
 
 /**
  * Retrieve all registered accounts on this browser
@@ -95,6 +164,8 @@ export function loginWithGoogle(profile: { id?: string; email: string; name?: st
 
   saveRegisteredAccounts(accounts);
   localStorage.setItem(CURRENT_USER_ID_KEY, user.id);
+  sessionStorage.removeItem(DEMO_MODE_KEY);
+  localStorage.removeItem(DEMO_MODE_KEY);
   window.dispatchEvent(new Event("sq_auth_changed"));
   return user;
 }
@@ -140,6 +211,8 @@ export function removeAccount(userId: string): void {
 export function logout(): void {
   try {
     localStorage.removeItem(CURRENT_USER_ID_KEY);
+    sessionStorage.removeItem(DEMO_MODE_KEY);
+    localStorage.removeItem(DEMO_MODE_KEY);
     window.dispatchEvent(new Event("sq_auth_changed"));
     window.dispatchEvent(new Event("sq_stats_updated"));
     window.dispatchEvent(new Event("sq_deck_updated"));

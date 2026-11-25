@@ -195,89 +195,55 @@ export default function GoogleLoginModal({ isOpen, onClose, onSuccess }: GoogleL
         </div>
 
         {/* Multi-Account Testing / Custom Google Email Option */}
-        <div style={{ marginTop: "16px", textAlign: "center" }}>
+        <div className="sq-modal-custom-wrap">
           {!customMode ? (
             <button
               type="button"
               className="sq-saved-accounts-toggle"
-              style={{ margin: "0 auto", fontSize: "0.82rem", opacity: 0.8 }}
               onClick={() => setCustomMode(true)}
             >
-              Sign in with another Google Email address ▾
+              <span>Use a different Google email</span>
+              <span aria-hidden="true">▾</span>
             </button>
           ) : (
-            <form onSubmit={handleCustomAccountSignIn} style={{ marginTop: "12px", textAlign: "left" }}>
-              <div style={{ marginBottom: "10px" }}>
-                <label style={{ display: "block", fontSize: "0.78rem", color: "#94A3B8", marginBottom: "4px" }}>
-                  Google Email Address
-                </label>
+            <form onSubmit={handleCustomAccountSignIn} className="sq-inline-email-form">
+              <div className="sq-form-field">
+                <label htmlFor="sq-modal-email">Google email</label>
                 <input
+                  id="sq-modal-email"
                   type="email"
                   value={customEmail}
                   onChange={(e) => setCustomEmail(e.target.value)}
-                  placeholder="e.g. userA@gmail.com"
+                  placeholder="you@gmail.com"
+                  autoComplete="email"
                   required
-                  style={{
-                    width: "100%",
-                    padding: "9px 12px",
-                    borderRadius: "8px",
-                    background: "#0F172A",
-                    border: "1px solid #334155",
-                    color: "#F8FAFC",
-                    fontSize: "0.88rem"
-                  }}
+                  autoFocus
                 />
               </div>
-              <div style={{ marginBottom: "12px" }}>
-                <label style={{ display: "block", fontSize: "0.78rem", color: "#94A3B8", marginBottom: "4px" }}>
-                  Display Name (optional)
+              <div className="sq-form-field">
+                <label htmlFor="sq-modal-name">
+                  Display name <span>(optional)</span>
                 </label>
                 <input
+                  id="sq-modal-name"
                   type="text"
                   value={customName}
                   onChange={(e) => setCustomName(e.target.value)}
-                  placeholder="e.g. Sarah Connor"
-                  style={{
-                    width: "100%",
-                    padding: "9px 12px",
-                    borderRadius: "8px",
-                    background: "#0F172A",
-                    border: "1px solid #334155",
-                    color: "#F8FAFC",
-                    fontSize: "0.88rem"
-                  }}
+                  placeholder="Your name"
+                  autoComplete="name"
                 />
               </div>
-              <div style={{ display: "flex", gap: "8px" }}>
-                <button
-                  type="submit"
-                  disabled={isLoading}
-                  style={{
-                    flex: 1,
-                    padding: "9px",
-                    background: "#7C3AED",
-                    color: "#fff",
-                    border: "none",
-                    borderRadius: "8px",
-                    cursor: "pointer",
-                    fontWeight: 600,
-                    fontSize: "0.85rem"
-                  }}
-                >
-                  Sign In Account
+              <div className="sq-modal-form-actions">
+                <button type="submit" disabled={isLoading} className="sq-primary-inline-btn">
+                  {isLoading ? "Signing in…" : "Sign in"}
                 </button>
                 <button
                   type="button"
-                  onClick={() => setCustomMode(false)}
-                  style={{
-                    padding: "9px 14px",
-                    background: "#1E293B",
-                    color: "#94A3B8",
-                    border: "none",
-                    borderRadius: "8px",
-                    cursor: "pointer",
-                    fontSize: "0.85rem"
+                  onClick={() => {
+                    setCustomMode(false);
+                    setErrorMessage(null);
                   }}
+                  className="sq-modal-cancel-btn"
                 >
                   Cancel
                 </button>
@@ -288,7 +254,7 @@ export default function GoogleLoginModal({ isOpen, onClose, onSuccess }: GoogleL
 
         {/* Saved accounts drawer if available */}
         {registeredAccounts.length > 0 && (
-          <div className="sq-saved-accounts-section" style={{ marginTop: "16px" }}>
+          <div className="sq-saved-accounts-section">
             <button
               type="button"
               className="sq-saved-accounts-toggle"
@@ -296,7 +262,7 @@ export default function GoogleLoginModal({ isOpen, onClose, onSuccess }: GoogleL
               aria-expanded={showSavedAccounts}
             >
               <span>Saved accounts on this device ({registeredAccounts.length})</span>
-              <span className="sq-toggle-chevron">{showSavedAccounts ? "▲" : "▼"}</span>
+              <span className="sq-toggle-chevron" aria-hidden="true">{showSavedAccounts ? "▲" : "▼"}</span>
             </button>
 
             {showSavedAccounts && (
@@ -318,7 +284,7 @@ export default function GoogleLoginModal({ isOpen, onClose, onSuccess }: GoogleL
                         </div>
                         <span className="sq-saved-email">{acc.email}</span>
                       </div>
-                      <span className="sq-saved-select-arrow">→</span>
+                      <span className="sq-saved-select-arrow" aria-hidden="true">→</span>
                     </button>
                   );
                 })}
@@ -329,10 +295,12 @@ export default function GoogleLoginModal({ isOpen, onClose, onSuccess }: GoogleL
 
         {/* Security & Isolation Note */}
         <div className="sq-auth-security-footer">
+          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" aria-hidden="true">
+            <rect x="3" y="11" width="18" height="11" rx="2" ry="2" />
+            <path d="M7 11V7a5 5 0 0 1 10 0v4" />
+          </svg>
           <p>
-            🔒 Google OAuth 2.0 Secure Authentication.
-            <br />
-            Every user account has an isolated database partition. Logging out never deletes progress.
+            Google OAuth 2.0 · Progress is stored per account.
           </p>
         </div>
       </div>

@@ -336,7 +336,7 @@ export default function GamesPage() {
                   ✨ Create your own game
                 </a>
 
-                {/* Video frame 015 pill: questions ready */}
+                {/* Active deck pill */}
                 {activeDeck && activeDeck.questions.length > 0 && (
                   <a
                     href="/dashboard"
@@ -345,19 +345,19 @@ export default function GamesPage() {
                       display: "inline-flex",
                       alignItems: "center",
                       gap: "8px",
-                      background: "rgba(52, 211, 153, 0.15)",
-                      border: "1.5px solid rgba(52, 211, 153, 0.4)",
-                      padding: "8px 16px",
+                      background: "rgba(52, 211, 153, 0.14)",
+                      border: "1px solid rgba(52, 211, 153, 0.35)",
+                      padding: "8px 14px",
                       borderRadius: "999px",
                       color: "#FFFFFF",
-                      fontSize: "14px",
-                      fontWeight: 800,
+                      fontSize: "13.5px",
+                      fontWeight: 700,
                       textDecoration: "none"
                     }}
                   >
                     <span style={{ width: "8px", height: "8px", borderRadius: "50%", background: "#34D399" }} />
                     <span>{activeDeck.questions.length} questions ready</span>
-                    <span style={{ color: "#6EE7B7", textDecoration: "underline", marginLeft: "4px" }}>
+                    <span style={{ color: "#818CF8", textDecoration: "underline", marginLeft: "4px" }}>
                       Replace material
                     </span>
                   </a>
@@ -691,12 +691,12 @@ export default function GamesPage() {
               </button>
             </div>
 
-            <div style={{ display: 'flex', flexDirection: 'column', gap: 14, textAlign: 'left', marginBottom: 20 }}>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: 12, textAlign: 'left', marginBottom: 20 }}>
               <div style={{ display: 'flex', gap: 12, alignItems: 'flex-start', background: '#0A0F24', padding: 14, borderRadius: 12, border: '1px solid #1E294B' }}>
                 <span style={{ fontSize: 24 }}>📝</span>
                 <div>
                   <strong style={{ display: 'block', color: '#FFF', fontSize: 14 }}>1. Add Your Notes</strong>
-                  <span style={{ color: '#94A3B8', fontSize: 12.5 }}>Upload any file, paste text, or type a topic in the Dashboard.</span>
+                  <span style={{ color: '#94A3B8', fontSize: 13 }}>Upload any PDF, Word, PowerPoint, or text file, or type a topic in the Dashboard.</span>
                 </div>
               </div>
 
@@ -704,23 +704,23 @@ export default function GamesPage() {
                 <span style={{ fontSize: 24 }}>☕</span>
                 <div>
                   <strong style={{ display: 'block', color: '#FFF', fontSize: 14 }}>2. Study Café</strong>
-                  <span style={{ color: '#94A3B8', fontSize: 12.5 }}>Run your café! Customers order items that test your notes. Serve matching drinks to earn stars and cash.</span>
+                  <span style={{ color: '#94A3B8', fontSize: 13 }}>Run your café! Customers order items that test your notes. Serve matching drinks to earn stars and coins.</span>
                 </div>
               </div>
 
               <div style={{ display: 'flex', gap: 12, alignItems: 'flex-start', background: '#0A0F24', padding: 14, borderRadius: 12, border: '1px solid #1E294B' }}>
-                <span style={{ fontSize: 24 }}>🎯</span>
+                <span style={{ fontSize: 24 }}>🎱</span>
                 <div>
-                  <strong style={{ display: 'block', color: '#FFF', fontSize: 14 }}>3. Angry Nerds</strong>
-                  <span style={{ color: '#94A3B8', fontSize: 12.5 }}>Answer questions to load your slingshot with Nerds. Fling them with physics to smash forts and topple Grumps!</span>
+                  <strong style={{ display: 'block', color: '#FFF', fontSize: 14 }}>3. Bingo Night</strong>
+                  <span style={{ color: '#94A3B8', fontSize: 13 }}>Answer questions to draw balls and stamp your 5x5 card. Complete any Line or Full Card to win!</span>
                 </div>
               </div>
 
               <div style={{ display: 'flex', gap: 12, alignItems: 'flex-start', background: '#0A0F24', padding: 14, borderRadius: 12, border: '1px solid #1E294B' }}>
                 <span style={{ fontSize: 24 }}>⚡</span>
                 <div>
-                  <strong style={{ display: 'block', color: '#FFF', fontSize: 14 }}>4. Level Up & Keep Streaks</strong>
-                  <span style={{ color: '#94A3B8', fontSize: 12.5 }}>Every correct order, destroyed fort, and 25m Focus session earns XP and keeps your daily streak blazing.</span>
+                  <strong style={{ display: 'block', color: '#FFF', fontSize: 14 }}>4. Level Up &amp; Keep Streaks</strong>
+                  <span style={{ color: '#94A3B8', fontSize: 13 }}>Every completed order, Bingo win, and 25m Focus session earns XP &amp; increases your daily Streak!</span>
                 </div>
               </div>
             </div>

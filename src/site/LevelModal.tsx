@@ -93,7 +93,7 @@ export default function LevelModal({ isOpen, onClose }: LevelModalProps) {
           <h4>Ways to Earn XP & Level Up</h4>
           <div className="sq-earn-pills">
             <span className="sq-earn-pill">☕ Serve Café Orders: <strong>+15 XP</strong></span>
-            <span className="sq-earn-pill">🎯 Destroy Angry Nerds Fort: <strong>+25 XP</strong></span>
+            <span className="sq-earn-pill">🎯 Win Bingo Night: <strong>+150 XP</strong></span>
             <span className="sq-earn-pill">⏱️ Complete 25m Focus: <strong>+50 XP</strong></span>
             <span className="sq-earn-pill">📅 Daily Streak Bonus: <strong>+25 XP</strong></span>
           </div>

@@ -1,7 +1,9 @@
 import { useState, useEffect, useRef, useCallback } from "react";
 import { getActiveDeck, addXp, recordActivityToday, type DeckInfo } from "./studyStore";
+import { isDemoMode } from "./authStore";
 import { type Question } from "./quizData";
 import TopNav from "./TopNav";
+import GoogleLoginModal from "./GoogleLoginModal";
 import "./bingoNight.css";
 
 /* ------------------------------------------------------------------ */
@@ -451,6 +453,51 @@ interface HallRegular {
   stampsCount: number;
 }
 
+interface WinResult {
+  lineLabel: string;
+  winningIds: number[];
+}
+
+function findWinningLine(squares: BingoSquare[], gameMode: BingoMode): WinResult | null {
+  if (squares.length !== 25) return null;
+
+  if (gameMode === "full") {
+    if (squares.every((sq) => sq.isStamped)) {
+      return { lineLabel: "Full Card", winningIds: squares.map((sq) => sq.id) };
+    }
+    return null;
+  }
+
+  // Line Bingo: Check all 5 rows
+  for (let r = 0; r < 5; r++) {
+    const rowSquares = squares.filter((sq) => sq.row === r);
+    if (rowSquares.length === 5 && rowSquares.every((sq) => sq.isStamped)) {
+      return { lineLabel: `Row ${r + 1}`, winningIds: rowSquares.map((sq) => sq.id) };
+    }
+  }
+
+  // Check all 5 columns
+  for (let c = 0; c < 5; c++) {
+    const colSquares = squares.filter((sq) => sq.col === c);
+    if (colSquares.length === 5 && colSquares.every((sq) => sq.isStamped)) {
+      return { lineLabel: `Column ${c + 1}`, winningIds: colSquares.map((sq) => sq.id) };
+    }
+  }
+
+  // Check both diagonals (index === row * 5 + col)
+  const diag1 = [0, 6, 12, 18, 24];
+  if (diag1.every((id) => squares.find((sq) => sq.id === id)?.isStamped)) {
+    return { lineLabel: "Main Diagonal", winningIds: diag1 };
+  }
+
+  const diag2 = [4, 8, 12, 16, 20];
+  if (diag2.every((id) => squares.find((sq) => sq.id === id)?.isStamped)) {
+    return { lineLabel: "Anti-Diagonal", winningIds: diag2 };
+  }
+
+  return null;
+}
+
 export default function BingoNightGame() {
   const [deck] = useState<DeckInfo>(() => {
     const active = getActiveDeck();
@@ -483,6 +530,8 @@ export default function BingoNightGame() {
   // 5x5 Bingo Grid
   const [cardSquares, setCardSquares] = useState<BingoSquare[]>([]);
   const [highlightedSquareId, setHighlightedSquareId] = useState<number | null>(null);
+  const [winningIds, setWinningIds] = useState<number[]>([]);
+  const [winLabel, setWinLabel] = useState<string>("");
 
   // Tumbler animation
   const [isSpinning, setIsSpinning] = useState(false);
@@ -493,17 +542,44 @@ export default function BingoNightGame() {
   const [isAnswerRevealed, setIsAnswerRevealed] = useState(false);
   const [isCorrect, setIsCorrect] = useState(false);
   const [autoNext, setAutoNext] = useState(true);
+  const [askedIndices, setAskedIndices] = useState<number[]>([]);
 
   // Dialogue & Feedback
   const [hostDialogue, setHostDialogue] = useState("Let's see what we've got.");
   const [promptBanner, setPromptBanner] = useState("Take your time — the ball waits for you.");
   const [floatingStars, setFloatingStars] = useState<{ id: number; text: string }[]>([]);
 
-  // Explain Modal
+  // Explain & Demo Auth Modals
   const [explainOpen, setExplainOpen] = useState(false);
+  const [demoLoginOpen, setDemoLoginOpen] = useState(false);
+  const [demoMode, setDemoMode] = useState<boolean>(isDemoMode());
 
   // Hall Regulars AI Rivals
   const [hallRegulars, setHallRegulars] = useState<HallRegular[]>([]);
+
+  const autoNextTimerRef = useRef<number | null>(null);
+  const spinTimerRef = useRef<number | null>(null);
+  const victoryTriggeredRef = useRef<boolean>(false);
+
+  const clearPendingTimers = useCallback(() => {
+    if (autoNextTimerRef.current !== null) {
+      window.clearTimeout(autoNextTimerRef.current);
+      autoNextTimerRef.current = null;
+    }
+    if (spinTimerRef.current !== null) {
+      window.clearTimeout(spinTimerRef.current);
+      spinTimerRef.current = null;
+    }
+  }, []);
+
+  useEffect(() => {
+    const syncAuth = () => setDemoMode(isDemoMode());
+    window.addEventListener("sq_auth_changed", syncAuth);
+    return () => {
+      window.removeEventListener("sq_auth_changed", syncAuth);
+      clearPendingTimers();
+    };
+  }, [clearPendingTimers]);
 
   // Audio Sync
   useEffect(() => {
@@ -527,28 +603,40 @@ export default function BingoNightGame() {
   /*  Initialize Bingo Card and Questions                               */
   /* ------------------------------------------------------------------ */
   const initializeGame = useCallback((chosenMode: BingoMode) => {
+    clearPendingTimers();
+    victoryTriggeredRef.current = false;
     setMode(chosenMode);
+    setWinningIds([]);
+    setWinLabel("");
 
-    // Merge deck questions with reference sample questions to ensure abundant bingo coverage
-    const pool = [...BINGO_SAMPLE_QUESTIONS, ...deck.questions];
-    // De-duplicate questions by question text
-    const uniquePool = pool.filter((q, idx, arr) => arr.findIndex(item => item.question === q.question) === idx);
-    const shuffledPool = [...uniquePool].sort(() => 0.5 - Math.random());
-    setQuestions(shuffledPool);
+    // Prioritize active deck questions first, then supplement with unique sample questions up to 24 card squares
+    const activeQs = [...deck.questions].sort(() => 0.5 - Math.random());
+    const sampleQs = [...BINGO_SAMPLE_QUESTIONS].sort(() => 0.5 - Math.random());
+    const combined = [...activeQs, ...sampleQs];
 
-    // Pick 24 distinct correct answers for the 5x5 grid (24 words + 1 center star)
-    const answersSet = new Set<string>();
-    for (const q of shuffledPool) {
-      const correctAns = q.options[q.correctIndex]?.trim();
-      if (correctAns && answersSet.size < 24) {
-        answersSet.add(correctAns);
-      }
+    const seenQuestions = new Set<string>();
+    const seenAnswers = new Set<string>();
+    const boardQuestions: Question[] = [];
+
+    for (const q of combined) {
+      const qKey = q.question.trim().toLowerCase();
+      const ans = q.options[q.correctIndex]?.trim();
+      if (!ans || seenQuestions.has(qKey) || seenAnswers.has(ans.toLowerCase())) continue;
+      seenQuestions.add(qKey);
+      seenAnswers.add(ans.toLowerCase());
+      boardQuestions.push(q);
+      if (boardQuestions.length === 24) break;
     }
-    const cardWords = Array.from(answersSet);
-    // Fill remaining if needed
+
+    // Shuffle the 24 card answers across the board while keeping their exact matching questions in the ball cage!
+    const cardWords = boardQuestions.map((q) => q.options[q.correctIndex].trim()).sort(() => 0.5 - Math.random());
     while (cardWords.length < 24) {
-      cardWords.push(`Term ${cardWords.length + 1}`);
+      cardWords.push(`Bonus ${cardWords.length + 1}`);
     }
+
+    const shuffledCageQuestions = [...boardQuestions].sort(() => 0.5 - Math.random());
+    setQuestions(shuffledCageQuestions);
+    setAskedIndices([0]);
 
     // Build 5x5 grid
     const squares: BingoSquare[] = [];
@@ -561,8 +649,8 @@ export default function BingoNightGame() {
           row: r,
           col: c,
           isFree,
-          isStamped: isFree, // Center free space is pre-stamped
-          text: isFree ? "⭐" : cardWords[wordIdx++]
+          isStamped: isFree,
+          text: isFree ? "★" : cardWords[wordIdx++]
         });
       }
     }
@@ -578,10 +666,9 @@ export default function BingoNightGame() {
     setGameState("playing");
     setDrawnBallNumber(Math.floor(Math.random() * 75) + 1);
 
-    // Reset rivals
     const rivals = BINGO_CHARACTERS.filter((_, idx) => idx !== callerIndex).slice(0, 3);
     setHallRegulars(
-      rivals.map(r => ({
+      rivals.map((r) => ({
         id: r.id,
         name: r.name,
         avatar: r.imageSrc,
@@ -589,20 +676,22 @@ export default function BingoNightGame() {
       }))
     );
 
-    // Initial Host line
-    const caller = BINGO_CHARACTERS[callerIndex];
     setHostDialogue("Let's see what we've got.");
-    setPromptBanner("Take your time — the ball waits for you.");
+    setPromptBanner(
+      chosenMode === "line"
+        ? "Line Bingo: Complete any row, column, or diagonal to win!"
+        : "Full Card: Stamp every square on your card to win!"
+    );
 
-    // Sound
     audioCtrl.playTumblerRoll();
-  }, [deck, callerIndex]);
+  }, [deck, callerIndex, clearPendingTimers]);
 
   /* ------------------------------------------------------------------ */
-  /*  Draw Next Ball                                                    */
+  /*  Draw Next Ball (Avoid repeating answered squares!)                */
   /* ------------------------------------------------------------------ */
   const rollNextBall = useCallback(() => {
-    if (gameState !== "playing") return;
+    if (gameState !== "playing" || victoryTriggeredRef.current) return;
+    clearPendingTimers();
 
     setIsSpinning(true);
     setHighlightedSquareId(null);
@@ -621,33 +710,76 @@ export default function BingoNightGame() {
     setHostDialogue(tumblerQuotes[Math.floor(Math.random() * tumblerQuotes.length)]);
     setPromptBanner("Answer right to stamp that square on your card.");
 
-    setTimeout(() => {
+    spinTimerRef.current = window.setTimeout(() => {
       setIsSpinning(false);
       setDrawnBallNumber(Math.floor(Math.random() * 75) + 1);
       audioCtrl.playBallDrop();
 
-      setCurrentQIndex(prev => (prev + 1) % (questions.length || 1));
-      setBallsCalled(prev => prev + 1);
+      // Prefer questions whose answer is still unstamped on the board and hasn't been asked yet
+      const unstampedTexts = new Set(
+        cardSquares.filter((sq) => !sq.isStamped && !sq.isFree).map((sq) => sq.text.trim().toLowerCase())
+      );
 
-      // Hall Regulars occasionally stamp a square (1 in 3 chance)
-      setHallRegulars(prev =>
-        prev.map(reg => {
-          if (Math.random() < 0.35 && reg.stampsCount < 24) {
+      let nextIdx = questions.findIndex(
+        (q, i) => !askedIndices.includes(i) && unstampedTexts.has(q.options[q.correctIndex]?.trim().toLowerCase() || "")
+      );
+      if (nextIdx === -1) {
+        nextIdx = questions.findIndex(
+          (q) => unstampedTexts.has(q.options[q.correctIndex]?.trim().toLowerCase() || "")
+        );
+      }
+      if (nextIdx === -1) {
+        nextIdx = (currentQIndex + 1) % (questions.length || 1);
+      }
+
+      setCurrentQIndex(nextIdx);
+      setAskedIndices((prev) => (prev.includes(nextIdx) ? prev : [...prev, nextIdx]));
+      setBallsCalled((prev) => prev + 1);
+
+      setHallRegulars((prev) =>
+        prev.map((reg) => {
+          if (Math.random() < 0.3 && reg.stampsCount < 23) {
             return { ...reg, stampsCount: reg.stampsCount + 1 };
           }
           return reg;
         })
       );
-    }, 700);
-  }, [gameState, questions.length]);
+    }, 620);
+  }, [gameState, questions, cardSquares, askedIndices, currentQIndex, clearPendingTimers]);
 
   const currentQ: Question | undefined = questions[currentQIndex] || BINGO_SAMPLE_QUESTIONS[0];
+
+  const handleBingoWin = useCallback((win: WinResult) => {
+    if (victoryTriggeredRef.current) return;
+    victoryTriggeredRef.current = true;
+    clearPendingTimers();
+
+    audioCtrl.playBingoWin();
+    const caller = BINGO_CHARACTERS[callerIndex];
+    setWinningIds(win.winningIds);
+    setWinLabel(win.lineLabel);
+    setHostDialogue(caller.bingoQuote);
+    setGameState("victory");
+
+    addXp(150, `Bingo Night (${win.lineLabel}) Victory`);
+    recordActivityToday("Completed Bingo Night", 25);
+  }, [callerIndex, clearPendingTimers]);
+
+  // Safety guard: whenever cardSquares changes during active play, verify win condition automatically
+  useEffect(() => {
+    if (gameState !== "playing" || victoryTriggeredRef.current || cardSquares.length !== 25) return;
+    const win = findWinningLine(cardSquares, mode);
+    if (win) {
+      handleBingoWin(win);
+    }
+  }, [cardSquares, mode, gameState, handleBingoWin]);
 
   /* ------------------------------------------------------------------ */
   /*  Handle Answer Selection                                           */
   /* ------------------------------------------------------------------ */
   const handleSelectAnswer = (optionIdx: number) => {
-    if (isAnswerRevealed || !currentQ) return;
+    if (isAnswerRevealed || !currentQ || victoryTriggeredRef.current) return;
+    clearPendingTimers();
 
     setSelectedOption(optionIdx);
     setIsAnswerRevealed(true);
@@ -655,34 +787,31 @@ export default function BingoNightGame() {
     const isAnsCorrect = optionIdx === currentQ.correctIndex;
     setIsCorrect(isAnsCorrect);
 
-    const caller = BINGO_CHARACTERS[callerIndex];
     const correctText = currentQ.options[currentQ.correctIndex];
 
     if (isAnsCorrect) {
       audioCtrl.playCorrectAnswer();
       setHostDialogue(`The answer was: ${correctText}!`);
 
-      // Check if this correct answer exists on player's bingo card
       const matchingSquare = cardSquares.find(
-        sq => !sq.isStamped && sq.text.trim().toLowerCase() === correctText.trim().toLowerCase()
+        (sq) => !sq.isStamped && sq.text.trim().toLowerCase() === correctText.trim().toLowerCase()
       );
 
       if (matchingSquare) {
         setHighlightedSquareId(matchingSquare.id);
-        setPromptBanner("That's on your card — stamp it!");
+        setPromptBanner("That's on your card — tap the glowing square or Stamp button!");
       } else {
-        setPromptBanner("Good answer! That ball isn't on your card, next ball!");
+        setPromptBanner("Good answer! Next ball coming up.");
       }
     } else {
       audioCtrl.playWrongBuzz();
       setHostDialogue(`The answer was: ${correctText}!`);
       setPromptBanner("The ball rolls back into the cage.");
 
-      // If autoNext is on, advance after 2.2 seconds on wrong answer
       if (autoNext) {
-        setTimeout(() => {
+        autoNextTimerRef.current = window.setTimeout(() => {
           rollNextBall();
-        }, 2200);
+        }, 2000);
       }
     }
   };
@@ -691,75 +820,41 @@ export default function BingoNightGame() {
   /*  Stamp Bingo Square                                                */
   /* ------------------------------------------------------------------ */
   const handleStampSquare = (square: BingoSquare) => {
-    // Square can be stamped if it's the currently highlighted square or already matched
-    if (square.isStamped) return;
+    if (square.isStamped || victoryTriggeredRef.current) return;
 
-    if (highlightedSquareId === square.id || (isCorrect && currentQ && square.text.trim().toLowerCase() === currentQ.options[currentQ.correctIndex].trim().toLowerCase())) {
-      audioCtrl.playDabberStamp();
+    const matchesCurrent =
+      highlightedSquareId === square.id ||
+      (isCorrect &&
+        currentQ &&
+        square.text.trim().toLowerCase() === currentQ.options[currentQ.correctIndex].trim().toLowerCase());
 
-      // Update card
-      const updated = cardSquares.map(sq => (sq.id === square.id ? { ...sq, isStamped: true } : sq));
-      setCardSquares(updated);
-      setHighlightedSquareId(null);
-      setStars(prev => prev + 1);
+    if (!matchesCurrent) return;
 
-      // Floating Star Reward animation
-      const newReward = { id: Date.now(), text: "+1 ⭐" };
-      setFloatingStars(prev => [...prev, newReward]);
-      setTimeout(() => {
-        setFloatingStars(prev => prev.filter(r => r.id !== newReward.id));
-      }, 1200);
+    clearPendingTimers();
+    audioCtrl.playDabberStamp();
 
-      // Check Win condition
-      const isWin = checkWin(updated, mode);
-      if (isWin) {
-        handleBingoWin();
-        return;
-      }
+    const updated = cardSquares.map((sq) => (sq.id === square.id ? { ...sq, isStamped: true } : sq));
+    setCardSquares(updated);
+    setHighlightedSquareId(null);
+    setStars((prev) => prev + 1);
 
-      // If autoNext is true, roll next ball after a brief moment
-      if (autoNext) {
-        setTimeout(() => {
-          rollNextBall();
-        }, 1100);
-      }
-    }
-  };
+    const newReward = { id: Date.now(), text: "+1 Star" };
+    setFloatingStars((prev) => [...prev, newReward]);
+    window.setTimeout(() => {
+      setFloatingStars((prev) => prev.filter((r) => r.id !== newReward.id));
+    }, 1200);
 
-  /* ------------------------------------------------------------------ */
-  /*  Check Win Condition                                               */
-  /* ------------------------------------------------------------------ */
-  const checkWin = (squares: BingoSquare[], gameMode: BingoMode): boolean => {
-    if (gameMode === "full") {
-      return squares.every(sq => sq.isStamped);
+    const win = findWinningLine(updated, mode);
+    if (win) {
+      handleBingoWin(win);
+      return;
     }
 
-    // Line Bingo: Check rows
-    for (let r = 0; r < 5; r++) {
-      if (squares.filter(sq => sq.row === r).every(sq => sq.isStamped)) return true;
+    if (autoNext) {
+      autoNextTimerRef.current = window.setTimeout(() => {
+        rollNextBall();
+      }, 950);
     }
-    // Check cols
-    for (let c = 0; c < 5; c++) {
-      if (squares.filter(sq => sq.col === c).every(sq => sq.isStamped)) return true;
-    }
-    // Diagonals
-    const diag1 = [0, 6, 12, 18, 24];
-    if (diag1.every(id => squares[id]?.isStamped)) return true;
-    const diag2 = [4, 8, 12, 16, 20];
-    if (diag2.every(id => squares[id]?.isStamped)) return true;
-
-    return false;
-  };
-
-  const handleBingoWin = () => {
-    audioCtrl.playBingoWin();
-    const caller = BINGO_CHARACTERS[callerIndex];
-    setHostDialogue(caller.bingoQuote);
-    setGameState("victory");
-
-    // Award XP and maintain Daily Streak
-    addXp(150, "Bingo Night Victory");
-    recordActivityToday("Completed Bingo Night", 25);
   };
 
   /* ------------------------------------------------------------------ */
@@ -844,12 +939,12 @@ export default function BingoNightGame() {
               </div>
             </div>
 
-            {/* Lobby Cards (Play Solo & Host a Night) */}
-            <div className="sq-bingo-cards-row">
-              {/* Card 1: Play Solo */}
+            {/* Lobby Card: Play Solo (Host a Night removed) */}
+            <div className="sq-bingo-cards-row single-card">
               <div
                 className="sq-bingo-option-card play-solo-card"
                 onClick={() => setGameState("pick_mode")}
+                onKeyDown={(e) => { if (e.key === "Enter" || e.key === " ") setGameState("pick_mode"); }}
                 role="button"
                 tabIndex={0}
               >
@@ -863,26 +958,12 @@ export default function BingoNightGame() {
                   You against the three Hall Regulars.
                 </p>
               </div>
-
-              {/* Card 2: Host a Night */}
-              <div className="sq-bingo-option-card host-night-card disabled">
-                <div className="sq-card-icon-circle tv-icon">
-                  <svg width="28" height="28" viewBox="0 0 24 24" fill="currentColor">
-                    <path d="M21 3H3c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h5v2h8v-2h5c1.1 0 1.99-.9 1.99-2L23 5c0-1.1-.9-2-2-2zm0 14H3V5h18v12z" />
-                  </svg>
-                  <span className="sq-disabled-slash" />
-                </div>
-                <h2 className="sq-card-title">Host a night</h2>
-                <p className="sq-card-desc">
-                  Your class joins with a code at studyquest.app/join.
-                </p>
-              </div>
             </div>
           </div>
         )}
 
         {/* ========================================================== */}
-        {/* VIEW 2: PICK YOUR NIGHT (Matches Ref Video 00:06s)          */}
+        {/* VIEW 2: PICK YOUR NIGHT                                    */}
         {/* ========================================================== */}
         {gameState === "pick_mode" && (
           <div className="sq-bingo-lobby-scene">
@@ -891,8 +972,7 @@ export default function BingoNightGame() {
               Answer questions to stamp your card. Five in a row — BINGO!
             </p>
 
-            <div className="sq-bingo-cards-row">
-              {/* Pick Your Night Modal Card */}
+            <div className="sq-bingo-cards-row single-card">
               <div className="sq-bingo-option-card pick-night-card">
                 <div className="sq-pick-night-header">
                   <button
@@ -908,7 +988,7 @@ export default function BingoNightGame() {
                 <div className="sq-night-modes-list">
                   {/* Option 1: Line Bingo */}
                   <button
-                    className="sq-mode-choice-btn"
+                    className="sq-mode-choice-btn active-gold"
                     onClick={() => initializeGame("line")}
                   >
                     <div className="sq-mode-icon lines-icon">
@@ -916,38 +996,36 @@ export default function BingoNightGame() {
                     </div>
                     <div className="sq-mode-info">
                       <strong>Line Bingo</strong>
-                      <small>First full line wins. Quick rounds.</small>
+                      <small>First full row, column, or diagonal wins.</small>
                     </div>
                   </button>
 
-                  {/* Option 2: Full Card */}
+                  {/* Option 2: Full Card (Locked in Demo Mode) */}
                   <button
-                    className="sq-mode-choice-btn active-gold"
-                    onClick={() => initializeGame("full")}
+                    className={`sq-mode-choice-btn ${demoMode ? "is-demo-locked" : ""}`}
+                    onClick={() => {
+                      if (demoMode) {
+                        setDemoLoginOpen(true);
+                      } else {
+                        initializeGame("full");
+                      }
+                    }}
                   >
                     <div className="sq-mode-icon star-icon">
                       <span>★</span>
                     </div>
                     <div className="sq-mode-info">
-                      <strong>Full card</strong>
-                      <small>Stamp every square — BINGO!</small>
+                      <strong>
+                        Full card {demoMode && <span className="sq-demo-lock-tag">Sign in</span>}
+                      </strong>
+                      <small>
+                        {demoMode
+                          ? "Sign in with Google to unlock Full Card mode."
+                          : "Stamp every square — BINGO!"}
+                      </small>
                     </div>
                   </button>
                 </div>
-              </div>
-
-              {/* Card 2: Host a Night (Static side card) */}
-              <div className="sq-bingo-option-card host-night-card disabled">
-                <div className="sq-card-icon-circle tv-icon">
-                  <svg width="28" height="28" viewBox="0 0 24 24" fill="currentColor">
-                    <path d="M21 3H3c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h5v2h8v-2h5c1.1 0 1.99-.9 1.99-2L23 5c0-1.1-.9-2-2-2zm0 14H3V5h18v12z" />
-                  </svg>
-                  <span className="sq-disabled-slash" />
-                </div>
-                <h2 className="sq-card-title">Host a night</h2>
-                <p className="sq-card-desc">
-                  Your class joins with a code at studyquest.app/join.
-                </p>
               </div>
             </div>
           </div>
@@ -1092,9 +1170,21 @@ export default function BingoNightGame() {
                             /* Correct Answer Feedback */
                             <div className="sq-correct-state-box">
                               {highlightedSquareId !== null ? (
-                                <div className="sq-stamp-instruction-text">
-                                  It's on your card — <strong>STAMP!</strong>
-                                </div>
+                                <>
+                                  <div className="sq-stamp-instruction-text">
+                                    It&apos;s on your card — <strong>STAMP!</strong>
+                                  </div>
+                                  <button
+                                    type="button"
+                                    className="sq-stamp-quick-btn"
+                                    onClick={() => {
+                                      const sq = cardSquares.find((s) => s.id === highlightedSquareId);
+                                      if (sq) handleStampSquare(sq);
+                                    }}
+                                  >
+                                    Stamp Square on Card ★
+                                  </button>
+                                </>
                               ) : (
                                 <div className="sq-stamp-instruction-text neutral">
                                   Good answer! Next ball awaits:
@@ -1181,10 +1271,11 @@ export default function BingoNightGame() {
                   <div className="sq-bingo-5x5-grid">
                     {cardSquares.map(sq => {
                       const isHighlighted = highlightedSquareId === sq.id;
+                      const isWinSquare = winningIds.includes(sq.id);
                       return (
                         <button
                           key={sq.id}
-                          className={`sq-bingo-cell ${sq.isFree ? "free-star" : ""} ${sq.isStamped ? "stamped" : ""} ${isHighlighted ? "highlighted-pulse" : ""}`}
+                          className={`sq-bingo-cell ${sq.isFree ? "free-star" : ""} ${sq.isStamped ? "stamped" : ""} ${isHighlighted ? "highlighted-pulse" : ""} ${isWinSquare ? "winning-cell" : ""}`}
                           onClick={() => handleStampSquare(sq)}
                           disabled={sq.isStamped && !sq.isFree}
                           title={sq.isFree ? "Free Star" : sq.text}
@@ -1228,7 +1319,14 @@ export default function BingoNightGame() {
             <div className="sq-bingo-victory-modal">
               <div className="sq-victory-confetti" />
               <div className="sq-victory-trophy">🏆</div>
-              <h2 className="sq-victory-headline">B I N G O !</h2>
+              <h2 className="sq-victory-headline">
+                {mode === "line" ? "LINE BINGO!" : "B I N G O !"}
+              </h2>
+              {winLabel && (
+                <div className="sq-victory-line-badge">
+                  Winning Line: {winLabel}
+                </div>
+              )}
               <p className="sq-victory-sub">
                 {currentCaller.bingoQuote}
               </p>
@@ -1239,12 +1337,12 @@ export default function BingoNightGame() {
                   <span className="sq-vstat-lbl">Balls Called</span>
                 </div>
                 <div className="sq-vstat-box">
-                  <span className="sq-vstat-val">⭐ {stars}</span>
+                  <span className="sq-vstat-val">★ {stars}</span>
                   <span className="sq-vstat-lbl">Stars Earned</span>
                 </div>
                 <div className="sq-vstat-box">
-                  <span className="sq-vstat-val">+150</span>
-                  <span className="sq-vstat-lbl">XP Gained</span>
+                  <span className="sq-vstat-val">{demoMode ? "Demo" : "+150"}</span>
+                  <span className="sq-vstat-lbl">{demoMode ? "Sign in to save" : "XP Gained"}</span>
                 </div>
               </div>
 
@@ -1297,12 +1395,21 @@ export default function BingoNightGame() {
                   className="sq-explain-gotit-btn"
                   onClick={() => setExplainOpen(false)}
                 >
-                  Got it, let's keep playing!
+                  Got it, let&apos;s keep playing!
                 </button>
               </div>
             </div>
           </div>
         )}
+
+        <GoogleLoginModal
+          isOpen={demoLoginOpen}
+          onClose={() => setDemoLoginOpen(false)}
+          onSuccess={() => {
+            setDemoMode(false);
+            setDemoLoginOpen(false);
+          }}
+        />
       </div>
     </div>
   );

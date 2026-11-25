@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { getActiveDeck, getPlayerStats, type DeckInfo, type PlayerStats } from "./studyStore";
-import { getCurrentUser, logout, type UserProfile } from "./authStore";
+import { getCurrentUser, isDemoMode, exitDemoMode, type UserProfile } from "./authStore";
 import { signOutOAuth } from "./supabaseClient";
 import { recordCompletedFocusSession } from "./focusStore";
 import GoogleLoginModal from "./GoogleLoginModal";
@@ -20,6 +20,7 @@ export default function TopNav({ activeTab = "dashboard", onOpenReviewerModal }:
   const [deck, setDeck] = useState<DeckInfo>(getActiveDeck());
   const [stats, setStats] = useState<PlayerStats>(getPlayerStats());
   const [user, setUser] = useState<UserProfile | null>(getCurrentUser());
+  const [demoMode, setDemoMode] = useState<boolean>(isDemoMode());
 
   // Modals state
   const [isLoginModalOpen, setIsLoginModalOpen] = useState(false);
@@ -40,7 +41,10 @@ export default function TopNav({ activeTab = "dashboard", onOpenReviewerModal }:
   useEffect(() => {
     const handleDeckUpdate = () => setDeck(getActiveDeck());
     const handleStatsUpdate = () => setStats(getPlayerStats());
-    const handleAuthUpdate = () => setUser(getCurrentUser());
+    const handleAuthUpdate = () => {
+      setUser(getCurrentUser());
+      setDemoMode(isDemoMode());
+    };
 
     window.addEventListener("sq_deck_updated", handleDeckUpdate);
     window.addEventListener("sq_stats_updated", handleStatsUpdate);
@@ -243,7 +247,7 @@ export default function TopNav({ activeTab = "dashboard", onOpenReviewerModal }:
               <span>{stats.streak || 1}</span>
             </button>
 
-            {/* 4. GOOGLE ACCOUNT SYSTEM & SWITCHER */}
+              {/* 4. GOOGLE ACCOUNT SYSTEM & SWITCHER */}
             <div className="sq-user-menu-container">
               {user ? (
                 <>
@@ -280,7 +284,7 @@ export default function TopNav({ activeTab = "dashboard", onOpenReviewerModal }:
                           setIsProfileModalOpen(true);
                         }}
                       >
-                        👤 View Profile & Settings
+                        View Profile &amp; Settings
                       </button>
 
                       <button
@@ -291,7 +295,7 @@ export default function TopNav({ activeTab = "dashboard", onOpenReviewerModal }:
                           setIsSwitcherModalOpen(true);
                         }}
                       >
-                        🔄 Switch Account
+                        Switch Account
                       </button>
 
                       <button
@@ -302,7 +306,7 @@ export default function TopNav({ activeTab = "dashboard", onOpenReviewerModal }:
                           setIsLoginModalOpen(true);
                         }}
                       >
-                        ➕ Add Another Account
+                        Add Another Account
                       </button>
 
                       <button
@@ -319,25 +323,48 @@ export default function TopNav({ activeTab = "dashboard", onOpenReviewerModal }:
                   )}
                 </>
               ) : (
-                <button
-                  type="button"
-                  className="sq-signin-nav-btn"
-                  onClick={() => setIsLoginModalOpen(true)}
-                  title="Sign in with your Google Account"
-                >
-                  <svg width="14" height="14" viewBox="0 0 24 24" className="sq-nav-google-icon" aria-hidden="true">
-                    <path fill="#4285F4" d="M23.745 12.27c0-.7-.06-1.4-.19-2.07H12v4.51h6.6c-.29 1.52-1.14 2.82-2.4 3.68v3.05h3.88c2.27-2.09 3.66-5.17 3.66-9.17z"/>
-                    <path fill="#34A853" d="M12 24c3.24 0 5.95-1.08 7.93-2.91l-3.88-3.05c-1.08.72-2.45 1.16-4.05 1.16-3.12 0-5.77-2.1-6.72-4.93H1.25v3.15C3.26 21.36 7.33 24 12 24z"/>
-                    <path fill="#FBBC05" d="M5.28 14.27c-.25-.72-.38-1.49-.38-2.27s.13-1.55.38-2.27V6.58H1.25C.45 8.18 0 9.98 0 12s.45 3.82 1.25 5.42l4.03-3.15z"/>
-                    <path fill="#EA4335" d="M12 4.75c1.77 0 3.35.61 4.6 1.8l3.42-3.42C17.95 1.19 15.24 0 12 0 7.33 0 3.26 2.64 1.25 6.58l4.03 3.15c.95-2.83 3.6-4.98 6.72-4.98z"/>
-                  </svg>
-                  <span>Sign In</span>
-                </button>
+                <div className="sq-demo-nav-actions">
+                  {demoMode && <span className="sq-demo-badge-pill">Demo</span>}
+                  <button
+                    type="button"
+                    className="sq-signin-nav-btn"
+                    onClick={() => setIsLoginModalOpen(true)}
+                    title="Sign in with your Google Account"
+                  >
+                    <span>Sign In</span>
+                  </button>
+                </div>
               )}
             </div>
           </div>
         </div>
       </header>
+
+      {demoMode && !user && (
+        <div className="sq-demo-banner-strip" role="status">
+          <div className="sq-demo-banner-inner">
+            <span>
+              <strong>Demo Preview:</strong> Study Café (5 Qs), Line Bingo, and 2 topic/text previews are open. Sign in to unlock document uploads, Study Plans, Full Card Bingo, and saved XP.
+            </span>
+            <div className="sq-demo-banner-btns">
+              <button
+                type="button"
+                className="sq-demo-banner-cta"
+                onClick={() => setIsLoginModalOpen(true)}
+              >
+                Sign In to Unlock All
+              </button>
+              <button
+                type="button"
+                className="sq-demo-banner-exit"
+                onClick={() => exitDemoMode()}
+              >
+                Exit Demo
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
 
       {/* Mobile Bottom Navigation Bar (Fixed to viewport bottom on screens <= 768px) */}
       <nav className="sq-mobile-bottom-bar" aria-label="Mobile Navigation">

@@ -3,7 +3,6 @@ import CharacterLab from "./character/CharacterLab";
 import GamesPage from "./site/GamesPage";
 import GamePlayPage from "./site/GamePlayPage";
 import StudyCafeGame from "./site/StudyCafeGame";
-import AngryNerdsGame from "./site/AngryNerdsGame";
 import BingoNightGame from "./site/BingoNightGame";
 import DashboardPage from "./site/DashboardPage";
 import StudyPlanPage from "./site/StudyPlanPage";
@@ -102,7 +101,6 @@ export default function App() {
     if (pathname === "/explain") return <ExplainPage />;
     if (pathname === "/games/bingo-night") return <BingoNightGame />;
     if (pathname === "/games/study-cafe") return <StudyCafeGame />;
-    if (pathname === "/games/angry-nerds") return <AngryNerdsGame />;
     if (pathname === "/games") return <GamesPage />;
     if (pathname.startsWith("/games/")) return <GamesPage />;
     if (pathname === "/" || pathname === "") return <DashboardPage />;

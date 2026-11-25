@@ -1,33 +1,60 @@
-import React, { useState, useRef } from "react";
+import React, { useState, useRef, useEffect } from "react";
 import TopNav from "./TopNav";
-import { getActiveDeck, setActiveDeck, getAIConfig, DEFAULT_GROQ_KEY, type DeckInfo } from "./studyStore";
-import { extractTextFromFile, generateWithGroq } from "./aiService";
+import GoogleLoginModal from "./GoogleLoginModal";
+import { getActiveDeck, setActiveDeck, type DeckInfo } from "./studyStore";
+import {
+  isDemoMode,
+  getDemoUsage,
+  incrementDemoUsage,
+  DEMO_LIMITS
+} from "./authStore";
+import {
+  extractDocumentDetails,
+  explainContentWithAI,
+  type ExplainerResult,
+  type DocumentExtractionResult,
+  type QuestionAnalysis
+} from "./aiService";
 import "./explain.css";
-
-interface ExplainerResult {
-  topic: string;
-  summary: string;
-  keyPoints: { title: string; explanation: string; analogy?: string }[];
-  funFact: string;
-  questions: {
-    question: string;
-    options: string[];
-    correctIndex: number;
-    explanation: string;
-  }[];
-}
 
 export default function ExplainPage() {
   const [topicInput, setTopicInput] = useState("");
+  const [attachedFileName, setAttachedFileName] = useState<string | null>(null);
+  const [attachedDocText, setAttachedDocText] = useState<string>("");
+  const [attachedDocMeta, setAttachedDocMeta] = useState<DocumentExtractionResult | null>(null);
+  const [isReadingFile, setIsReadingFile] = useState(false);
+
   const [isGenerating, setIsGenerating] = useState(false);
+  const [isRefreshingQuiz, setIsRefreshingQuiz] = useState(false);
   const [generatingStatus, setGeneratingStatus] = useState("");
+  const [errorMsg, setErrorMsg] = useState<string | null>(null);
+  const [liveAnalysis, setLiveAnalysis] = useState<QuestionAnalysis | null>(null);
+  const [blockedAnalysis, setBlockedAnalysis] = useState<QuestionAnalysis | null>(null);
   const [result, setResult] = useState<ExplainerResult | null>(null);
   const [selectedAnswers, setSelectedAnswers] = useState<{ [key: number]: number }>({});
-  const [attachedFileName, setAttachedFileName] = useState<string | null>(null);
-  const [activeDeck, setActiveDeckState] = useState<DeckInfo>(getActiveDeck());
+  const [askedQuestionsHistory, setAskedQuestionsHistory] = useState<string[]>([]);
+  const [quizSeed, setQuizSeed] = useState(1);
 
+  const [activeDeck, setActiveDeckState] = useState<DeckInfo>(getActiveDeck());
+  const [demoMode, setDemoMode] = useState<boolean>(isDemoMode());
+  const [demoUsage, setDemoUsage] = useState(getDemoUsage());
+  const [loginModalOpen, setLoginModalOpen] = useState(false);
 
   const fileInputRef = useRef<HTMLInputElement>(null);
+
+  useEffect(() => {
+    const syncAuth = () => {
+      setDemoMode(isDemoMode());
+      setDemoUsage(getDemoUsage());
+    };
+    const syncDemo = () => setDemoUsage(getDemoUsage());
+    window.addEventListener("sq_auth_changed", syncAuth);
+    window.addEventListener("sq_demo_updated", syncDemo);
+    return () => {
+      window.removeEventListener("sq_auth_changed", syncAuth);
+      window.removeEventListener("sq_demo_updated", syncDemo);
+    };
+  }, []);
 
   const SUGGESTED_TOPICS = [
     "What is osmosis?",
@@ -39,184 +66,171 @@ export default function ExplainPage() {
   ];
 
   const handleSelectSuggested = (t: string) => {
+    setAttachedFileName(null);
+    setAttachedDocText("");
+    setAttachedDocMeta(null);
     setTopicInput(t);
-    handleExplain(t);
+    handleExplain(t, "");
+  };
+
+  const handleUseSuggestedQuestion = (q: string) => {
+    setTopicInput(q);
+    handleExplain(q, attachedDocText);
   };
 
   const handleAttachFile = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (!file) return;
+    setErrorMsg(null);
     setAttachedFileName(file.name);
+    setIsReadingFile(true);
     try {
-      const extracted = await extractTextFromFile(file);
-      if (extracted) {
-        setTopicInput(
-          (prev) => (prev ? prev + "\n\n" : "") + `Notes from ${file.name}:\n` + extracted.slice(0, 4000)
-        );
+      const details = await extractDocumentDetails(file);
+      setAttachedDocMeta(details);
+      setAttachedDocText(details.text);
+      if (details.warning && details.charCount < 20) {
+        setErrorMsg(details.warning);
+      } else if (!topicInput.trim()) {
+        setTopicInput(`Explain the key concepts and mechanisms inside ${file.name}`);
       }
-    } catch (err) {
-      console.warn("Could not read attached file:", err);
+    } catch {
+      setErrorMsg(`Could not read "${file.name}".`);
+    } finally {
+      setIsReadingFile(false);
     }
   };
 
+  const handleClearFile = () => {
+    setAttachedFileName(null);
+    setAttachedDocText("");
+    setAttachedDocMeta(null);
+    setErrorMsg(null);
+    if (fileInputRef.current) fileInputRef.current.value = "";
+  };
+
   const handleFromLibrary = () => {
-    if (activeDeck && activeDeck.title) {
+    if (demoMode) {
+      setLoginModalOpen(true);
+      return;
+    }
+    if (activeDeck && activeDeck.questions.length > 0) {
+      const deckContent =
+        activeDeck.contentPreview ||
+        activeDeck.questions.map((q) => `${q.question} Answer: ${q.options[q.correctIndex]}. ${q.explanation || ""}`).join("\n");
+      setAttachedFileName(activeDeck.title);
+      setAttachedDocText(deckContent);
+      setAttachedDocMeta({ text: deckContent, charCount: deckContent.length, format: "DECK" });
       setTopicInput(`Explain the core principles of: ${activeDeck.title}`);
     } else {
       setTopicInput("Explain how cellular respiration produces ATP");
     }
   };
 
-  const handleExplain = async (targetTopic?: string) => {
-    const textToExplain = (targetTopic || topicInput).trim();
-    if (!textToExplain) {
-      alert("Please enter a question or topic to explain!");
+  const handleExplain = async (overrideTopic?: string, overrideDocText?: string, forceExplain: boolean = false) => {
+    setErrorMsg(null);
+    setBlockedAnalysis(null);
+    setLiveAnalysis(null);
+
+    if (demoMode && demoUsage.explainsRun >= DEMO_LIMITS.maxExplains) {
+      setLoginModalOpen(true);
+      return;
+    }
+
+    const docBody = overrideDocText !== undefined ? overrideDocText : attachedDocText;
+    const query = (overrideTopic !== undefined ? overrideTopic : topicInput).trim();
+
+    if (!query && !docBody.trim()) {
+      setErrorMsg("Enter a question, topic, or attach a readable document to explain.");
+      return;
+    }
+
+    if (attachedFileName && docBody.trim().length < 20 && overrideDocText === undefined) {
+      setErrorMsg(
+        attachedDocMeta?.warning ||
+          `No readable text was found inside "${attachedFileName}". Paste your notes or upload a text-based PDF/DOCX/PPTX.`
+      );
       return;
     }
 
     setIsGenerating(true);
-    setGeneratingStatus("Groq AI: Connecting to ultra-fast model (openai/gpt-oss-120b)...");
+    setGeneratingStatus("Thinking & analyzing if your question is helpful...");
     setSelectedAnswers({});
 
-    const aiConfig = getAIConfig();
-    const groqKey = aiConfig.groqKey || DEFAULT_GROQ_KEY;
-
     try {
-      setGeneratingStatus("Groq AI: Generating deep-dive explanation and analogies...");
-
-      const prompt = `You are a world-class science and education explainer (like 3Blue1Brown, Kurzgesagt, or Khan Academy).
-A student asked: "${textToExplain}"
-
-Explain this concept thoroughly, engagingly, and clearly.
-Return ONLY a valid JSON object matching this schema:
-{
-  "topic": "${textToExplain.slice(0, 60)}",
-  "summary": "A 2-3 sentence crystal clear overview answering the question directly.",
-  "keyPoints": [
-    {
-      "title": "Step 1: The Core Mechanism / Background",
-      "explanation": "Clear explanation in plain English."
-    },
-    {
-      "title": "Step 2: How It Actually Works",
-      "explanation": "Deeper step-by-step breakdown."
-    },
-    {
-      "title": "Step 3: Real-World Analogy",
-      "explanation": "A vivid relatable real-world comparison that makes it unforgettable.",
-      "analogy": "The analogy in one vivid sentence."
-    }
-  ],
-  "funFact": "An interesting surprising fact related to this topic.",
-  "questions": [
-    {
-      "question": "Question 1 testing core understanding?",
-      "options": ["Correct Option", "Misconception B", "Plausible C", "Opposite D"],
-      "correctIndex": 0,
-      "explanation": "Why this answer is correct."
-    },
-    {
-      "question": "Question 2 testing practical application?",
-      "options": ["Misconception A", "Correct Option", "Distractor C", "Distractor D"],
-      "correctIndex": 1,
-      "explanation": "Why this answer is correct."
-    },
-    {
-      "question": "Question 3 testing key term or cause?",
-      "options": ["Distractor A", "Distractor B", "Correct Option", "Distractor D"],
-      "correctIndex": 2,
-      "explanation": "Why this answer is correct."
-    }
-  ]
-}`;
-
-      const response = await fetch("https://api.groq.com/openai/v1/chat/completions", {
-        method: "POST",
-        headers: {
-          Authorization: `Bearer ${groqKey.trim()}`,
-          "Content-Type": "application/json"
-        },
-        body: JSON.stringify({
-          model: "openai/gpt-oss-120b",
-          response_format: { type: "json_object" },
-          temperature: 0.3,
-          messages: [
-            {
-              role: "system",
-              content: "You are an educational assistant that strictly outputs valid JSON explanations."
-            },
-            {
-              role: "user",
-              content: prompt
-            }
-          ]
-        })
+      const parsed = await explainContentWithAI(query, docBody, {
+        fileName: attachedFileName || undefined,
+        seed: quizSeed,
+        forceExplain,
+        onProgress: (stage) => setGeneratingStatus(stage),
+        onAnalysis: (analysis) => setLiveAnalysis(analysis)
       });
 
-      if (response.ok) {
-        const data = await response.json();
-        const raw = data.choices?.[0]?.message?.content;
-        if (raw) {
-          const parsed: ExplainerResult = JSON.parse(raw);
-          setResult(parsed);
+      if (parsed.blockedByAnalysis && parsed.analysis) {
+        setBlockedAnalysis(parsed.analysis);
+        setResult(null);
+        return;
+      }
 
-          // Also save as an active deck for games!
-          if (parsed.questions && parsed.questions.length > 0) {
-            const newDeck: DeckInfo = {
-              id: "deck-" + Date.now(),
-              title: `${parsed.topic} Explained`,
-              sourceType: "topic",
-              contentPreview: parsed.summary,
-              createdAt: new Date().toISOString(),
-              questionCount: parsed.questions.length,
-              questions: parsed.questions.map((q, i) => ({
-                id: 2000 + i,
-                subject: "general",
-                question: q.question,
-                options: q.options,
-                correctIndex: q.correctIndex,
-                explanation: q.explanation
-              }))
-            };
-            setActiveDeck(newDeck);
-            setActiveDeckState(newDeck);
-          }
-        }
-      } else {
-        // Fallback with groq generator
-        const deck = await generateWithGroq(textToExplain, "topic", 5, groqKey);
-        setResult({
-          topic: textToExplain,
-          summary: `Here is a structured explanation of ${textToExplain}. Key principles and concepts have been broken down below.`,
-          keyPoints: [
-            {
-              title: "1. Core Definition",
-              explanation: `${textToExplain} involves fundamental mechanisms governed by established scientific and logical laws.`
-            },
-            {
-              title: "2. Working Process",
-              explanation: "Each component interacts systematically to produce the observed phenomena."
-            },
-            {
-              title: "3. Everyday Analogy",
-              explanation: "Think of it like a coordinated factory line where each station performs one crucial task to ensure the final output succeeds.",
-              analogy: "Like a precision mechanical clock where each gear drives the next."
-            }
-          ],
-          funFact: `Did you know? Studying ${textToExplain} using active recall games boosts 7-day retention by up to 250%!`,
-          questions: deck.questions.slice(0, 3).map((q) => ({
+      setResult(parsed);
+      setAskedQuestionsHistory(parsed.questions.map((q) => q.question));
+
+      if (demoMode) {
+        setDemoUsage(incrementDemoUsage("explainsRun"));
+      }
+
+      if (parsed.questions && parsed.questions.length > 0) {
+        const newDeck: DeckInfo = {
+          id: "deck-" + Date.now(),
+          title: `${parsed.topic} Explained`,
+          sourceType: docBody.trim().length >= 30 ? "file" : "topic",
+          fileName: attachedFileName || undefined,
+          contentPreview: docBody.trim().length >= 30 ? docBody.slice(0, 6000) : parsed.summary,
+          createdAt: Date.now(),
+          questionCount: parsed.questions.length,
+          questions: parsed.questions.map((q, i) => ({
+            id: 2000 + i,
+            subject: "general",
             question: q.question,
             options: q.options,
             correctIndex: q.correctIndex,
             explanation: q.explanation
           }))
-        });
+        };
+        setActiveDeck(newDeck);
+        setActiveDeckState(newDeck);
       }
-    } catch (err) {
-      console.warn("Groq explanation error:", err);
+    } catch (err: any) {
+      setErrorMsg(err?.message || "Could not generate an explanation. Please try again.");
     } finally {
       setIsGenerating(false);
       setGeneratingStatus("");
+    }
+  };
+
+  const handleRegenerateQuestions = async () => {
+    if (!result) return;
+    setIsRefreshingQuiz(true);
+    const nextSeed = quizSeed + 1;
+    setQuizSeed(nextSeed);
+    setSelectedAnswers({});
+
+    try {
+      const docBody = attachedDocText.trim().length >= 30
+        ? attachedDocText
+        : `${result.topic}. ${result.summary} ${result.keyPoints.map((k) => `${k.title}: ${k.explanation}`).join(" ")}`;
+      const refreshed = await explainContentWithAI(topicInput || result.topic, docBody, {
+        fileName: attachedFileName || undefined,
+        seed: nextSeed,
+        excludeQuestions: askedQuestionsHistory,
+        skipQuestionCheck: true
+      });
+
+      if (refreshed.questions && refreshed.questions.length > 0) {
+        setResult((prev) => (prev ? { ...prev, questions: refreshed.questions } : refreshed));
+        setAskedQuestionsHistory((prev) => [...prev, ...refreshed.questions.map((q) => q.question)].slice(-30));
+      }
+    } finally {
+      setIsRefreshingQuiz(false);
     }
   };
 
@@ -227,22 +241,22 @@ Return ONLY a valid JSON object matching this schema:
     }));
   };
 
+  const demoLeft = Math.max(0, DEMO_LIMITS.maxExplains - demoUsage.explainsRun);
+
   return (
     <div className="sq-explain-body">
-      {/* Hidden file input for Attach */}
       <input
         ref={fileInputRef}
         type="file"
         style={{ display: "none" }}
-        accept="*/*"
+        accept=".txt,.md,.pdf,.docx,.doc,.pptx,.ppt,.xlsx,.xls,.odt,.rtf,.csv,.json,.html"
         onChange={handleAttachFile}
       />
 
-      {/* TopNav */}
       <TopNav activeTab="explain" />
 
       <main className="sq-ex-main">
-        {/* Top Badge matching Photo 3 */}
+        {/* Top Badge */}
         <div className="sq-ex-badge-row">
           <div className="sq-ex-badge-pill">
             <span>New: EduQuest Explain</span>
@@ -250,22 +264,43 @@ Return ONLY a valid JSON object matching this schema:
           </div>
         </div>
 
-        {/* Main Headline matching Photo 3 */}
+        {/* Main Headline */}
         <h1 className="sq-ex-title">
           Understand <span className="sq-ex-title-gradient">anything</span>
         </h1>
-
-        {/* Subtitle matching Photo 3 */}
         <p className="sq-ex-sub">
-          Ask a question or add your notes. Get a short video that explains it, then a quiz to check you got it.
+          Ask a question or attach a full document (PDF, Word, PowerPoint, Excel, or text). EduQuest
+          reads inside the document and builds a breakdown with non-repeating check questions.
         </p>
 
-        {/* Main Explainer Input Box matching Photo 3 */}
+        {/* Main Explainer Input Box */}
         <div className="sq-ex-input-box">
+          {attachedFileName && (
+            <div className={`sq-ex-file-chip ${attachedDocMeta && attachedDocMeta.charCount < 20 ? "warn" : ""}`}>
+              <span>
+                {isReadingFile
+                  ? `Reading ${attachedFileName}...`
+                  : attachedDocMeta && attachedDocMeta.charCount >= 20
+                  ? `${attachedFileName} · ${attachedDocMeta.charCount.toLocaleString()} chars read${
+                      attachedDocMeta.pageCount ? ` (${attachedDocMeta.pageCount} pages)` : ""
+                    }`
+                  : `${attachedFileName} · unreadable`}
+              </span>
+              <button
+                type="button"
+                className="sq-ex-file-remove"
+                onClick={handleClearFile}
+                aria-label="Remove attached document"
+              >
+                ×
+              </button>
+            </div>
+          )}
+
           <textarea
             className="sq-ex-textarea"
             rows={3}
-            placeholder="Explain how the heart pumps blood"
+            placeholder="Ask a question or summarize what you want explained from your attached file..."
             value={topicInput}
             onChange={(e) => setTopicInput(e.target.value)}
             onKeyDown={(e) => {
@@ -277,23 +312,28 @@ Return ONLY a valid JSON object matching this schema:
           />
 
           <div className="sq-ex-box-bottom">
-            {/* Left Tools: Attach & From library */}
             <div className="sq-ex-box-tools">
               <button
                 type="button"
-                className="sq-ex-tool-btn"
-                onClick={() => fileInputRef.current?.click()}
-                title="Attach any document or study notes"
+                className={`sq-ex-tool-btn ${demoMode ? "locked" : ""}`}
+                onClick={() => {
+                  if (demoMode) {
+                    setLoginModalOpen(true);
+                  } else {
+                    fileInputRef.current?.click();
+                  }
+                }}
+                title={demoMode ? "Sign in to upload documents" : "Attach PDF, DOCX, PPTX, XLSX, or TXT"}
               >
                 <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2">
                   <path d="M21.44 11.05l-9.19 9.19a6 6 0 0 1-8.49-8.49l9.19-9.19a4 4 0 0 1 5.66 5.66l-9.2 9.19a2 2 0 0 1-2.83-2.83l8.49-8.48" />
                 </svg>
-                <span>{attachedFileName ? `📎 ${attachedFileName}` : "Attach"}</span>
+                <span>{demoMode ? "Attach Doc (Sign in)" : attachedFileName ? "Replace Doc" : "Attach Doc"}</span>
               </button>
 
               <button
                 type="button"
-                className="sq-ex-tool-btn"
+                className={`sq-ex-tool-btn ${demoMode ? "locked" : ""}`}
                 onClick={handleFromLibrary}
                 title="Use material from your active deck"
               >
@@ -301,47 +341,45 @@ Return ONLY a valid JSON object matching this schema:
                   <path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20" />
                   <path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z" />
                 </svg>
-                <span>From my library</span>
+                <span>{demoMode ? "Library (Sign in)" : "From library"}</span>
               </button>
             </div>
 
-            {/* Right Action: Explain Button */}
             <button
               type="button"
               className="sq-ex-submit-btn"
               onClick={() => handleExplain()}
-              disabled={isGenerating}
+              disabled={isGenerating || isReadingFile}
             >
-              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
-                <circle cx="12" cy="12" r="10" />
-                <polygon points="10 8 16 12 10 16 10 8" fill="currentColor" />
-              </svg>
-              <span>{isGenerating ? "Explaining..." : "Explain"}</span>
+              <span>
+                {isGenerating
+                  ? "Explaining..."
+                  : demoMode && demoLeft === 0
+                  ? "Sign In for More"
+                  : "Explain"}
+              </span>
             </button>
           </div>
         </div>
 
-        {/* Free usage pill centered under box */}
         <div className="sq-ex-free-indicator">
-          <span>Free AI Explainer · Powered by Groq AI</span>
+          <span>
+            {demoMode
+              ? `Demo Preview: ${demoLeft} of ${DEMO_LIMITS.maxExplains} explanations remaining`
+              : "Reads PDF, DOCX, PPTX, XLSX, and notes directly"}
+          </span>
         </div>
 
-        {/* Suggested Prompt Pills matching Photo 3 */}
+        {errorMsg && (
+          <div className="sq-ex-error-banner" role="alert">
+            {errorMsg}
+          </div>
+        )}
+
+        {/* Suggested Prompt Pills */}
         <div className="sq-ex-prompts-container">
           <div className="sq-ex-prompts-row">
-            {SUGGESTED_TOPICS.slice(0, 4).map((topic, i) => (
-              <button
-                key={i}
-                type="button"
-                className="sq-ex-pill-btn"
-                onClick={() => handleSelectSuggested(topic)}
-              >
-                {topic}
-              </button>
-            ))}
-          </div>
-          <div className="sq-ex-prompts-row">
-            {SUGGESTED_TOPICS.slice(4).map((topic, i) => (
+            {SUGGESTED_TOPICS.map((topic, i) => (
               <button
                 key={i}
                 type="button"
@@ -356,26 +394,151 @@ Return ONLY a valid JSON object matching this schema:
 
         {/* Generating Indicator */}
         {isGenerating && (
-          <div className="sq-ex-generating-card">
-            <div className="sq-ex-gen-spinner" />
-            <h3>Generating Interactive Explanation...</h3>
-            <p>⚡ High-speed Groq AI (openai/gpt-oss-120b) is analyzing your concept.</p>
-            <small>{generatingStatus}</small>
+          <div className="sq-ex-generating-card" role="status" aria-live="polite">
+            <div className="sq-ex-loader" aria-hidden="true">
+              <div className="sq-ex-loader-halo" />
+              <svg className="sq-ex-loader-svg" viewBox="0 0 56 56" fill="none">
+                <circle
+                  className="sq-ex-loader-track"
+                  cx="28"
+                  cy="28"
+                  r="22"
+                  strokeWidth="3"
+                />
+                <circle
+                  className="sq-ex-loader-arc"
+                  cx="28"
+                  cy="28"
+                  r="22"
+                  strokeWidth="3"
+                  strokeLinecap="round"
+                />
+              </svg>
+              <div className="sq-ex-loader-core" />
+            </div>
+
+            <h3>{liveAnalysis ? "Building your explanation & quiz..." : "Thinking about your question..."}</h3>
+            <small className="sq-ex-gen-status">{generatingStatus}</small>
+
+            <div className="sq-ex-stage-track" aria-hidden="true">
+              <div className={`sq-ex-stage-step ${liveAnalysis ? "done" : "active"}`}>
+                <span className="sq-ex-stage-dot" />
+                <span>1. Analyze question</span>
+              </div>
+              <div className="sq-ex-stage-connector" />
+              <div className={`sq-ex-stage-step ${liveAnalysis ? "active" : ""}`}>
+                <span className="sq-ex-stage-dot" />
+                <span>2. Generate quiz</span>
+              </div>
+            </div>
+
+            <div className="sq-ex-shimmer-rail" aria-hidden="true">
+              <div className="sq-ex-shimmer-bar" />
+            </div>
+
+            {liveAnalysis && (
+              <div className={`sq-ex-live-thinking verdict-${liveAnalysis.verdict}`}>
+                <div className="sq-ex-analysis-meta">
+                  <span className={`sq-ex-verdict-pill verdict-${liveAnalysis.verdict}`}>
+                    {liveAnalysis.verdict === "helpful"
+                      ? `Helpful Question · ${liveAnalysis.helpfulnessScore}/10`
+                      : liveAnalysis.verdict === "needs_clarity"
+                      ? `Clarified Focus · ${liveAnalysis.helpfulnessScore}/10`
+                      : `Needs Improvement · ${liveAnalysis.helpfulnessScore}/10`}
+                  </span>
+                </div>
+                <p>{liveAnalysis.thinking}</p>
+              </div>
+            )}
           </div>
         )}
 
-        {/* Result Card: Video/Step presentation & Quiz */}
+        {/* Question Needs Refinement Card (paused before generating questions) */}
+        {blockedAnalysis && !isGenerating && (
+          <div className="sq-ex-card sq-ex-analysis-gate-card" role="region" aria-label="Question analysis">
+            <div className="sq-ex-analysis-meta">
+              <span className="sq-ex-verdict-pill verdict-not_helpful">
+                Question Check · {blockedAnalysis.helpfulnessScore}/10
+              </span>
+              <span className="sq-ex-analysis-label">Analyzed before generating questions</span>
+            </div>
+            <h3>Let&apos;s make this question more helpful first</h3>
+            <p className="sq-ex-analysis-thinking">{blockedAnalysis.thinking}</p>
+
+            {blockedAnalysis.refinedQuestion && (
+              <div className="sq-ex-refined-box">
+                <span className="sq-ex-refined-label">Suggested stronger question:</span>
+                <button
+                  type="button"
+                  className="sq-ex-refined-btn"
+                  onClick={() => handleUseSuggestedQuestion(blockedAnalysis.refinedQuestion!)}
+                >
+                  Use &amp; Explain: &ldquo;{blockedAnalysis.refinedQuestion}&rdquo; →
+                </button>
+              </div>
+            )}
+
+            {blockedAnalysis.suggestions && blockedAnalysis.suggestions.length > 0 && (
+              <div className="sq-ex-alt-suggestions">
+                <span className="sq-ex-refined-label">Or try one of these helpful study questions:</span>
+                <div className="sq-ex-alt-pills">
+                  {blockedAnalysis.suggestions.map((s, idx) => (
+                    <button
+                      key={idx}
+                      type="button"
+                      className="sq-ex-pill-btn"
+                      onClick={() => handleUseSuggestedQuestion(s)}
+                    >
+                      {s}
+                    </button>
+                  ))}
+                </div>
+              </div>
+            )}
+
+            <div className="sq-ex-gate-actions">
+              <button
+                type="button"
+                className="sq-ex-force-btn"
+                onClick={() => handleExplain(undefined, undefined, true)}
+              >
+                Generate Questions Anyway
+              </button>
+            </div>
+          </div>
+        )}
+
+        {/* Result Card */}
         {result && !isGenerating && (
           <div className="sq-ex-result-section">
-            {/* Explainer Presentation Card */}
             <div className="sq-ex-card sq-ex-player-card">
+              {result.analysis && (
+                <div className={`sq-ex-analysis-banner verdict-${result.analysis.verdict}`}>
+                  <div className="sq-ex-analysis-meta">
+                    <span className={`sq-ex-verdict-pill verdict-${result.analysis.verdict}`}>
+                      {result.analysis.verdict === "helpful"
+                        ? `Question Check: Helpful · ${result.analysis.helpfulnessScore}/10`
+                        : result.analysis.verdict === "needs_clarity"
+                        ? `Question Check: Clarified · ${result.analysis.helpfulnessScore}/10`
+                        : `Question Check: Forced · ${result.analysis.helpfulnessScore}/10`}
+                    </span>
+                    <span className="sq-ex-analysis-label">AI Pre-Generation Thinking</span>
+                  </div>
+                  <p className="sq-ex-analysis-thinking">{result.analysis.thinking}</p>
+                  {result.analysis.refinedQuestion && result.analysis.verdict !== "helpful" && (
+                    <p className="sq-ex-analysis-focus">
+                      <strong>Focused angle:</strong> {result.analysis.refinedQuestion}
+                    </p>
+                  )}
+                </div>
+              )}
+
               <div className="sq-ex-player-head">
-                <span className="sq-ex-player-tag">🎬 AI Video Explainer</span>
+                <span className="sq-ex-player-tag">Document &amp; Concept Breakdown</span>
                 <h2>{result.topic}</h2>
                 <p className="sq-ex-summary-text">{result.summary}</p>
               </div>
 
-              {/* Step by step cards */}
               <div className="sq-ex-steps-grid">
                 {result.keyPoints.map((pt, idx) => (
                   <div key={idx} className="sq-ex-step-item">
@@ -385,7 +548,7 @@ Return ONLY a valid JSON object matching this schema:
                       <p>{pt.explanation}</p>
                       {pt.analogy && (
                         <div className="sq-ex-analogy-box">
-                          💡 <strong>Analogy:</strong> {pt.analogy}
+                          <strong>Key Takeaway:</strong> {pt.analogy}
                         </div>
                       )}
                     </div>
@@ -395,16 +558,28 @@ Return ONLY a valid JSON object matching this schema:
 
               {result.funFact && (
                 <div className="sq-ex-fun-fact">
-                  <span>✨ <strong>Fun Fact:</strong> {result.funFact}</span>
+                  <span>
+                    <strong>Highlight:</strong> {result.funFact}
+                  </span>
                 </div>
               )}
             </div>
 
-            {/* Quick Check Quiz */}
+            {/* Quick Check Quiz with Non-Repeating Regenerator */}
             <div className="sq-ex-card sq-ex-quiz-card">
               <div className="sq-ex-quiz-head">
-                <span className="sq-ex-quiz-badge">🎯 Quick Check Quiz</span>
-                <h3>Test what you just learned:</h3>
+                <div>
+                  <span className="sq-ex-quiz-badge">Quick Check Quiz</span>
+                  <h3>Test what you just read</h3>
+                </div>
+                <button
+                  type="button"
+                  className="sq-ex-regen-quiz-btn"
+                  onClick={handleRegenerateQuestions}
+                  disabled={isRefreshingQuiz}
+                >
+                  {isRefreshingQuiz ? "Generating..." : "↻ Generate New Questions"}
+                </button>
               </div>
 
               <div className="sq-ex-questions-list">
@@ -413,7 +588,7 @@ Return ONLY a valid JSON object matching this schema:
                   const hasAnswered = typeof userChoice === "number";
 
                   return (
-                    <div key={qIdx} className="sq-ex-q-item">
+                    <div key={`${quizSeed}-${qIdx}`} className="sq-ex-q-item">
                       <p className="sq-ex-q-text">
                         <strong>Q{qIdx + 1}:</strong> {q.question}
                       </p>
@@ -439,9 +614,7 @@ Return ONLY a valid JSON object matching this schema:
                               onClick={() => !hasAnswered && handleSelectOption(qIdx, optIdx)}
                               disabled={hasAnswered}
                             >
-                              <span className="sq-ex-opt-letter">
-                                {["A", "B", "C", "D"][optIdx]}
-                              </span>
+                              <span className="sq-ex-opt-letter">{["A", "B", "C", "D"][optIdx]}</span>
                               <span>{opt}</span>
                             </button>
                           );
@@ -449,13 +622,9 @@ Return ONLY a valid JSON object matching this schema:
                       </div>
 
                       {hasAnswered && (
-                        <div
-                          className={`sq-ex-ans-feedback ${
-                            userChoice === q.correctIndex ? "success" : "retry"
-                          }`}
-                        >
+                        <div className={`sq-ex-ans-feedback ${userChoice === q.correctIndex ? "success" : "retry"}`}>
                           <span>
-                            {userChoice === q.correctIndex ? "✓ Correct! " : "✕ Incorrect. "}
+                            {userChoice === q.correctIndex ? "✓ Correct — " : "✕ Incorrect — "}
                             {q.explanation}
                           </span>
                         </div>
@@ -465,49 +634,43 @@ Return ONLY a valid JSON object matching this schema:
                 })}
               </div>
 
-              {/* Action Buttons to Play in Games */}
               <div className="sq-ex-quiz-actions">
                 <a href="/games/study-cafe" className="sq-ex-play-btn sq-btn-cafe">
-                  ☕ Play In Study Café →
+                  Play in Study Café →
                 </a>
-                <a href="/games/angry-nerds" className="sq-ex-play-btn sq-btn-nerds">
-                  🎯 Play In Angry Nerds →
+                <a href="/games/bingo-night" className="sq-ex-play-btn sq-btn-bingo">
+                  Play in Bingo Night →
                 </a>
               </div>
             </div>
           </div>
         )}
 
-        {/* How It Works Section matching Photo 3 */}
+        {/* How It Works */}
         <section className="sq-ex-how-it-works">
           <div className="sq-ex-divider">
             <span>How it works</span>
           </div>
 
           <div className="sq-ex-features-grid">
-            {/* Card 1 */}
             <div className="sq-ex-feature-card">
               <div className="sq-ex-feat-icon sq-feat-purple">
                 <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
                   <path d="M12 2v4M12 18v4M4.93 4.93l2.83 2.83M16.24 16.24l2.83 2.83M2 12h4M18 12h4M4.93 19.07l2.83-2.83M16.24 7.76l2.83-2.83" />
                 </svg>
               </div>
-              <h4>Ask or attach notes</h4>
-              <p>Type any difficult concept or attach notes from your classes or textbook.</p>
+              <h4>1. Reads inside documents</h4>
+              <p>Parses actual pages, slides, and paragraphs from PDF, DOCX, PPTX, XLSX, and plain text.</p>
             </div>
-
-            {/* Card 2 */}
             <div className="sq-ex-feature-card">
               <div className="sq-ex-feat-icon sq-feat-cyan">
                 <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
                   <polygon points="5 3 19 12 5 21 5 3" fill="currentColor" />
                 </svg>
               </div>
-              <h4>AI Video Explainer</h4>
-              <p>Groq AI generates a step-by-step breakdown with crystal-clear visual analogies.</p>
+              <h4>2. Structured explanation</h4>
+              <p>Breaks complex sections into clear steps, plain-English summaries, and key takeaways.</p>
             </div>
-
-            {/* Card 3 */}
             <div className="sq-ex-feature-card">
               <div className="sq-ex-feat-icon sq-feat-green">
                 <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
@@ -515,12 +678,18 @@ Return ONLY a valid JSON object matching this schema:
                   <path d="m9 12 2 2 4-4" />
                 </svg>
               </div>
-              <h4>Instant retention quiz</h4>
-              <p>Reinforce your understanding immediately with interactive practice and games.</p>
+              <h4>3. Fresh retention quiz</h4>
+              <p>Generates new non-repeating questions on demand and sends them straight to your games.</p>
             </div>
           </div>
         </section>
       </main>
+
+      <GoogleLoginModal
+        isOpen={loginModalOpen}
+        onClose={() => setLoginModalOpen(false)}
+        onSuccess={() => setLoginModalOpen(false)}
+      />
     </div>
   );
 }

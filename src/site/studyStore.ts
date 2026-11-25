@@ -1,18 +1,20 @@
 import { type Question } from "./quizData";
-import { getCurrentUser } from "./authStore";
+import { getCurrentUser, isDemoMode } from "./authStore";
 
 export interface DeckInfo {
   id: string;
   title: string;
   sourceType: "file" | "text" | "topic" | "sample";
   fileName?: string;
+  contentPreview?: string;
   questionCount: number;
-  createdAt: number;
+  createdAt: number | string;
   questions: Question[];
 }
 
 export interface AIProviderConfig {
-  provider: "groq" | "builtin" | "gemini" | "openai";
+  provider: "nvidia" | "groq" | "builtin" | "gemini" | "openai";
+  nvidiaKey: string;
   groqKey: string;
   geminiKey: string;
   openaiKey: string;
@@ -124,9 +126,11 @@ export function getActiveDeck(): DeckInfo {
 export function setActiveDeck(deck: DeckInfo): void {
   try {
     localStorage.setItem(getUserKey("active_deck"), JSON.stringify(deck));
-    const saved = getSavedDecks().filter((d) => d.id !== deck.id);
-    saved.unshift(deck);
-    localStorage.setItem(getUserKey("saved_decks"), JSON.stringify(saved.slice(0, 10)));
+    if (!isDemoMode()) {
+      const saved = getSavedDecks().filter((d) => d.id !== deck.id);
+      saved.unshift(deck);
+      localStorage.setItem(getUserKey("saved_decks"), JSON.stringify(saved.slice(0, 10)));
+    }
     window.dispatchEvent(new Event("sq_deck_updated"));
   } catch (e) {
     console.error("Failed to save active deck", e);
@@ -134,12 +138,16 @@ export function setActiveDeck(deck: DeckInfo): void {
 }
 
 export function getSavedDecks(): DeckInfo[] {
+  if (isDemoMode()) return [];
   try {
     const raw = localStorage.getItem(getUserKey("saved_decks"));
     if (raw) return JSON.parse(raw);
   } catch (e) {}
   return [];
 }
+
+export const DEFAULT_NVIDIA_KEY =
+  (typeof import.meta !== "undefined" && import.meta.env?.VITE_NVIDIA_API_KEY) || "";
 
 export const DEFAULT_GROQ_KEY =
   (typeof import.meta !== "undefined" && import.meta.env?.VITE_GROQ_API_KEY) || "";
@@ -149,19 +157,30 @@ export function getAIConfig(): AIProviderConfig {
     const raw = localStorage.getItem(getUserKey("ai_config"));
     if (raw) {
       const parsed = JSON.parse(raw);
+      const isLegacyConfig = typeof parsed.nvidiaKey === "undefined";
+      if (!parsed.nvidiaKey) {
+        parsed.nvidiaKey = DEFAULT_NVIDIA_KEY;
+      }
       if (!parsed.groqKey) {
         parsed.groqKey = DEFAULT_GROQ_KEY;
-        parsed.provider = "groq";
+      }
+      // Migrate pre-NVIDIA saved configs so NVIDIA becomes the main provider
+      if (isLegacyConfig && (!parsed.provider || parsed.provider === "groq")) {
+        parsed.provider = DEFAULT_NVIDIA_KEY ? "nvidia" : "groq";
+      }
+      if (!parsed.provider) {
+        parsed.provider = DEFAULT_NVIDIA_KEY ? "nvidia" : "groq";
       }
       return parsed;
     }
   } catch (e) {}
   return {
-    provider: "groq",
+    provider: DEFAULT_NVIDIA_KEY ? "nvidia" : "groq",
+    nvidiaKey: DEFAULT_NVIDIA_KEY,
     groqKey: DEFAULT_GROQ_KEY,
     geminiKey: "",
     openaiKey: "",
-    model: "openai/gpt-oss-120b"
+    model: "nvidia/nemotron-3.5-lightning-30b-a3b"
   };
 }
 
@@ -229,7 +248,7 @@ function savePlayerStats(stats: PlayerStats): void {
  * Add experience points (XP) to the current user with automatic Level-Up calculation!
  */
 export function addXp(amount: number, reason: string): { newLevel: number; leveledUp: boolean; stats: PlayerStats } {
-  if (amount <= 0) return { newLevel: 1, leveledUp: false, stats: getPlayerStats() };
+  if (amount <= 0 || isDemoMode()) return { newLevel: 1, leveledUp: false, stats: getPlayerStats() };
 
   const current = getPlayerStats();
   let level = current.level;
@@ -285,6 +304,7 @@ export function addXp(amount: number, reason: string): { newLevel: number; level
  * Record daily learning activity (games, quizzes, focus timer) with calendar-day streak tracking
  */
 export function recordActivityToday(reason: string, xpReward: number = 25): PlayerStats {
+  if (isDemoMode()) return getPlayerStats();
   const current = getPlayerStats();
   const today = new Date();
   const todayStr = today.toISOString().split("T")[0];
@@ -328,6 +348,7 @@ export function recordActivityToday(reason: string, xpReward: number = 25): Play
  * Update stats delta (coins, stars, etc.)
  */
 export function updatePlayerStats(delta: Partial<PlayerStats>): PlayerStats {
+  if (isDemoMode()) return getPlayerStats();
   const current = getPlayerStats();
   const updated: PlayerStats = {
     ...current,
